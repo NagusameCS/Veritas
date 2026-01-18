@@ -235,6 +235,49 @@ body {
     gap: var(--space-sm);
 }
 
+/* Theme Toggle Button */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-secondary);
+}
+
+.theme-toggle:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-medium);
+    color: var(--text-primary);
+    transform: scale(1.05);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+.theme-toggle .sun-icon {
+    display: block;
+}
+
+.theme-toggle .moon-icon {
+    display: none;
+}
+
+[data-theme="dark"] .theme-toggle .sun-icon {
+    display: none;
+}
+
+[data-theme="dark"] .theme-toggle .moon-icon {
+    display: block;
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    Main Content
    ───────────────────────────────────────────────────────────────────────────── */
@@ -319,40 +362,46 @@ body {
     display: flex;
     flex-direction: column;
     padding: var(--space-md);
+    background: var(--bg-secondary);
 }
 
-#text-input {
-    flex: 1;
+#textInput {
     width: 100%;
-    min-height: 300px;
-    padding: var(--space-md);
+    min-height: 200px;
+    max-height: none;
+    padding: var(--space-lg);
     font-family: var(--font-sans);
-    font-size: 0.9375rem;
-    line-height: 1.7;
+    font-size: 1rem;
+    line-height: 1.8;
     color: var(--text-primary);
-    background: var(--bg-primary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    resize: none;
-    transition: border-color var(--transition-fast);
-}
-
-#text-input:focus {
+    background: transparent;
+    border: none;
     outline: none;
-    border-color: var(--border-strong);
+    resize: none;
+    overflow-y: hidden;
+    transition: none;
 }
 
-#text-input::placeholder {
+#textInput:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
+}
+
+#textInput::placeholder {
     color: var(--text-muted);
+    opacity: 0.6;
 }
 
 .textarea-stats {
     display: flex;
     gap: var(--space-lg);
-    padding: var(--space-sm) 0;
+    padding: var(--space-sm) var(--space-lg);
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--text-tertiary);
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-tertiary);
 }
 
 .analyze-actions {

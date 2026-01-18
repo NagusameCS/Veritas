@@ -24,8 +24,19 @@
                 <a href="#" class="nav-link" data-view="about">About</a>
             </nav>
             <div class="header-actions">
-                <button class="btn btn-ghost" id="themeToggle" aria-label="Toggle theme">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                         <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
                     </svg>
                 </button>
@@ -44,14 +55,46 @@
                             <div class="panel-actions">
                                 <button class="btn btn-sm btn-ghost" id="sampleBtn">Sample</button>
                                 <button class="btn btn-sm btn-ghost" id="clearBtn">Clear</button>
-                                <label class="btn btn-sm btn-ghost" id="uploadBtn">Upload</label>
-                                <input type="file" id="fileInput" accept=".txt,.md" hidden>
+                                <div class="upload-dropdown">
+                                    <button class="btn btn-sm btn-ghost" id="uploadDropdownBtn">
+                                        Upload ▾
+                                    </button>
+                                    <div class="upload-menu" id="uploadMenu">
+                                        <label class="upload-option" data-type="txt">
+                                            <span class="upload-icon">📄</span> Text File (.txt, .md)
+                                            <input type="file" accept=".txt,.md" hidden>
+                                        </label>
+                                        <label class="upload-option" data-type="docx">
+                                            <span class="upload-icon">📝</span> Word Document (.docx)
+                                            <input type="file" accept=".docx" hidden>
+                                        </label>
+                                        <label class="upload-option" data-type="pdf">
+                                            <span class="upload-icon">📕</span> PDF Document (.pdf)
+                                            <input type="file" accept=".pdf" hidden>
+                                        </label>
+                                        <button class="upload-option" id="pasteClipboardBtn" data-type="clipboard">
+                                            <span class="upload-icon">📋</span> Paste from Clipboard
+                                        </button>
+                                        <button class="upload-option" id="googleDocsBtn" data-type="gdocs">
+                                            <span class="upload-icon">📊</span> Google Docs URL
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        
+                        <!-- Metadata indicators -->
+                        <div class="metadata-bar" id="metadataBar" hidden>
+                            <span class="metadata-source" id="sourceIndicator"></span>
+                            <span class="metadata-warnings" id="metadataWarnings"></span>
+                        </div>
+                        
                         <div class="textarea-wrapper">
                             <textarea 
                                 id="textInput" 
-                                placeholder="Paste or type text to analyze for AI-generated content... (minimum 10 words)"
+                                placeholder="Paste or type text to analyze for AI-generated content... (minimum 10 words)
+
+Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 spellcheck="false"
                             ></textarea>
                             <div class="textarea-stats">
@@ -124,6 +167,28 @@
 
                                 <div class="tab-panel" id="tab-graphs" role="tabpanel" hidden>
                                     <div id="probabilityGraphs" class="graphs-container"></div>
+                                    <div id="advancedGraphs" class="graphs-container advanced-graphs">
+                                        <div class="graph-section">
+                                            <h4>Sentence Length Distribution</h4>
+                                            <div id="sentenceLengthHistogram" class="graph-wrapper"></div>
+                                        </div>
+                                        <div class="graph-section">
+                                            <h4>N-gram Repetition Heatmap</h4>
+                                            <div id="ngramHeatmap" class="graph-wrapper"></div>
+                                        </div>
+                                        <div class="graph-section">
+                                            <h4>Tone Stability Timeline</h4>
+                                            <div id="toneTimeline" class="graph-wrapper"></div>
+                                        </div>
+                                        <div class="graph-section">
+                                            <h4>Word Frequency Distribution</h4>
+                                            <div id="zipfChart" class="graph-wrapper"></div>
+                                        </div>
+                                        <div class="graph-section">
+                                            <h4>Feature Contributions</h4>
+                                            <div id="featureContributionChart" class="graph-wrapper"></div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="tab-panel" id="tab-report" role="tabpanel" hidden>
@@ -134,7 +199,22 @@
                             <!-- Export Actions -->
                             <div class="export-actions">
                                 <button class="btn btn-sm btn-ghost" id="copyResultsBtn">Copy Results</button>
-                                <button class="btn btn-sm btn-ghost" id="exportBtn">Export Report</button>
+                                <div class="export-dropdown">
+                                    <button class="btn btn-sm btn-ghost" id="exportDropdownBtn">
+                                        Export Report ▾
+                                    </button>
+                                    <div class="export-menu" id="exportMenu">
+                                        <button class="export-option" data-format="docx">
+                                            <span class="export-icon">📝</span> Word Document (.docx)
+                                        </button>
+                                        <button class="export-option" data-format="markdown">
+                                            <span class="export-icon">📄</span> Markdown (.md)
+                                        </button>
+                                        <button class="export-option" data-format="json">
+                                            <span class="export-icon">📊</span> JSON Data (.json)
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -251,8 +331,16 @@
         </footer>
     </div>
 
-    <!-- Scripts -->
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://unpkg.com/docx@8.2.4/build/index.umd.js"></script>
+    
+    <!-- Core Utilities -->
     <script src="js/utils.js"></script>
+    <script src="js/variance-utils.js"></script>
+    
+    <!-- Analyzers -->
     <script src="js/analyzers/grammar.js"></script>
     <script src="js/analyzers/syntax.js"></script>
     <script src="js/analyzers/lexical.js"></script>
@@ -263,8 +351,17 @@
     <script src="js/analyzers/statistical.js"></script>
     <script src="js/analyzers/authorship.js"></script>
     <script src="js/analyzers/metapatterns.js"></script>
+    <script src="js/analyzers/metadata.js"></script>
+    <script src="js/analyzers/repetition.js"></script>
+    <script src="js/analyzers/tone.js"></script>
+    <script src="js/analyzers/partofspeech.js"></script>
+    
+    <!-- Engine & Features -->
     <script src="js/analyzer-engine.js"></script>
     <script src="js/visualizations.js"></script>
+    <script src="js/advanced-visualizations.js"></script>
+    <script src="js/file-parser.js"></script>
+    <script src="js/report-exporter.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

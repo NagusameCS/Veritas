@@ -1,10 +1,11 @@
 /**
- * VERITAS — Main Application
- * Application initialization and event handling
+ * VERITAS — Main Application v2.0
+ * Application initialization with enhanced file support and reporting
  */
 
 const App = {
     currentResult: null,
+    currentMetadata: null,
     isAnalyzing: false,
 
     /**
@@ -12,10 +13,11 @@ const App = {
      */
     init() {
         this.bindEvents();
+        this.bindNewEvents();
         this.loadHistory();
         this.initTheme();
         this.initTabs();
-        console.log('VERITAS initialized');
+        console.log('VERITAS v2.0 initialized');
     },
 
     /**
@@ -45,14 +47,9 @@ const App = {
                     this.analyze();
                 }
             });
-        }
-
-        // File upload
-        const uploadBtn = document.getElementById('uploadBtn');
-        const fileInput = document.getElementById('fileInput');
-        if (uploadBtn && fileInput) {
-            uploadBtn.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+            
+            // Handle paste events for clipboard detection
+            textInput.addEventListener('paste', (e) => this.handlePaste(e));
         }
 
         // Sample text button
@@ -82,17 +79,68 @@ const App = {
             clearHistoryBtn.addEventListener('click', () => this.clearHistory());
         }
 
-        // Export button
-        const exportBtn = document.getElementById('exportBtn');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => this.exportReport());
-        }
-
         // Copy results
         const copyBtn = document.getElementById('copyResultsBtn');
         if (copyBtn) {
             copyBtn.addEventListener('click', () => this.copyResults());
         }
+    },
+
+    /**
+     * Bind new events for enhanced features
+     */
+    bindNewEvents() {
+        // Upload dropdown
+        const uploadDropdownBtn = document.getElementById('uploadDropdownBtn');
+        const uploadMenu = document.getElementById('uploadMenu');
+        if (uploadDropdownBtn && uploadMenu) {
+            uploadDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                uploadMenu.classList.toggle('active');
+            });
+            document.addEventListener('click', () => {
+                uploadMenu.classList.remove('active');
+            });
+        }
+
+        // File upload options
+        document.querySelectorAll('.upload-option[data-type]').forEach(option => {
+            const input = option.querySelector('input[type="file"]');
+            if (input) {
+                option.addEventListener('click', () => {});  // Label handles click
+                input.addEventListener('change', (e) => this.handleFileUpload(e, option.dataset.type));
+            }
+        });
+
+        // Paste from clipboard button
+        const pasteBtn = document.getElementById('pasteClipboardBtn');
+        if (pasteBtn) {
+            pasteBtn.addEventListener('click', () => this.pasteFromClipboard());
+        }
+
+        // Google Docs button
+        const gdocsBtn = document.getElementById('googleDocsBtn');
+        if (gdocsBtn) {
+            gdocsBtn.addEventListener('click', () => this.promptGoogleDocsUrl());
+        }
+
+        // Export dropdown
+        const exportDropdownBtn = document.getElementById('exportDropdownBtn');
+        const exportMenu = document.getElementById('exportMenu');
+        if (exportDropdownBtn && exportMenu) {
+            exportDropdownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                exportMenu.classList.toggle('active');
+            });
+            document.addEventListener('click', () => {
+                exportMenu.classList.remove('active');
+            });
+        }
+
+        // Export format options
+        document.querySelectorAll('.export-option[data-format]').forEach(option => {
+            option.addEventListener('click', () => this.exportReport(option.dataset.format));
+        });
     },
 
     /**
@@ -192,6 +240,25 @@ const App = {
             const hasText = textInput.value.trim().length > 0;
             analyzeBtn.disabled = !hasText || this.isAnalyzing;
         }
+        
+        // Auto-expand textarea
+        this.autoExpandTextarea();
+    },
+
+    /**
+     * Auto-expand textarea to fit content
+     */
+    autoExpandTextarea() {
+        const textInput = document.getElementById('textInput');
+        if (!textInput) return;
+        
+        // Reset height to auto to get the correct scrollHeight
+        textInput.style.height = 'auto';
+        
+        // Set to scrollHeight with minimum
+        const minHeight = 200;
+        const newHeight = Math.max(minHeight, textInput.scrollHeight);
+        textInput.style.height = newHeight + 'px';
     },
 
     /**
@@ -201,8 +268,17 @@ const App = {
         const textInput = document.getElementById('textInput');
         if (textInput) {
             textInput.value = '';
+            textInput.style.height = '200px'; // Reset to minimum
             textInput.focus();
         }
+        
+        // Reset metadata
+        this.currentMetadata = null;
+        const metadataBar = document.getElementById('metadataBar');
+        if (metadataBar) {
+            metadataBar.hidden = true;
+        }
+        
         this.updateAnalyzeButton();
         this.hideResults();
     },
@@ -246,12 +322,15 @@ const App = {
             // Small delay for UI feedback
             await new Promise(resolve => setTimeout(resolve, 100));
             
-            // Run analysis
-            const result = AnalyzerEngine.analyze(text);
+            // Run analysis with metadata if available
+            const result = AnalyzerEngine.analyze(text, this.currentMetadata);
             this.currentResult = result;
             
             // Display results
             this.displayResults(result);
+            
+            // Render advanced visualizations
+            this.renderAdvancedVisualizations(result);
             
             // Save to history
             this.saveToHistory(text, result);
@@ -271,6 +350,52 @@ const App = {
             this.isAnalyzing = false;
             analyzeBtn.classList.remove('loading');
             this.updateAnalyzeButton();
+        }
+    },
+
+    /**
+     * Render advanced visualizations in graphs tab
+     */
+    renderAdvancedVisualizations(result) {
+        // Check if AdvancedVisualizations is available
+        if (typeof AdvancedVisualizations === 'undefined') return;
+
+        // Sentence length histogram
+        const histogramContainer = document.getElementById('sentenceLengthHistogram');
+        if (histogramContainer && result.sentences) {
+            AdvancedVisualizations.createSentenceLengthHistogram(histogramContainer, result.sentences);
+        }
+
+        // N-gram heatmap - find repetition analyzer result
+        const repetitionResult = result.categoryResults.find(r => 
+            r.name?.toLowerCase().includes('repetition') || r.category === 12
+        );
+        const heatmapContainer = document.getElementById('ngramHeatmap');
+        if (heatmapContainer && repetitionResult?.details) {
+            AdvancedVisualizations.createNgramHeatmap(heatmapContainer, repetitionResult.details);
+        }
+
+        // Tone timeline - find tone analyzer result
+        const toneResult = result.categoryResults.find(r => 
+            r.name?.toLowerCase().includes('tone') || r.category === 13
+        );
+        const timelineContainer = document.getElementById('toneTimeline');
+        if (timelineContainer && toneResult?.details) {
+            AdvancedVisualizations.createToneTimeline(timelineContainer, toneResult.details);
+        }
+
+        // Zipf chart
+        const textInput = document.getElementById('textInput');
+        const zipfContainer = document.getElementById('zipfChart');
+        if (zipfContainer && textInput) {
+            const tokens = Utils.tokenize(textInput.value.toLowerCase());
+            AdvancedVisualizations.createZipfChart(zipfContainer, tokens);
+        }
+
+        // Feature contribution chart
+        const contributionContainer = document.getElementById('featureContributionChart');
+        if (contributionContainer && result.categoryResults) {
+            AdvancedVisualizations.createFeatureContributionChart(contributionContainer, result.categoryResults);
         }
     },
 
@@ -323,11 +448,23 @@ const App = {
             verdictDescEl.textContent = result.verdict.description;
         }
 
-        // Confidence
+        // Confidence with interval
         const confidenceEl = document.querySelector('.confidence-value');
         if (confidenceEl) {
-            confidenceEl.textContent = Math.round(result.confidence * 100) + '%';
+            if (result.confidenceInterval) {
+                const ci = result.confidenceInterval;
+                confidenceEl.innerHTML = `${Math.round(result.confidence * 100)}% 
+                    <span class="confidence-range">(${Math.round(ci.lower * 100)}%—${Math.round(ci.upper * 100)}%)</span>`;
+            } else {
+                confidenceEl.textContent = Math.round(result.confidence * 100) + '%';
+            }
         }
+
+        // Render confidence interval bar
+        this.renderConfidenceInterval(result);
+
+        // Render false positive warnings
+        this.renderFalsePositiveWarnings(result);
 
         // Stats
         const statsContainer = document.querySelector('.text-stats');
@@ -407,41 +544,291 @@ const App = {
     },
 
     /**
-     * Handle file upload
+     * Render confidence interval visualization
      */
-    handleFileUpload(event) {
+    renderConfidenceInterval(result) {
+        const confidenceContainer = document.querySelector('.confidence');
+        if (!confidenceContainer || !result.confidenceInterval) return;
+
+        // Remove existing interval display
+        const existing = confidenceContainer.querySelector('.confidence-interval');
+        if (existing) existing.remove();
+
+        const ci = result.confidenceInterval;
+        const intervalHtml = `
+            <div class="confidence-interval">
+                <span class="ci-label">${Math.round(ci.lower * 100)}%</span>
+                <div class="confidence-interval-bar">
+                    <div class="confidence-interval-range" 
+                         style="left: ${ci.lower * 100}%; width: ${(ci.upper - ci.lower) * 100}%"></div>
+                    <div class="confidence-interval-center" 
+                         style="left: ${result.aiProbability * 100}%"></div>
+                </div>
+                <span class="ci-label">${Math.round(ci.upper * 100)}%</span>
+            </div>
+        `;
+        confidenceContainer.insertAdjacentHTML('beforeend', intervalHtml);
+    },
+
+    /**
+     * Render false positive warnings
+     */
+    renderFalsePositiveWarnings(result) {
+        const scoreCard = document.querySelector('.score-card');
+        if (!scoreCard || !result.falsePositiveRisk?.hasRisks) return;
+
+        // Remove existing warnings
+        const existing = scoreCard.querySelector('.false-positive-warning');
+        if (existing) existing.remove();
+
+        const risks = result.falsePositiveRisk.risks;
+        const warningHtml = `
+            <div class="false-positive-warning">
+                <div class="false-positive-warning-title">
+                    ⚠️ Detection Caveats
+                </div>
+                <ul class="false-positive-warning-list">
+                    ${risks.map(r => `<li>${r.message}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+        scoreCard.insertAdjacentHTML('beforeend', warningHtml);
+    },
+
+    /**
+     * Handle file upload with format detection
+     */
+    async handleFileUpload(event, fileType) {
         const file = event.target.files[0];
         if (!file) return;
 
-        // Check file type
-        const validTypes = ['text/plain', 'text/markdown'];
-        if (!validTypes.includes(file.type) && !file.name.endsWith('.txt') && !file.name.endsWith('.md')) {
-            this.showToast('Please upload a .txt or .md file', 'error');
+        // Check file size (max 5MB for PDFs/DOCX)
+        const maxSize = fileType === 'txt' ? 100000 : 5000000;
+        if (file.size > maxSize) {
+            this.showToast(`File too large. Maximum size is ${maxSize / 1000000}MB`, 'error');
             return;
         }
 
-        // Check file size (max 100KB)
-        if (file.size > 100000) {
-            this.showToast('File too large. Maximum size is 100KB', 'error');
-            return;
-        }
+        this.showToast('Processing file...', 'info');
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const textInput = document.getElementById('textInput');
-            if (textInput) {
-                textInput.value = e.target.result;
-                this.updateAnalyzeButton();
+        try {
+            // Check if FileParser is available
+            if (typeof FileParser !== 'undefined') {
+                const result = await FileParser.parseFile(file);
+                
+                if (result.error) {
+                    this.showToast(result.error, 'error');
+                    return;
+                }
+
+                // Set text
+                const textInput = document.getElementById('textInput');
+                if (textInput) {
+                    textInput.value = result.text;
+                    this.updateAnalyzeButton();
+                }
+
+                // Store metadata
+                this.currentMetadata = result.metadata || {};
+                this.currentMetadata.source = fileType;
+                this.currentMetadata.filename = file.name;
+
+                // Show metadata bar
+                this.showMetadataBar(result);
+
                 this.showToast(`Loaded ${file.name}`, 'success');
+            } else {
+                // Fallback to basic text reading
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const textInput = document.getElementById('textInput');
+                    if (textInput) {
+                        textInput.value = e.target.result;
+                        this.updateAnalyzeButton();
+                        this.showToast(`Loaded ${file.name}`, 'success');
+                    }
+                };
+                reader.onerror = () => {
+                    this.showToast('Error reading file', 'error');
+                };
+                reader.readAsText(file);
             }
-        };
-        reader.onerror = () => {
-            this.showToast('Error reading file', 'error');
-        };
-        reader.readAsText(file);
+        } catch (error) {
+            console.error('File parsing error:', error);
+            this.showToast('Error processing file: ' + error.message, 'error');
+        }
 
         // Reset input
         event.target.value = '';
+    },
+
+    /**
+     * Handle paste events for clipboard detection
+     */
+    async handlePaste(event) {
+        // Check if FileParser is available for source detection
+        if (typeof FileParser !== 'undefined') {
+            const clipboardData = event.clipboardData || window.clipboardData;
+            const html = clipboardData.getData('text/html');
+            
+            if (html) {
+                const detection = FileParser.detectClipboardSource(html);
+                if (detection.source !== 'unknown') {
+                    // Delay to allow paste to complete
+                    setTimeout(() => {
+                        this.currentMetadata = {
+                            source: 'clipboard',
+                            detectedSource: detection.source,
+                            confidence: detection.confidence
+                        };
+                        
+                        // Check for hidden formatting
+                        const textInput = document.getElementById('textInput');
+                        if (textInput) {
+                            const hiddenFormatting = FileParser.detectHiddenFormatting(textInput.value);
+                            if (hiddenFormatting.hasIssues) {
+                                this.currentMetadata.hiddenFormatting = hiddenFormatting;
+                            }
+                            this.showMetadataBar({
+                                metadata: this.currentMetadata,
+                                hiddenFormatting
+                            });
+                        }
+                    }, 100);
+                }
+            }
+        }
+    },
+
+    /**
+     * Paste from clipboard button handler
+     */
+    async pasteFromClipboard() {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+                const textInput = document.getElementById('textInput');
+                if (textInput) {
+                    textInput.value = text;
+                    this.updateAnalyzeButton();
+                    this.showToast('Text pasted from clipboard', 'success');
+                }
+            }
+        } catch (error) {
+            this.showToast('Could not access clipboard. Please paste manually (Ctrl+V)', 'warning');
+        }
+    },
+
+    /**
+     * Prompt for Google Docs URL
+     */
+    async promptGoogleDocsUrl() {
+        const url = prompt('Enter Google Docs URL:\n\n(Note: Document must be publicly accessible or you must be signed in)');
+        
+        if (!url) return;
+
+        if (!url.includes('docs.google.com')) {
+            this.showToast('Please enter a valid Google Docs URL', 'error');
+            return;
+        }
+
+        this.showToast('Fetching document...', 'info');
+
+        try {
+            if (typeof FileParser !== 'undefined') {
+                const result = await FileParser.parseGoogleDocsUrl(url);
+                
+                if (result.error) {
+                    this.showToast(result.error, 'error');
+                    return;
+                }
+
+                const textInput = document.getElementById('textInput');
+                if (textInput) {
+                    textInput.value = result.text;
+                    this.updateAnalyzeButton();
+                }
+
+                this.currentMetadata = {
+                    source: 'google_docs',
+                    url: url
+                };
+
+                this.showToast('Google Doc loaded', 'success');
+            } else {
+                this.showToast('Google Docs parsing not available', 'error');
+            }
+        } catch (error) {
+            console.error('Google Docs error:', error);
+            this.showToast('Could not load Google Doc. Make sure it\'s publicly accessible.', 'error');
+        }
+    },
+
+    /**
+     * Show metadata bar with source info and warnings
+     */
+    showMetadataBar(result) {
+        const metadataBar = document.getElementById('metadataBar');
+        const sourceIndicator = document.getElementById('sourceIndicator');
+        const warningsContainer = document.getElementById('metadataWarnings');
+        
+        if (!metadataBar) return;
+
+        metadataBar.hidden = false;
+
+        // Source indicator
+        if (sourceIndicator) {
+            const source = result.metadata?.source || result.metadata?.detectedSource || 'text';
+            sourceIndicator.textContent = this.getSourceLabel(source);
+            sourceIndicator.className = `metadata-source ${source}`;
+        }
+
+        // Warnings
+        if (warningsContainer) {
+            warningsContainer.innerHTML = '';
+            
+            const warnings = [];
+            
+            // Check hidden formatting
+            if (result.hiddenFormatting?.hasIssues) {
+                const hf = result.hiddenFormatting;
+                if (hf.hasInvisibleChars) warnings.push('Invisible characters detected');
+                if (hf.hasMixedSpacing) warnings.push('Mixed spacing/tabs');
+                if (hf.hasUnusualUnicode) warnings.push('Unusual Unicode');
+            }
+
+            // Check metadata issues
+            if (result.metadata?.detectedSource === 'chatgpt') {
+                warnings.push('ChatGPT formatting detected');
+            }
+            if (result.metadata?.detectedSource === 'google_docs') {
+                warnings.push('Google Docs formatting');
+            }
+
+            warnings.forEach(warning => {
+                const badge = document.createElement('span');
+                badge.className = 'metadata-warning';
+                badge.textContent = '⚠ ' + warning;
+                warningsContainer.appendChild(badge);
+            });
+        }
+    },
+
+    /**
+     * Get human-readable source label
+     */
+    getSourceLabel(source) {
+        const labels = {
+            'txt': 'Plain Text',
+            'docx': 'Word Document',
+            'pdf': 'PDF Document',
+            'clipboard': 'Clipboard',
+            'google_docs': 'Google Docs',
+            'chatgpt': 'ChatGPT',
+            'ms_word': 'MS Word',
+            'notion': 'Notion'
+        };
+        return labels[source] || 'Text';
     },
 
     /**
@@ -610,19 +997,77 @@ These findings have important implications for urban planning and public health 
     },
 
     /**
-     * Export report
+     * Export report in specified format
      */
-    exportReport() {
+    async exportReport(format = 'markdown') {
         if (!this.currentResult) {
             this.showToast('No analysis to export', 'warning');
             return;
         }
 
-        const report = AnalyzerEngine.generateReport(this.currentResult);
         const textInput = document.getElementById('textInput');
         const originalText = textInput?.value || '';
 
-        // Create markdown report
+        this.showToast('Generating report...', 'info');
+
+        try {
+            // Check if ReportExporter is available
+            if (typeof ReportExporter !== 'undefined') {
+                switch (format) {
+                    case 'docx':
+                        await ReportExporter.exportDocx(this.currentResult, originalText);
+                        this.showToast('DOCX report downloaded', 'success');
+                        break;
+                    
+                    case 'markdown':
+                        const markdown = ReportExporter.exportMarkdown(this.currentResult, originalText);
+                        this.downloadFile(markdown, `veritas-report-${Date.now()}.md`, 'text/markdown');
+                        this.showToast('Markdown report downloaded', 'success');
+                        break;
+                    
+                    case 'json':
+                        const json = JSON.stringify({
+                            generated: new Date().toISOString(),
+                            result: this.currentResult,
+                            originalText: originalText
+                        }, null, 2);
+                        this.downloadFile(json, `veritas-data-${Date.now()}.json`, 'application/json');
+                        this.showToast('JSON data downloaded', 'success');
+                        break;
+                    
+                    default:
+                        this.showToast('Unknown export format', 'error');
+                }
+            } else {
+                // Fallback to basic markdown export
+                const report = AnalyzerEngine.generateReport(this.currentResult);
+                const markdown = this.generateBasicMarkdown(report, originalText);
+                this.downloadFile(markdown, `veritas-report-${Date.now()}.md`, 'text/markdown');
+                this.showToast('Report exported', 'success');
+            }
+        } catch (error) {
+            console.error('Export error:', error);
+            this.showToast('Error exporting report: ' + error.message, 'error');
+        }
+    },
+
+    /**
+     * Download file helper
+     */
+    downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    /**
+     * Generate basic markdown report (fallback)
+     */
+    generateBasicMarkdown(report, originalText) {
         let markdown = `# VERITAS Analysis Report\n\n`;
         markdown += `**Generated:** ${new Date().toLocaleString()}\n\n`;
         markdown += `## Overall Result\n\n`;
@@ -651,16 +1096,7 @@ These findings have important implications for urban planning and public health 
         markdown += `## Analyzed Text\n\n`;
         markdown += `\`\`\`\n${originalText}\n\`\`\`\n`;
 
-        // Download file
-        const blob = new Blob([markdown], { type: 'text/markdown' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `veritas-report-${Date.now()}.md`;
-        a.click();
-        URL.revokeObjectURL(url);
-
-        this.showToast('Report exported', 'success');
+        return markdown;
     },
 
     /**

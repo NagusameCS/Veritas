@@ -1,27 +1,62 @@
 /**
- * VERITAS — Analyzer Engine
- * Main analysis orchestrator combining all feature analyzers
+ * VERITAS — Analyzer Engine v2.0
+ * Variance-Based Detection: Measures deviations from expected human variance
+ * 
+ * Philosophy: "Never grade features as 'AI-like' or 'human-like' in isolation.
+ * Grade them as deviations from expected human variance."
  */
 
 const AnalyzerEngine = {
-    // All analyzers in order
-    analyzers: [
-        GrammarAnalyzer,      // Category 1
-        SyntaxAnalyzer,       // Category 2
-        LexicalAnalyzer,      // Category 3
-        DialectAnalyzer,      // Category 4
-        ArchaicAnalyzer,      // Category 5
-        DiscourseAnalyzer,    // Category 6
-        SemanticAnalyzer,     // Category 7
-        StatisticalAnalyzer,  // Category 8
-        AuthorshipAnalyzer,   // Category 9
-        MetaPatternsAnalyzer  // Category 10
-    ],
+    // Category weights based on detection importance
+    categoryWeights: {
+        syntaxVariance: 0.20,      // Syntax variance
+        lexicalDiversity: 0.15,    // Lexical diversity  
+        repetitionUniformity: 0.15, // Repetition uniformity
+        toneStability: 0.15,       // Tone stability
+        grammarEntropy: 0.10,      // Grammar entropy
+        perplexity: 0.10,          // Statistical perplexity
+        authorshipDrift: 0.15      // Authorship drift
+    },
+
+    // Getter for analyzers - allows graceful handling of missing modules
+    get analyzers() {
+        const all = [];
+        
+        // Core analyzers (Categories 1-10)
+        if (typeof GrammarAnalyzer !== 'undefined') all.push(GrammarAnalyzer);
+        if (typeof SyntaxAnalyzer !== 'undefined') all.push(SyntaxAnalyzer);
+        if (typeof LexicalAnalyzer !== 'undefined') all.push(LexicalAnalyzer);
+        if (typeof DialectAnalyzer !== 'undefined') all.push(DialectAnalyzer);
+        if (typeof ArchaicAnalyzer !== 'undefined') all.push(ArchaicAnalyzer);
+        if (typeof DiscourseAnalyzer !== 'undefined') all.push(DiscourseAnalyzer);
+        if (typeof SemanticAnalyzer !== 'undefined') all.push(SemanticAnalyzer);
+        if (typeof StatisticalAnalyzer !== 'undefined') all.push(StatisticalAnalyzer);
+        if (typeof AuthorshipAnalyzer !== 'undefined') all.push(AuthorshipAnalyzer);
+        if (typeof MetaPatternsAnalyzer !== 'undefined') all.push(MetaPatternsAnalyzer);
+        
+        // New variance-based analyzers (Categories 11-14)
+        if (typeof MetadataAnalyzer !== 'undefined') all.push(MetadataAnalyzer);
+        if (typeof RepetitionAnalyzer !== 'undefined') all.push(RepetitionAnalyzer);
+        if (typeof ToneAnalyzer !== 'undefined') all.push(ToneAnalyzer);
+        if (typeof PartOfSpeechAnalyzer !== 'undefined') all.push(PartOfSpeechAnalyzer);
+        
+        return all;
+    },
+
+    // Fallback for missing analyzers (graceful degradation)
+    safeGetAnalyzer(analyzerRef) {
+        try {
+            return typeof analyzerRef !== 'undefined' ? analyzerRef : null;
+        } catch {
+            return null;
+        }
+    },
 
     /**
      * Run full analysis on text
+     * Now uses variance-based detection philosophy
      */
-    analyze(text) {
+    analyze(text, metadata = null) {
         const startTime = performance.now();
         
         if (!text || text.trim().length === 0) {
@@ -42,17 +77,25 @@ const AnalyzerEngine = {
             avgWordsPerSentence: sentences.length > 0 ? (tokens.length / sentences.length).toFixed(1) : 0
         };
 
+        // Filter to only available analyzers
+        const availableAnalyzers = this.analyzers.filter(a => this.safeGetAnalyzer(a));
+
         // Run all analyzers
         const categoryResults = [];
-        for (const analyzer of this.analyzers) {
+        for (const analyzer of availableAnalyzers) {
+            if (!analyzer) continue;
             try {
-                const result = analyzer.analyze(text);
+                const result = analyzer.analyze(text, metadata);
+                // Add variance scores if analyzer supports it
+                if (result.uniformityScores) {
+                    result.varianceAnalysis = this.computeVarianceMetrics(result.uniformityScores);
+                }
                 categoryResults.push(result);
             } catch (error) {
-                console.error(`Error in ${analyzer.name}:`, error);
+                console.error(`Error in ${analyzer?.name || 'unknown'}:`, error);
                 categoryResults.push({
-                    name: analyzer.name,
-                    category: analyzer.category,
+                    name: analyzer?.name || 'Unknown',
+                    category: analyzer?.category || 0,
                     aiProbability: 0.5,
                     confidence: 0,
                     error: error.message
@@ -60,8 +103,8 @@ const AnalyzerEngine = {
             }
         }
 
-        // Calculate overall AI probability
-        const overallResult = this.calculateOverallProbability(categoryResults);
+        // Calculate overall AI probability using variance-based scoring
+        const overallResult = this.calculateVarianceBasedProbability(categoryResults);
         
         // Generate sentence-level scores for highlighting
         const sentenceScores = this.scoreSentences(text, sentences, categoryResults);
@@ -74,6 +117,16 @@ const AnalyzerEngine = {
                 return (order[a.indicator] || 3) - (order[b.indicator] || 3);
             });
 
+        // Compute confidence interval
+        const confidenceInterval = this.computeConfidenceInterval(
+            overallResult.aiProbability,
+            categoryResults.length,
+            overallResult.confidence
+        );
+
+        // Assess false positive risk
+        const falsePositiveRisk = this.assessFalsePositiveRisk(categoryResults, text);
+
         const endTime = performance.now();
 
         return {
@@ -82,7 +135,13 @@ const AnalyzerEngine = {
             humanProbability: 1 - overallResult.aiProbability,
             mixedProbability: overallResult.mixedProbability,
             confidence: overallResult.confidence,
-            verdict: this.getVerdict(overallResult.aiProbability),
+            confidenceInterval,
+            falsePositiveRisk,
+            verdict: this.getVerdict(overallResult.aiProbability, overallResult.confidence),
+            
+            // Variance-specific data
+            varianceProfile: overallResult.varianceProfile,
+            featureContributions: overallResult.featureContributions,
             
             // Per-category results
             categoryResults,
@@ -96,48 +155,233 @@ const AnalyzerEngine = {
             
             // Statistics
             stats,
+            metadata: metadata || null,
             analysisTime: (endTime - startTime).toFixed(0) + 'ms'
         };
     },
 
     /**
-     * Calculate overall AI probability from category results
+     * Compute variance metrics from uniformity scores
      */
-    calculateOverallProbability(categoryResults) {
-        // Filter out categories with low confidence or errors
+    computeVarianceMetrics(uniformityScores) {
+        const values = Object.values(uniformityScores).filter(v => typeof v === 'number');
+        if (values.length === 0) return null;
+
+        return {
+            meanUniformity: Utils.mean(values),
+            uniformityVariance: Utils.variance(values),
+            maxUniformity: Math.max(...values),
+            minUniformity: Math.min(...values),
+            uniformityRange: Math.max(...values) - Math.min(...values)
+        };
+    },
+
+    /**
+     * Calculate overall AI probability using variance-based methodology
+     * Key principle: High uniformity = AI, High variance = Human
+     */
+    calculateVarianceBasedProbability(categoryResults) {
         const validResults = categoryResults.filter(r => 
             r.confidence > 0.2 && !r.error && r.aiProbability !== undefined
         );
 
         if (validResults.length === 0) {
-            return { aiProbability: 0.5, confidence: 0, mixedProbability: 0 };
+            return { 
+                aiProbability: 0.5, 
+                confidence: 0, 
+                mixedProbability: 0,
+                varianceProfile: null,
+                featureContributions: []
+            };
         }
 
-        // Weight by both category weight and confidence
+        // Calculate feature contributions using category weights
+        const featureContributions = [];
         let weightedSum = 0;
         let totalWeight = 0;
 
         for (const result of validResults) {
-            const analyzer = this.analyzers.find(a => a.category === result.category);
-            const weight = (analyzer?.weight || 1) * result.confidence;
-            weightedSum += result.aiProbability * weight;
-            totalWeight += weight;
+            // Map categories to weight keys
+            const weightKey = this.getCategoryWeightKey(result.category, result.name);
+            const baseWeight = this.categoryWeights[weightKey] || 0.1;
+            
+            // Apply confidence as a weight multiplier
+            const effectiveWeight = baseWeight * result.confidence;
+            
+            // Calculate contribution
+            const contribution = result.aiProbability * effectiveWeight;
+            
+            featureContributions.push({
+                category: result.category,
+                name: result.name,
+                aiProbability: result.aiProbability,
+                weight: effectiveWeight,
+                contribution,
+                uniformityScores: result.uniformityScores || null
+            });
+
+            weightedSum += contribution;
+            totalWeight += effectiveWeight;
         }
 
         const aiProbability = totalWeight > 0 ? weightedSum / totalWeight : 0.5;
         
-        // Calculate overall confidence
-        const avgConfidence = Utils.mean(validResults.map(r => r.confidence));
-        
-        // Calculate mixed probability (uncertainty)
+        // Calculate confidence based on result agreement
         const probabilities = validResults.map(r => r.aiProbability);
-        const variance = Utils.variance(probabilities);
-        const mixedProbability = Math.min(0.3, Math.sqrt(variance));
+        const agreement = 1 - Utils.standardDeviation(probabilities);
+        const avgConfidence = Utils.mean(validResults.map(r => r.confidence));
+        const overallConfidence = (agreement * 0.4 + avgConfidence * 0.6);
+        
+        // Mixed probability increases with disagreement
+        const mixedProbability = Math.min(0.3, Utils.standardDeviation(probabilities));
+
+        // Build variance profile
+        const varianceProfile = this.buildVarianceProfile(validResults);
 
         return {
             aiProbability: Math.max(0, Math.min(1, aiProbability)),
-            confidence: avgConfidence,
-            mixedProbability
+            confidence: overallConfidence,
+            mixedProbability,
+            varianceProfile,
+            featureContributions: featureContributions.sort((a, b) => b.contribution - a.contribution)
+        };
+    },
+
+    /**
+     * Map category number/name to weight key
+     */
+    getCategoryWeightKey(category, name) {
+        const nameLower = (name || '').toLowerCase();
+        
+        if (nameLower.includes('syntax') || category === 2) return 'syntaxVariance';
+        if (nameLower.includes('lexical') || category === 3) return 'lexicalDiversity';
+        if (nameLower.includes('repetition') || category === 12) return 'repetitionUniformity';
+        if (nameLower.includes('tone') || category === 13) return 'toneStability';
+        if (nameLower.includes('grammar') || category === 1) return 'grammarEntropy';
+        if (nameLower.includes('statistical') || nameLower.includes('perplexity') || category === 8) return 'perplexity';
+        if (nameLower.includes('authorship') || category === 9) return 'authorshipDrift';
+        
+        return 'grammarEntropy'; // default
+    },
+
+    /**
+     * Build variance profile summarizing key metrics
+     */
+    buildVarianceProfile(results) {
+        const profile = {
+            sentenceLengthVariance: null,
+            vocabularyDiversity: null,
+            toneStability: null,
+            repetitionUniformity: null,
+            overallUniformity: null
+        };
+
+        for (const result of results) {
+            if (result.uniformityScores) {
+                if (result.uniformityScores.sentenceLength !== undefined) {
+                    profile.sentenceLengthVariance = result.uniformityScores.sentenceLength;
+                }
+                if (result.uniformityScores.vocabulary !== undefined) {
+                    profile.vocabularyDiversity = 1 - result.uniformityScores.vocabulary;
+                }
+                if (result.uniformityScores.overall !== undefined) {
+                    profile.overallUniformity = result.uniformityScores.overall;
+                }
+            }
+            
+            if (result.stability?.overall !== undefined) {
+                profile.toneStability = result.stability.overall;
+            }
+        }
+
+        // Calculate overall uniformity if not set
+        const uniformityValues = Object.values(profile).filter(v => v !== null);
+        if (profile.overallUniformity === null && uniformityValues.length > 0) {
+            profile.overallUniformity = Utils.mean(uniformityValues);
+        }
+
+        return profile;
+    },
+
+    /**
+     * Compute confidence interval for the AI probability estimate
+     */
+    computeConfidenceInterval(probability, sampleSize, confidence) {
+        // Use Wilson score interval approximation
+        const z = 1.96; // 95% confidence
+        const n = Math.max(sampleSize, 1);
+        const p = probability;
+        
+        const denominator = 1 + z * z / n;
+        const center = (p + z * z / (2 * n)) / denominator;
+        const margin = z * Math.sqrt((p * (1 - p) + z * z / (4 * n)) / n) / denominator;
+        
+        // Adjust based on confidence level
+        const adjustedMargin = margin * (2 - confidence);
+        
+        return {
+            lower: Math.max(0, center - adjustedMargin),
+            upper: Math.min(1, center + adjustedMargin),
+            center,
+            margin: adjustedMargin
+        };
+    },
+
+    /**
+     * Assess false positive risk based on edge cases
+     */
+    assessFalsePositiveRisk(categoryResults, text) {
+        const risks = [];
+        
+        // Check for academic/formal writing (often mistaken for AI)
+        const formalIndicators = (text.match(/\b(furthermore|moreover|consequently|thus|hence|therefore)\b/gi) || []).length;
+        if (formalIndicators > 3) {
+            risks.push({
+                type: 'formal_writing',
+                message: 'Formal/academic writing style may increase false positive rate',
+                severity: 'medium'
+            });
+        }
+
+        // Check for short text (less reliable)
+        const wordCount = Utils.tokenize(text).length;
+        if (wordCount < 100) {
+            risks.push({
+                type: 'short_text',
+                message: 'Short texts have lower detection accuracy',
+                severity: 'high'
+            });
+        }
+
+        // Check for technical/specialized content
+        const technicalTerms = (text.match(/\b[A-Z]{2,}[a-z]*\b/g) || []).length;
+        if (technicalTerms > 5) {
+            risks.push({
+                type: 'technical_content',
+                message: 'Technical jargon may affect detection accuracy',
+                severity: 'low'
+            });
+        }
+
+        // Check for disagreement between analyzers
+        const validResults = categoryResults.filter(r => r.confidence > 0.3);
+        if (validResults.length > 3) {
+            const probs = validResults.map(r => r.aiProbability);
+            const spread = Math.max(...probs) - Math.min(...probs);
+            if (spread > 0.4) {
+                risks.push({
+                    type: 'analyzer_disagreement',
+                    message: 'High disagreement between detection methods',
+                    severity: 'medium'
+                });
+            }
+        }
+
+        return {
+            hasRisks: risks.length > 0,
+            risks,
+            overallRisk: risks.length === 0 ? 'low' : 
+                         risks.some(r => r.severity === 'high') ? 'high' : 'medium'
         };
     },
 
@@ -231,38 +475,78 @@ const AnalyzerEngine = {
     },
 
     /**
-     * Get verdict based on AI probability
+     * Get verdict based on AI probability and confidence
+     * Now includes probability bands and confidence qualifiers
      */
-    getVerdict(aiProbability) {
-        if (aiProbability < 0.25) {
+    getVerdict(aiProbability, confidence = 0.5) {
+        // Confidence qualifier
+        const confidenceLevel = confidence < 0.4 ? 'Low confidence: ' : 
+                               confidence < 0.7 ? '' : 
+                               'High confidence: ';
+
+        // Probability bands with more nuanced thresholds
+        if (aiProbability < 0.15) {
             return {
-                label: 'Likely Human',
-                description: 'This text shows strong human-writing characteristics',
-                level: 'human'
+                label: confidenceLevel + 'Human Written',
+                description: 'This text shows strong, consistent human-writing characteristics',
+                level: 'human',
+                band: 'definitely-human',
+                probability: aiProbability,
+                confidence
             };
-        } else if (aiProbability < 0.4) {
+        } else if (aiProbability < 0.30) {
             return {
-                label: 'Possibly Human',
-                description: 'This text appears mostly human with some uncertain elements',
-                level: 'probably-human'
+                label: confidenceLevel + 'Likely Human',
+                description: 'This text exhibits predominantly human patterns with minimal AI signals',
+                level: 'probably-human',
+                band: 'likely-human',
+                probability: aiProbability,
+                confidence
             };
-        } else if (aiProbability < 0.6) {
+        } else if (aiProbability < 0.45) {
             return {
-                label: 'Uncertain',
-                description: 'This text shows mixed signals - could be human or AI',
-                level: 'mixed'
+                label: confidenceLevel + 'Possibly Human',
+                description: 'This text appears mostly human but has some uncertain elements',
+                level: 'leaning-human',
+                band: 'possibly-human',
+                probability: aiProbability,
+                confidence
             };
-        } else if (aiProbability < 0.75) {
+        } else if (aiProbability < 0.55) {
             return {
-                label: 'Possibly AI',
-                description: 'This text shows several AI-typical patterns',
-                level: 'probably-ai'
+                label: 'Inconclusive',
+                description: 'This text shows mixed signals — could be human, AI, or a mixture',
+                level: 'mixed',
+                band: 'inconclusive',
+                probability: aiProbability,
+                confidence
+            };
+        } else if (aiProbability < 0.70) {
+            return {
+                label: confidenceLevel + 'Possibly AI',
+                description: 'This text has notable AI-typical patterns but some human elements',
+                level: 'leaning-ai',
+                band: 'possibly-ai',
+                probability: aiProbability,
+                confidence
+            };
+        } else if (aiProbability < 0.85) {
+            return {
+                label: confidenceLevel + 'Likely AI',
+                description: 'This text exhibits strong AI-generated characteristics',
+                level: 'probably-ai',
+                band: 'likely-ai',
+                probability: aiProbability,
+                confidence
             };
         } else {
             return {
-                label: 'Likely AI',
-                description: 'This text exhibits strong AI-generated characteristics',
-                level: 'ai'
+                label: confidenceLevel + 'AI Generated',
+                description: 'This text shows overwhelming AI-generated patterns',
+                level: 'ai',
+                band: 'definitely-ai',
+                probability: aiProbability,
+                confidence
             };
         }
     },
