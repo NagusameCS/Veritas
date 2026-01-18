@@ -445,7 +445,8 @@ const ReportExporter = {
                     children: [new TextRun({ text: 'Findings:', bold: true })]
                 }));
                 for (const finding of cat.findings.slice(0, 3)) {
-                    children.push(new Paragraph({ text: `• ${finding.text}` }));
+                    const findingText = finding.text || finding.value || finding.label || 'Unknown finding';
+                    children.push(new Paragraph({ text: `• ${findingText}` }));
                 }
             }
         }
@@ -525,7 +526,8 @@ const ReportExporter = {
             if (cat.findings.length > 0) {
                 text += `Key Findings:\n`;
                 for (const f of cat.findings.slice(0, 3)) {
-                    text += `  • ${f.text}\n`;
+                    const findingText = f.text || f.value || f.label || 'Unknown finding';
+                    text += `  • ${findingText}\n`;
                 }
             }
             text += `\n`;
@@ -536,7 +538,8 @@ const ReportExporter = {
         if (report.keyFindings.aiIndicators.length > 0) {
             text += `AI Indicators:\n`;
             for (const f of report.keyFindings.aiIndicators.slice(0, 5)) {
-                text += `  • ${f.text}\n`;
+                const findingText = f.text || f.value || f.label || 'Unknown finding';
+                text += `  • ${findingText}\n`;
             }
             text += `\n`;
         }
@@ -544,7 +547,8 @@ const ReportExporter = {
         if (report.keyFindings.humanIndicators.length > 0) {
             text += `Human Indicators:\n`;
             for (const f of report.keyFindings.humanIndicators.slice(0, 3)) {
-                text += `  • ${f.text}\n`;
+                const findingText = f.text || f.value || f.label || 'Unknown finding';
+                text += `  • ${findingText}\n`;
             }
             text += `\n`;
         }
@@ -629,7 +633,8 @@ ${escaped}
                 md += `**Findings:**\n`;
                 for (const f of cat.findings.slice(0, 3)) {
                     const icon = f.indicator === 'ai' ? '🤖' : (f.indicator === 'human' ? '👤' : '⚖️');
-                    md += `- ${icon} ${f.text}\n`;
+                    const findingText = f.text || f.value || f.label || 'Unknown finding';
+                    md += `- ${icon} ${findingText}\n`;
                 }
                 md += `\n`;
             }

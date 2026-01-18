@@ -9,13 +9,14 @@
 const AnalyzerEngine = {
     // Category weights based on detection importance
     categoryWeights: {
-        syntaxVariance: 0.20,      // Syntax variance
-        lexicalDiversity: 0.15,    // Lexical diversity  
-        repetitionUniformity: 0.15, // Repetition uniformity
-        toneStability: 0.15,       // Tone stability
-        grammarEntropy: 0.10,      // Grammar entropy
-        perplexity: 0.10,          // Statistical perplexity
-        authorshipDrift: 0.15      // Authorship drift
+        syntaxVariance: 0.15,          // Syntax variance
+        lexicalDiversity: 0.12,        // Lexical diversity  
+        repetitionUniformity: 0.12,    // Repetition uniformity
+        toneStability: 0.12,           // Tone stability
+        grammarEntropy: 0.08,          // Grammar entropy
+        perplexity: 0.08,              // Statistical perplexity
+        authorshipDrift: 0.10,         // Authorship drift
+        metadataFormatting: 0.25       // Metadata & formatting (strong signal for AI markers)
     },
 
     // Getter for analyzers - allows graceful handling of missing modules
@@ -260,6 +261,7 @@ const AnalyzerEngine = {
         if (nameLower.includes('grammar') || category === 1) return 'grammarEntropy';
         if (nameLower.includes('statistical') || nameLower.includes('perplexity') || category === 8) return 'perplexity';
         if (nameLower.includes('authorship') || category === 9) return 'authorshipDrift';
+        if (nameLower.includes('metadata') || nameLower.includes('formatting') || category === 11) return 'metadataFormatting';
         
         return 'grammarEntropy'; // default
     },

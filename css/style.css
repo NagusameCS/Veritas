@@ -289,6 +289,12 @@ body {
     transform: scale(0.95);
 }
 
+.theme-toggle .sun-icon,
+.theme-toggle .moon-icon {
+    width: 16px;
+    height: 16px;
+}
+
 .theme-toggle .sun-icon {
     display: block;
 }
@@ -1354,6 +1360,24 @@ body {
 }
 
 /* Material Icons styling for findings */
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 18px;
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'liga';
+}
+
 .finding-indicator {
     font-size: 18px;
     vertical-align: middle;

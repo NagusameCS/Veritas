@@ -6,13 +6,13 @@
 
 const AdvancedVisualizations = {
     colors: {
-        ai: '#2a2a2a',
-        human: '#7a7a7a',
-        mixed: '#5a5a5a',
-        neutral: '#999999',
-        grid: '#e0e0e0',
-        accent: '#404040',
-        bg: '#f8f8f8'
+        ai: '#ef4444',          // Red for AI indicators
+        human: '#10b981',       // Green for human indicators  
+        mixed: '#f59e0b',       // Amber for mixed/uncertain
+        neutral: '#6b7280',     // Gray for neutral
+        grid: '#e5e7eb',
+        accent: '#374151',
+        bg: '#f9fafb'
     },
 
     /**
