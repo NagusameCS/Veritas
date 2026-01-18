@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veritas — AI Text Detection</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">◈</span>
+                <span class="logo-text">VERITAS</span>
+                <span class="logo-tagline">AI Text Detection</span>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-link active" data-view="analyze">Analyze</a>
+                <a href="#" class="nav-link" data-view="history">History</a>
+                <a href="#" class="nav-link" data-view="about">About</a>
+            </nav>
+            <div class="header-actions">
+                <button class="btn btn-ghost" id="themeToggle" aria-label="Toggle theme">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Analyze View -->
+            <section class="view active" id="analyzeView">
+                <div class="analyze-container">
+                    <!-- Input Panel -->
+                    <div class="panel input-panel">
+                        <div class="panel-header">
+                            <h2>Input Text</h2>
+                            <div class="panel-actions">
+                                <button class="btn btn-sm btn-ghost" id="sampleBtn">Sample</button>
+                                <button class="btn btn-sm btn-ghost" id="clearBtn">Clear</button>
+                                <label class="btn btn-sm btn-ghost" id="uploadBtn">Upload</label>
+                                <input type="file" id="fileInput" accept=".txt,.md" hidden>
+                            </div>
+                        </div>
+                        <div class="textarea-wrapper">
+                            <textarea 
+                                id="textInput" 
+                                placeholder="Paste or type text to analyze for AI-generated content... (minimum 10 words)"
+                                spellcheck="false"
+                            ></textarea>
+                            <div class="textarea-stats">
+                                <span id="charCount">0 characters</span>
+                                <span id="wordCount">0 words</span>
+                                <span id="sentenceCount">0 sentences</span>
+                            </div>
+                        </div>
+                        <div class="analyze-actions">
+                            <button class="btn btn-primary btn-lg" id="analyzeBtn" disabled>
+                                <span class="btn-text">Analyze Text</span>
+                                <span class="btn-spinner"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Results Panel -->
+                    <div class="panel results-panel">
+                        <div class="results-placeholder">
+                            <div class="placeholder-icon">◇</div>
+                            <p>Enter text and click "Analyze" to begin detection</p>
+                        </div>
+
+                        <!-- Results Content -->
+                        <div class="results-content">
+                            <!-- Overall Score -->
+                            <div class="score-card">
+                                <div class="score-header">
+                                    <h3>Detection Result</h3>
+                                    <div class="text-stats"></div>
+                                </div>
+                                <div class="score-display">
+                                    <div class="overall-score">
+                                        <div class="score-ring-container"></div>
+                                        <div class="verdict">
+                                            <span class="verdict-label"></span>
+                                            <span class="verdict-description"></span>
+                                        </div>
+                                        <div class="confidence">
+                                            <span class="confidence-label">Confidence:</span>
+                                            <span class="confidence-value">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Key Findings -->
+                            <div class="findings-card">
+                                <h4>Key Findings</h4>
+                                <div id="findingsList" class="findings-container"></div>
+                            </div>
+
+                            <!-- Results Tabs -->
+                            <div class="results-tabs">
+                                <div class="tabs" role="tablist">
+                                    <button class="tab-btn active" data-tab="tab-highlighted" role="tab" aria-selected="true">Highlighted Text</button>
+                                    <button class="tab-btn" data-tab="tab-features" role="tab" aria-selected="false">Feature Analysis</button>
+                                    <button class="tab-btn" data-tab="tab-graphs" role="tab" aria-selected="false">Probability Graphs</button>
+                                    <button class="tab-btn" data-tab="tab-report" role="tab" aria-selected="false">Detailed Report</button>
+                                </div>
+
+                                <!-- Tab Panels -->
+                                <div class="tab-panel active" id="tab-highlighted" role="tabpanel">
+                                    <div id="highlightedText" class="highlighted-text-wrapper"></div>
+                                </div>
+
+                                <div class="tab-panel" id="tab-features" role="tabpanel" hidden>
+                                    <div id="featureAnalysis" class="features-container"></div>
+                                </div>
+
+                                <div class="tab-panel" id="tab-graphs" role="tabpanel" hidden>
+                                    <div id="probabilityGraphs" class="graphs-container"></div>
+                                </div>
+
+                                <div class="tab-panel" id="tab-report" role="tabpanel" hidden>
+                                    <div id="detailedReport" class="report-container"></div>
+                                </div>
+                            </div>
+
+                            <!-- Export Actions -->
+                            <div class="export-actions">
+                                <button class="btn btn-sm btn-ghost" id="copyResultsBtn">Copy Results</button>
+                                <button class="btn btn-sm btn-ghost" id="exportBtn">Export Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History View -->
+            <section class="view" id="historyView" hidden>
+                <div class="history-container">
+                    <div class="history-header">
+                        <h2>Analysis History</h2>
+                        <button class="btn btn-sm btn-ghost" id="clearHistoryBtn">Clear All</button>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <div class="history-empty">
+                            <span class="empty-icon">◇</span>
+                            <p>No analysis history yet</p>
+                            <p class="text-muted">Your analyzed texts will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About View -->
+            <section class="view" id="aboutView" hidden>
+                <div class="about-container">
+                    <div class="about-hero">
+                        <h1>About Veritas</h1>
+                        <p class="subtitle">Advanced AI Text Detection Using Linguistic Analysis</p>
+                    </div>
+                    
+                    <div class="about-content">
+                        <div class="about-section">
+                            <h3>How It Works</h3>
+                            <p>Veritas analyzes text using 10 comprehensive feature categories derived from NLP literature, authorship attribution research, and AI-detection studies. Each feature is measured programmatically to provide accurate detection results.</p>
+                        </div>
+
+                        <div class="feature-categories-grid">
+                            <div class="category-card">
+                                <span class="category-num">01</span>
+                                <h4>Grammar & Error Patterns</h4>
+                                <p>Error rates, distribution, self-corrections, and human-specific grammatical signals.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">02</span>
+                                <h4>Sentence Structure & Syntax</h4>
+                                <p>Length metrics, structural diversity, parse tree depth, and coordination patterns.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">03</span>
+                                <h4>Lexical Choice & Vocabulary</h4>
+                                <p>Type-token ratio, word entropy, frequency analysis, and register consistency.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">04</span>
+                                <h4>Dialect & Regional Consistency</h4>
+                                <p>Spelling variants, punctuation conventions, and lexical regionalism.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">05</span>
+                                <h4>Archaic / Historical Grammar</h4>
+                                <p>Morphological signals, obsolete forms, and consistency in historical style.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">06</span>
+                                <h4>Discourse & Coherence</h4>
+                                <p>Paragraph flow, transition smoothness, logical progression, and discourse markers.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">07</span>
+                                <h4>Semantic & Pragmatic Features</h4>
+                                <p>Content depth, informational density, and human experience signals.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">08</span>
+                                <h4>Statistical Language Model Indicators</h4>
+                                <p>Perplexity variance, token predictability, and n-gram repetition patterns.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">09</span>
+                                <h4>Authorship Consistency</h4>
+                                <p>Intra-document style drift, cross-document deviation, and fluency analysis.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">10</span>
+                                <h4>Meta-Patterns Unique to AI</h4>
+                                <p>Argument balance, hedging, formatting symmetry, and rhetorical arc predictability.</p>
+                            </div>
+                        </div>
+
+                        <div class="about-section">
+                            <h3>Methodology</h3>
+                            <p>Our detection system combines multiple analytical approaches:</p>
+                            <ul class="method-list">
+                                <li><strong>Linguistic Profiling:</strong> Statistical analysis of grammar, syntax, and vocabulary patterns</li>
+                                <li><strong>Perplexity Analysis:</strong> Measuring predictability using language model baselines</li>
+                                <li><strong>Stylometric Analysis:</strong> Identifying unique authorial fingerprints and inconsistencies</li>
+                                <li><strong>Discourse Analysis:</strong> Evaluating coherence, flow, and rhetorical structures</li>
+                            </ul>
+                        </div>
+
+                        <div class="about-section disclaimer">
+                            <h3>Disclaimer</h3>
+                            <p>No AI detection system is 100% accurate. Results should be used as one of multiple factors in evaluation. Human judgment remains essential.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Veritas AI Detection — Linguistic Analysis Engine</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/analyzers/grammar.js"></script>
+    <script src="js/analyzers/syntax.js"></script>
+    <script src="js/analyzers/lexical.js"></script>
+    <script src="js/analyzers/dialect.js"></script>
+    <script src="js/analyzers/archaic.js"></script>
+    <script src="js/analyzers/discourse.js"></script>
+    <script src="js/analyzers/semantic.js"></script>
+    <script src="js/analyzers/statistical.js"></script>
+    <script src="js/analyzers/authorship.js"></script>
+    <script src="js/analyzers/metapatterns.js"></script>
+    <script src="js/analyzer-engine.js"></script>
+    <script src="js/visualizations.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

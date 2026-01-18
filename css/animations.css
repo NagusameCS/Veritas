@@ -1,0 +1,289 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   VERITAS — Animations
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Basic Transitions
+   ───────────────────────────────────────────────────────────────────────────── */
+.fade-in {
+    animation: fadeIn var(--transition-base) ease-out;
+}
+
+.fade-out {
+    animation: fadeOut var(--transition-base) ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.slide-up {
+    animation: slideUp var(--transition-base) ease-out;
+}
+
+.slide-down {
+    animation: slideDown var(--transition-base) ease-out;
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes slideDown {
+    from { 
+        opacity: 0; 
+        transform: translateY(-20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.scale-in {
+    animation: scaleIn var(--transition-base) ease-out;
+}
+
+@keyframes scaleIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.95); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Score Ring Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.score-ring-animate {
+    animation: ringPulse 2s ease-out;
+}
+
+@keyframes ringPulse {
+    0% {
+        filter: drop-shadow(0 0 0 var(--accent));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px var(--accent));
+    }
+    100% {
+        filter: drop-shadow(0 0 0 var(--accent));
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Number Counter Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.counter-animate {
+    animation: counterPop 0.3s ease-out;
+}
+
+@keyframes counterPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Bar Fill Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.bar-fill-animate {
+    animation: barFill 0.8s ease-out forwards;
+}
+
+@keyframes barFill {
+    from { width: 0; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Staggered List Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.stagger-item {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: staggerIn var(--transition-base) ease-out forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 50ms; }
+.stagger-item:nth-child(3) { animation-delay: 100ms; }
+.stagger-item:nth-child(4) { animation-delay: 150ms; }
+.stagger-item:nth-child(5) { animation-delay: 200ms; }
+.stagger-item:nth-child(6) { animation-delay: 250ms; }
+.stagger-item:nth-child(7) { animation-delay: 300ms; }
+.stagger-item:nth-child(8) { animation-delay: 350ms; }
+.stagger-item:nth-child(9) { animation-delay: 400ms; }
+.stagger-item:nth-child(10) { animation-delay: 450ms; }
+
+@keyframes staggerIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Pulse Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Shimmer Effect
+   ───────────────────────────────────────────────────────────────────────────── */
+.shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    to { left: 100%; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Typing Cursor
+   ───────────────────────────────────────────────────────────────────────────── */
+.typing-cursor::after {
+    content: '|';
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Highlight Animation (for sentences)
+   ───────────────────────────────────────────────────────────────────────────── */
+.highlight-flash {
+    animation: highlightFlash 1s ease-out;
+}
+
+@keyframes highlightFlash {
+    0% { filter: brightness(1.2); }
+    100% { filter: brightness(1); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Graph Line Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.graph-line-animate {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawLine 1.5s ease-out forwards;
+}
+
+@keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Radar Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.radar-animate {
+    transform-origin: center;
+    animation: radarGrow 0.8s ease-out forwards;
+}
+
+@keyframes radarGrow {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Spin Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Bounce Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.bounce {
+    animation: bounce 0.5s ease;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Shake Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.shake {
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Reduced Motion
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
