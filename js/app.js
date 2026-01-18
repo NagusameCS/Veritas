@@ -84,6 +84,58 @@ const App = {
         if (copyBtn) {
             copyBtn.addEventListener('click', () => this.copyResults());
         }
+
+        // Drag and drop file support
+        this.initDragDrop();
+    },
+
+    /**
+     * Initialize drag and drop for file uploads
+     */
+    initDragDrop() {
+        const textInput = document.getElementById('textInput');
+        const inputPanel = document.querySelector('.input-panel');
+        if (!inputPanel) return;
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            inputPanel.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        // Highlight drop area
+        ['dragenter', 'dragover'].forEach(eventName => {
+            inputPanel.addEventListener(eventName, () => {
+                inputPanel.classList.add('drag-over');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            inputPanel.addEventListener(eventName, () => {
+                inputPanel.classList.remove('drag-over');
+            }, false);
+        });
+
+        // Handle dropped files
+        inputPanel.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                const ext = file.name.split('.').pop().toLowerCase();
+                
+                // Determine file type
+                let fileType = 'txt';
+                if (ext === 'docx') fileType = 'docx';
+                else if (ext === 'pdf') fileType = 'pdf';
+                else if (['txt', 'md', 'text'].includes(ext)) fileType = 'txt';
+                
+                // Create a fake event for the file handler
+                const fakeEvent = { target: { files: [file] } };
+                this.handleFileUpload(fakeEvent, fileType);
+            }
+        }, false);
     },
 
     /**
@@ -346,10 +398,27 @@ const App = {
         } catch (error) {
             console.error('Analysis error:', error);
             this.showToast('An error occurred during analysis', 'error');
+            // Clear skeleton loaders on error
+            this.hideLoadingState();
         } finally {
             this.isAnalyzing = false;
             analyzeBtn.classList.remove('loading');
             this.updateAnalyzeButton();
+        }
+    },
+
+    /**
+     * Hide loading state / clear skeletons
+     */
+    hideLoadingState() {
+        const scoreCard = document.querySelector('.overall-score');
+        if (scoreCard) {
+            scoreCard.innerHTML = '<p class="no-data">Analysis failed - please try again</p>';
+        }
+
+        const findingsContainer = document.getElementById('findingsList');
+        if (findingsContainer) {
+            findingsContainer.innerHTML = '<p class="no-findings">No findings available</p>';
         }
     },
 

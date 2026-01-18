@@ -421,6 +421,31 @@ const Utils = {
             console.error('Failed to remove from localStorage:', e);
             return false;
         }
+    },
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // History Management
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Load analysis history from localStorage
+     */
+    loadHistory() {
+        return this.loadFromStorage('veritas_history', []);
+    },
+
+    /**
+     * Save analysis history to localStorage
+     */
+    saveHistory(history) {
+        return this.saveToStorage('veritas_history', history);
+    },
+
+    /**
+     * Clear analysis history
+     */
+    clearHistory() {
+        return this.removeFromStorage('veritas_history');
     }
 };
 

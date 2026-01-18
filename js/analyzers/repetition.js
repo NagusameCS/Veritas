@@ -79,8 +79,9 @@ const RepetitionAnalyzer = {
             const ngramPositions = {};
             
             // Track positions of each n-gram
+            // Note: Utils.ngrams returns already-joined strings
             ngrams.forEach((gram, index) => {
-                const key = gram.join(' ');
+                const key = gram; // gram is already a string
                 if (!ngramPositions[key]) {
                     ngramPositions[key] = [];
                 }

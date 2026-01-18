@@ -43,13 +43,13 @@
     --accent-hover: var(--gray-700);
     --accent-muted: var(--gray-600);
     
-    /* Detection Indicators (subtle variations) */
-    --human-color: #4a4a4a;
-    --human-bg: rgba(74, 74, 74, 0.1);
-    --mixed-color: #7a7a7a;
-    --mixed-bg: rgba(122, 122, 122, 0.15);
-    --ai-color: #2a2a2a;
-    --ai-bg: rgba(42, 42, 42, 0.2);
+    /* Detection Indicators - Distinct colors for visibility */
+    --human-color: #10b981;       /* Green - human */
+    --human-bg: rgba(16, 185, 129, 0.15);
+    --mixed-color: #f59e0b;       /* Amber - uncertain */
+    --mixed-bg: rgba(245, 158, 11, 0.15);
+    --ai-color: #ef4444;          /* Red - AI */
+    --ai-bg: rgba(239, 68, 68, 0.15);
     
     /* Typography */
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -110,12 +110,13 @@
     --accent-hover: var(--gray-300);
     --accent-muted: var(--gray-400);
     
-    --human-color: #b0b0b0;
-    --human-bg: rgba(176, 176, 176, 0.15);
-    --mixed-color: #888888;
-    --mixed-bg: rgba(136, 136, 136, 0.2);
-    --ai-color: #e0e0e0;
-    --ai-bg: rgba(224, 224, 224, 0.15);
+    /* Detection Indicators - Dark mode (slightly brighter for visibility) */
+    --human-color: #34d399;       /* Green - human */
+    --human-bg: rgba(52, 211, 153, 0.2);
+    --mixed-color: #fbbf24;       /* Amber - uncertain */
+    --mixed-bg: rgba(251, 191, 36, 0.2);
+    --ai-color: #f87171;          /* Red - AI */
+    --ai-bg: rgba(248, 113, 113, 0.2);
     
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
@@ -204,6 +205,32 @@ body {
 .nav {
     display: flex;
     gap: var(--space-xs);
+}
+
+/* Nav Links - Remove hyperlink styling */
+.nav-link {
+    background: transparent;
+    border: none;
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    text-decoration: none;
+}
+
+.nav-link.active {
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
 }
 
 .nav-btn {
@@ -328,6 +355,36 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+/* Drag and drop state */
+.panel.drag-over {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.panel.drag-over::after {
+    content: 'Drop file to analyze';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    pointer-events: none;
+    z-index: 10;
+}
+
+[data-theme="dark"] .panel.drag-over::after {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.input-panel {
+    position: relative;
 }
 
 .panel-header {
@@ -1282,16 +1339,30 @@ body {
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
     font-size: 0.875rem;
+    align-items: flex-start;
 }
 
 .finding-item.ai { border-left: 3px solid var(--ai-color); }
 .finding-item.human { border-left: 3px solid var(--human-color); }
 .finding-item.mixed { border-left: 3px solid var(--mixed-color); }
+.finding-item.neutral { border-left: 3px solid var(--gray-400); }
 
 .finding-icon {
     flex-shrink: 0;
     font-size: 1rem;
+    line-height: 1;
 }
+
+/* Material Icons styling for findings */
+.finding-indicator {
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+.finding-indicator.ai { color: var(--ai-color); }
+.finding-indicator.human { color: var(--human-color); }
+.finding-indicator.mixed { color: var(--mixed-color); }
+.finding-indicator.neutral { color: var(--gray-400); }
 
 .finding-content {
     flex: 1;

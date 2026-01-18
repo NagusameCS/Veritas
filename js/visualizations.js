@@ -397,12 +397,15 @@ const Visualizations = {
         
         const html = displayFindings.map(finding => {
             const icon = this.getIndicatorIcon(finding.indicator);
+            // Support both text format (legacy) and label/value format (new)
+            const mainText = finding.text || finding.value || finding.label || 'Unknown finding';
+            const category = finding.category || finding.label || '';
             return `
-                <div class="finding-item ${finding.indicator}">
+                <div class="finding-item ${finding.indicator || 'neutral'}">
                     <span class="finding-icon">${icon}</span>
                     <div class="finding-content">
-                        <span class="finding-text">${this.escapeHtml(finding.text)}</span>
-                        <span class="finding-category">${finding.category}</span>
+                        <span class="finding-text">${this.escapeHtml(mainText)}</span>
+                        ${category ? `<span class="finding-category">${this.escapeHtml(category)}</span>` : ''}
                     </div>
                 </div>
             `;
@@ -428,12 +431,15 @@ const Visualizations = {
 
         const sectionsHtml = report.sections.map(section => {
             const findingsHtml = section.findings.length > 0 
-                ? section.findings.map(f => `
-                    <div class="report-finding ${f.indicator}">
-                        <span class="finding-icon">${this.getIndicatorIcon(f.indicator)}</span>
-                        <span class="finding-text">${this.escapeHtml(f.text)}</span>
-                    </div>
-                `).join('')
+                ? section.findings.map(f => {
+                    const mainText = f.text || f.value || f.label || 'Unknown finding';
+                    return `
+                        <div class="report-finding ${f.indicator || 'neutral'}">
+                            <span class="finding-icon">${this.getIndicatorIcon(f.indicator)}</span>
+                            <span class="finding-text">${this.escapeHtml(mainText)}</span>
+                        </div>
+                    `;
+                }).join('')
                 : '<p class="no-findings">No significant findings in this category</p>';
 
             return `
@@ -508,14 +514,14 @@ const Visualizations = {
     },
 
     /**
-     * Helper: Get indicator icon
+     * Helper: Get indicator icon (Material Icons)
      */
     getIndicatorIcon(indicator) {
         const icons = {
-            ai: '🤖',
-            human: '👤',
-            mixed: '⚖️',
-            neutral: '○'
+            ai: '<span class="material-icons finding-indicator ai">smart_toy</span>',
+            human: '<span class="material-icons finding-indicator human">person</span>',
+            mixed: '<span class="material-icons finding-indicator mixed">help_outline</span>',
+            neutral: '<span class="material-icons finding-indicator neutral">radio_button_unchecked</span>'
         };
         return icons[indicator] || icons.neutral;
     },
