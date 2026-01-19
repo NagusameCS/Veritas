@@ -1882,11 +1882,11 @@ const App = {
         
         // Confidence qualifier
         if (conf < 0.4) {
-            confidenceNote = `⚠️ <strong>Low Confidence:</strong> The analysis has limited certainty due to short text length, unusual writing style, or conflicting signals. Consider this result as indicative rather than definitive.`;
+            confidenceNote = `<span class="material-icons conf-icon">warning</span> <strong>Low Confidence:</strong> The analysis has limited certainty due to short text length, unusual writing style, or conflicting signals. Consider this result as indicative rather than definitive.`;
         } else if (conf < 0.7) {
-            confidenceNote = `📊 <strong>Moderate Confidence:</strong> The analysis has reasonable certainty, though some factors introduce ambiguity. The true origin is likely within the stated probability range.`;
+            confidenceNote = `<span class="material-icons conf-icon">bar_chart</span> <strong>Moderate Confidence:</strong> The analysis has reasonable certainty, though some factors introduce ambiguity. The true origin is likely within the stated probability range.`;
         } else {
-            confidenceNote = `✅ <strong>High Confidence:</strong> Multiple analyzers strongly agree on this assessment. The detected patterns are consistent and clear.`;
+            confidenceNote = `<span class="material-icons conf-icon">check_circle</span> <strong>High Confidence:</strong> Multiple analyzers strongly agree on this assessment. The detected patterns are consistent and clear.`;
         }
         
         // Statistics summary
@@ -1901,7 +1901,7 @@ const App = {
         
         container.innerHTML = `
             <div class="verbose-conclusion-content">
-                <h4 class="conclusion-title">📋 Detailed Analysis</h4>
+                <h4 class="conclusion-title"><span class="material-icons">assignment</span> Detailed Analysis</h4>
                 ${statsSummary}
                 <div class="conclusion-explanation">
                     <p>${explanation}</p>
@@ -1955,31 +1955,31 @@ const App = {
         let advisoryLevel = 'none';
         let advisoryColor = 'var(--text-tertiary)';
         let advisoryText = '';
-        let advisoryIcon = '✓';
+        let advisoryIcon = 'check';
         
         if (flagCount === 0 && prob < 0.4) {
             advisoryLevel = 'none';
-            advisoryIcon = '✅';
+            advisoryIcon = 'verified_user';
             advisoryColor = 'var(--human-color)';
             advisoryText = 'No humanization signals detected. This text appears to be authentically human-written.';
         } else if (flagCount === 0 && prob >= 0.4) {
             advisoryLevel = 'none';
-            advisoryIcon = '🤖';
+            advisoryIcon = 'smart_toy';
             advisoryColor = 'var(--ai-color)';
             advisoryText = 'No humanization signals detected. This appears to be unmodified AI-generated text.';
         } else if (flagCount <= 2) {
             advisoryLevel = 'possible';
-            advisoryIcon = '🔍';
+            advisoryIcon = 'search';
             advisoryColor = 'var(--warning-color, #f59e0b)';
             advisoryText = `Possible humanization detected (${flagCount}/5 signals). This could be AI text that was lightly edited or run through a paraphrasing tool.`;
         } else if (flagCount <= 3) {
             advisoryLevel = 'likely';
-            advisoryIcon = '⚠️';
+            advisoryIcon = 'warning';
             advisoryColor = 'var(--warning-color, #f59e0b)';
             advisoryText = `Likely humanization detected (${flagCount}/5 signals). Strong indicators suggest this text originated from AI but was modified to appear more human.`;
         } else {
             advisoryLevel = 'confident';
-            advisoryIcon = '🚨';
+            advisoryIcon = 'report';
             advisoryColor = 'var(--ai-color)';
             advisoryText = `High confidence humanization (${flagCount}/5 signals). Multiple clear indicators that AI-generated text was processed through humanization tools or extensive manual editing.`;
         }
@@ -2008,7 +2008,7 @@ const App = {
         container.innerHTML = `
             <div class="humanization-advisory-content ${advisoryLevel}">
                 <h4 class="advisory-title">
-                    <span class="advisory-icon">${advisoryIcon}</span>
+                    <span class="material-icons advisory-icon" style="color: ${advisoryColor}">${advisoryIcon}</span>
                     Humanization Advisory
                 </h4>
                 <div class="advisory-meter">

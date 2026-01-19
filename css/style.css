@@ -1335,7 +1335,7 @@ body {
 }
 
 .about-section.sunrise-highlight {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(249, 115, 22, 0.08));
+    background: rgba(251, 191, 36, 0.08);
     border: 1px solid rgba(251, 191, 36, 0.3);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
@@ -2196,7 +2196,7 @@ body {
    Detection Transparency Section
    ───────────────────────────────────────────────────────────────────────────── */
 .transparency-section {
-    background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.03), rgba(var(--accent-rgb), 0.08));
+    background: rgba(var(--accent-rgb), 0.05);
     border-left: 3px solid var(--accent);
 }
 
@@ -2283,7 +2283,7 @@ body {
 
 /* Warning Section for Humanization Flags */
 .warning-section {
-    background: linear-gradient(135deg, rgba(255, 152, 0, 0.05), rgba(255, 152, 0, 0.1));
+    background: rgba(255, 152, 0, 0.08);
     border-left: 3px solid #ff9800;
 }
 
@@ -2375,23 +2375,33 @@ body {
     position: relative;
     height: 24px;
     border-radius: 12px;
-    background: linear-gradient(to right, 
-        var(--human-color) 0%, 
-        var(--human-color) 15%,
-        #8bc34a 15%,
-        #8bc34a 30%,
-        #ffc107 30%,
-        #ffc107 45%,
-        #9e9e9e 45%,
-        #9e9e9e 55%,
-        #ff9800 55%,
-        #ff9800 70%,
-        #f44336 70%,
-        #f44336 85%,
-        var(--ai-color) 85%,
-        var(--ai-color) 100%
-    );
+    background: var(--bg-tertiary);
     overflow: visible;
+    display: flex;
+}
+
+.curve-gradient::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30%;
+    height: 100%;
+    background: var(--human-color);
+    border-radius: 12px 0 0 12px;
+    opacity: 0.7;
+}
+
+.curve-gradient::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 30%;
+    height: 100%;
+    background: var(--ai-color);
+    border-radius: 0 12px 12px 0;
+    opacity: 0.7;
 }
 
 .curve-zone {
@@ -2578,15 +2588,15 @@ body {
 }
 
 .humanization-advisory-content.possible {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(245, 158, 11, 0.1));
+    background: rgba(245, 158, 11, 0.08);
 }
 
 .humanization-advisory-content.likely {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.15));
+    background: rgba(245, 158, 11, 0.12);
 }
 
 .humanization-advisory-content.confident {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(239, 68, 68, 0.15));
+    background: rgba(239, 68, 68, 0.1);
 }
 
 .advisory-title {
@@ -2724,6 +2734,7 @@ body {
 
 .model-icon {
     font-size: 1.5rem;
+    color: var(--accent);
 }
 
 .model-name {
@@ -2734,6 +2745,23 @@ body {
 .model-desc {
     font-size: 0.75rem;
     color: var(--text-tertiary);
+}
+
+.model-stats {
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    margin-top: var(--space-xs);
+}
+
+/* Confidence icons in verbose conclusion */
+.conf-icon {
+    font-size: 1rem;
+    vertical-align: middle;
+    margin-right: var(--space-xs);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

@@ -369,7 +369,7 @@ const Visualizations = {
         const trendsHtml = trends.length > 0 
             ? trends.map(trend => `
                 <div class="trend-item ${trend.type}">
-                    <span class="trend-icon">${trend.icon}</span>
+                    <span class="material-icons trend-icon">${trend.icon}</span>
                     <div class="trend-content">
                         <span class="trend-title">${this.escapeHtml(trend.title)}</span>
                         <span class="trend-detail">${this.escapeHtml(trend.detail)}</span>
@@ -409,14 +409,14 @@ const Visualizations = {
         if (lengthCV < 0.3) {
             trends.push({
                 type: 'ai-signal',
-                icon: '📏',
+                icon: 'straighten',
                 title: 'Uniform sentence length',
                 detail: `Low variance (CV: ${(lengthCV * 100).toFixed(0)}%) — typical of AI text`
             });
         } else if (lengthCV > 0.6) {
             trends.push({
                 type: 'human-signal',
-                icon: '✏️',
+                icon: 'edit',
                 title: 'Variable sentence length',
                 detail: `High variance (CV: ${(lengthCV * 100).toFixed(0)}%) — typical of human writing`
             });
@@ -427,7 +427,7 @@ const Visualizations = {
         if (paragraphs.length === 1 && sentences.length > 5) {
             trends.push({
                 type: 'neutral',
-                icon: '📄',
+                icon: 'article',
                 title: 'Single paragraph structure',
                 detail: `${sentences.length} sentences in one block`
             });
@@ -441,7 +441,7 @@ const Visualizations = {
         if (repeatedWords.length > 5) {
             trends.push({
                 type: 'ai-signal',
-                icon: '🔄',
+                icon: 'loop',
                 title: 'Repetitive vocabulary',
                 detail: `${repeatedWords.length} words repeated 3+ times`
             });
@@ -454,7 +454,7 @@ const Visualizations = {
         if (foundPhrases.length >= 2) {
             trends.push({
                 type: 'ai-signal',
-                icon: '💬',
+                icon: 'format_quote',
                 title: 'Formulaic transitions',
                 detail: `Found: "${foundPhrases.slice(0, 2).join('", "')}"`
             });
@@ -466,14 +466,14 @@ const Visualizations = {
         if (firstPersonRatio > 0.02) {
             trends.push({
                 type: 'human-signal',
-                icon: '👤',
+                icon: 'person',
                 title: 'Personal voice present',
                 detail: `${firstPersonCount} first-person references found`
             });
         } else if (firstPersonRatio < 0.005 && sentences.length > 3) {
             trends.push({
                 type: 'ai-signal',
-                icon: '🤖',
+                icon: 'smart_toy',
                 title: 'Impersonal tone',
                 detail: 'Minimal first-person pronouns'
             });
@@ -484,14 +484,14 @@ const Visualizations = {
         if (contractions > 3) {
             trends.push({
                 type: 'human-signal',
-                icon: '💡',
+                icon: 'lightbulb',
                 title: 'Natural contractions',
                 detail: `${contractions} contractions used`
             });
         } else if (contractions === 0 && sentences.length > 5) {
             trends.push({
                 type: 'ai-signal',
-                icon: '📝',
+                icon: 'description',
                 title: 'No contractions',
                 detail: 'Formal style without contractions'
             });
@@ -503,7 +503,7 @@ const Visualizations = {
         if (questions > 0) {
             trends.push({
                 type: 'human-signal',
-                icon: '❓',
+                icon: 'help',
                 title: 'Rhetorical questions',
                 detail: `${questions} question${questions > 1 ? 's' : ''} in text`
             });
@@ -511,7 +511,7 @@ const Visualizations = {
         if (exclamations > 0) {
             trends.push({
                 type: 'human-signal',
-                icon: '❗',
+                icon: 'priority_high',
                 title: 'Expressive punctuation',
                 detail: `${exclamations} exclamation${exclamations > 1 ? 's' : ''} used`
             });
