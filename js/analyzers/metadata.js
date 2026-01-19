@@ -664,7 +664,7 @@ const MetadataAnalyzer = {
                     benchmark: {
                         humanRange: '30%–60% uniformity',
                         aiRange: '70%–95% uniformity',
-                        note: 'This is the #1 predictor in our Enhanced model (39% importance)'
+                        note: 'This is the #1 predictor in our Helios model (39% importance)'
                     }
                 });
             }

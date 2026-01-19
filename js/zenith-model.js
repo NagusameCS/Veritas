@@ -1,10 +1,10 @@
 /**
- * VERITAS Sunset Model Configuration v1.0
- * GPTZero-style Detection with Perplexity Proxies
+ * VERITAS Zenith Model Configuration v1.0
+ * Perplexity-Based Detection with Entropy Analysis
  * 
  * Methodology:
- * This model approximates GPTZero's approach using entropy and burstiness
- * as proxies for perplexity (since we don't have access to GPT's logits).
+ * This model uses entropy and burstiness as proxies for perplexity
+ * (since we don't have access to GPT's logits).
  * 
  * Key Features:
  * - Paragraph uniformity detection (AI writes more uniform paragraphs)
@@ -23,10 +23,10 @@
  * - Humanized AI Detection: 86.7%
  */
 
-const VERITAS_SUNSET_CONFIG = {
+const VERITAS_ZENITH_CONFIG = {
     version: '1.0.0',
-    modelName: 'Sunset',
-    description: 'GPTZero-style perplexity + burstiness detection',
+    modelName: 'Zenith',
+    description: 'Perplexity-based entropy + burstiness detection',
     
     // Binary classification
     classes: ['Human', 'AI'],
@@ -161,5 +161,5 @@ const VERITAS_SUNSET_CONFIG = {
 };
 
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = VERITAS_SUNSET_CONFIG;
+    module.exports = VERITAS_ZENITH_CONFIG;
 }

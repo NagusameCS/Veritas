@@ -224,8 +224,8 @@ const App = {
             option.addEventListener('change', (e) => this.handleModelChange(e.target.value));
         });
         
-        // Load saved preference (default to enhanced as the best model)
-        const savedModel = localStorage.getItem('veritas-model') || 'enhanced';
+        // Load saved preference (default to helios as the best model)
+        const savedModel = localStorage.getItem('veritas-model') || 'helios';
         const savedOption = document.querySelector(`input[name="model"][value="${savedModel}"]`);
         if (savedOption) {
             savedOption.checked = true;
@@ -241,10 +241,10 @@ const App = {
         
         // Model labels for all supported models
         const modelLabels = {
-            'enhanced': 'Enhanced (45-Feature)',
-            'sunset': 'Sunset (GPTZero-style)',
+            'helios': 'Helios (45-Feature)',
+            'zenith': 'Zenith (Perplexity-Based)',
             'sunrise': 'Sunrise (Statistical)',
-            'genesis': 'Genesis (Legacy)'
+            'dawn': 'Dawn (Legacy)'
         };
         
         const modelLabel = modelLabels[modelType] || modelType;
@@ -265,7 +265,7 @@ const App = {
      */
     getCurrentModel() {
         const selected = document.querySelector('input[name="model"]:checked');
-        return selected ? selected.value : 'enhanced';
+        return selected ? selected.value : 'helios';
     },
     
     /**

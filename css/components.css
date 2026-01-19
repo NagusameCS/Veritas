@@ -990,7 +990,7 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Model Selector (Sunrise/Sunset)
+   Model Selector (Helios/Zenith/Sunrise/Dawn)
    ───────────────────────────────────────────────────────────────────────────── */
 .model-selector {
     display: flex;

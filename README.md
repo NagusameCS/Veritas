@@ -13,27 +13,27 @@ Veritas includes multiple specialized models for maximum accuracy:
 
 | Model | Accuracy | ROC AUC | Specialty |
 |-------|----------|---------|-----------|
-| **Enhanced** | 99.24% | 99.98% | Tone + style detection (45 features) |
-| **Sunset** | 99.57% | 99.97% | GPTZero-style perplexity analysis |
+| **Helios** | 99.24% | 99.98% | Tone + style detection (45 features) |
+| **Zenith** | 99.57% | 99.97% | GPTZero-style perplexity analysis |
 | **Sunrise** | 98.08% | 99.80% | Statistical variance (primary) |
-| **TriClass** | 96.32% | - | Human/AI/Humanized 3-way |
+| **Dawn** | 84.9% | - | Legacy baseline detector |
 
 ### Model Comparison
 
 ```
                     Human Detection    AI Detection    Humanized Detection
 Sunrise             100%               99.2%           66.7%
-Sunset              100%               100%            86.7%
-Enhanced            99.2%              99.2%           -
+Zenith              100%               100%            86.7%
+Helios              99.2%              99.2%           -
 ```
 
-**Sunset excels at humanized AI detection** (86.7% vs 66.7% for Sunrise).
+**Zenith excels at humanized AI detection** (86.7% vs 66.7% for Sunrise).
 
 ## Key Features
 
 - **Multi-Model Ensemble**: 4 specialized models for different detection scenarios
-- **99%+ Accuracy**: Enhanced model with tone detection achieves 99.24%
-- **Humanized AI Detection**: Sunset model specifically catches AI text modified by bypass tools
+- **99%+ Accuracy**: Helios model with tone detection achieves 99.24%
+- **Humanized AI Detection**: Zenith model specifically catches AI text modified by bypass tools
 - **Bidirectional Analysis**: Flags both AI uniformity AND humanizer chaos
 - **45+ Feature Analysis**: Tone, hedging, personal voice, coherence, and more
 - **Statistical Foundation**: Zipf's Law, TTR, Hapax, Entropy, Burstiness
@@ -117,7 +117,7 @@ Veritas analyzes text across 45+ linguistic dimensions grouped into categories:
 
 ### Top Discriminating Features
 
-From our Enhanced model training:
+From our Helios model training:
 
 1. **paragraph_uniformity** (39.3%) - AI writes uniform paragraphs
 2. **trigram_entropy** (15.4%) - AI has lower 3-gram entropy
@@ -190,8 +190,8 @@ console.log(result.model.accuracy);    // 0.9808
 
 ## What's New in v4.0
 
-- **Enhanced Model** (99.24% accuracy): 45 features including tone detection
-- **Sunset Model** (99.57% accuracy): GPTZero-style perplexity analysis
+- **Helios Model** (99.24% accuracy): 45 features including tone detection
+- **Zenith Model** (99.57% accuracy): GPTZero-style perplexity analysis
 - **TriClass Detection**: 3-way classification (Human/AI/Humanized)
 - **Humanization Detection**: 86.7% detection rate for bypass tools
 - **Tone Analysis**: Formality, emotional intensity, sentiment variance

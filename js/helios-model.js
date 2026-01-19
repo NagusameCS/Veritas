@@ -1,6 +1,6 @@
 /**
- * VERITAS Enhanced Model Configuration v4.0
- * 45-Feature Enhanced Detection with Tone, Hedging, and Rhetorical Analysis
+ * VERITAS Helios Model Configuration v4.0
+ * 45-Feature Detection with Tone, Hedging, and Rhetorical Analysis
  * 
  * Accuracy: 99.24% | F1: 99.24% | ROC-AUC: 99.98%
  * 
@@ -17,11 +17,11 @@
  * 10. sentence_complexity: 1.56%
  */
 
-const VERITAS_ENHANCED_CONFIG = {
+const VERITAS_HELIOS_CONFIG = {
     // Model identification
-    modelName: "Veritas Enhanced",
+    modelName: "Veritas Helios",
     version: "4.0",
-    type: "enhanced",
+    type: "helios",
     
     // Training statistics
     trainingStats: {
@@ -309,5 +309,5 @@ const VERITAS_ENHANCED_CONFIG = {
 
 // Export for Node.js environments
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = VERITAS_ENHANCED_CONFIG;
+    module.exports = VERITAS_HELIOS_CONFIG;
 }
