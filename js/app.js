@@ -794,8 +794,24 @@ const App = {
                             <span class="stat-value">${formatNum(advStats.readability?.gunningFogIndex, 1)}</span>
                         </div>
                         <div class="stat-row">
+                            <span class="stat-label">Coleman-Liau Index</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.colemanLiauIndex, 1)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">SMOG Index</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.smogIndex, 1)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">ARI (Automated Readability)</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.ariIndex, 1)}</span>
+                        </div>
+                        <div class="stat-row">
                             <span class="stat-label">Complex Word %</span>
                             <span class="stat-value">${formatNum(advStats.readability?.complexWordPercentage, 1)}%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Polysyllable %</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.polysyllablePercentage, 1)}%</span>
                         </div>
                     </div>
                 </div>
@@ -820,8 +836,9 @@ const App = {
                 </div>
 
                 <!-- N-gram Analysis -->
-                <div class="stats-section">
-                    <h4>🔗 N-gram Analysis</h4>
+                <div class="stats-section ${advStats.ngrams?.repeatedPhraseScore > 0.3 ? 'humanizer-warning' : ''}">
+                    <h4>🔗 N-gram & Phrase Analysis</h4>
+                    <p class="section-note">Research shows repeated higher-order n-grams are strong AI indicators.</p>
                     <div class="stats-table">
                         <div class="stat-row">
                             <span class="stat-label">Unique Bigrams</span>
@@ -831,6 +848,10 @@ const App = {
                             <span class="stat-label">Unique Trigrams</span>
                             <span class="stat-value">${advStats.ngrams?.uniqueTrigrams?.toLocaleString() || 0}</span>
                         </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Unique Quadgrams</span>
+                            <span class="stat-value">${advStats.ngrams?.uniqueQuadgrams?.toLocaleString() || 0}</span>
+                        </div>
                         <div class="stat-row indicator-${getIndicator(advStats.ngrams?.bigramRepetitionRate, [0.4, 0.25])}">
                             <span class="stat-label">Bigram Repetition Rate</span>
                             <span class="stat-value">${formatPct(advStats.ngrams?.bigramRepetitionRate)}</span>
@@ -839,7 +860,29 @@ const App = {
                             <span class="stat-label">Trigram Repetition Rate</span>
                             <span class="stat-value">${formatPct(advStats.ngrams?.trigramRepetitionRate)}</span>
                         </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.ngrams?.quadgramRepetitionRate, [0.1, 0.05])}">
+                            <span class="stat-label">Quadgram Repetition Rate</span>
+                            <span class="stat-value">${formatPct(advStats.ngrams?.quadgramRepetitionRate)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.ngrams?.repeatedPhraseScore, [0.3, 0.1])}">
+                            <span class="stat-label"><strong>Repeated Phrase Score</strong></span>
+                            <span class="stat-value"><strong>${formatPct(advStats.ngrams?.repeatedPhraseScore)}</strong></span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.ngrams?.repeatedPhraseCount > 2 ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Repeated Phrases (4+ words)</span>
+                            <span class="stat-value">${advStats.ngrams?.repeatedPhraseCount || 0} found</span>
+                        </div>
                     </div>
+                    ${advStats.ngrams?.repeatedPhrases?.length > 0 ? `
+                    <div class="repeated-phrases-list">
+                        <p class="stat-label">Top repeated phrases:</p>
+                        <ul class="phrase-list">
+                            ${advStats.ngrams.repeatedPhrases.slice(0, 5).map(p => 
+                                `<li>"${p.phrase}" (${p.count}x)</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
                 </div>
 
                 <!-- Function Words -->
@@ -861,6 +904,50 @@ const App = {
                         <div class="stat-row">
                             <span class="stat-label">Content Word Ratio</span>
                             <span class="stat-value">${formatPct(advStats.functionWords?.contentWordRatio)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word Pattern Analysis -->
+                <div class="stats-section">
+                    <h4>🏷️ Word Pattern Analysis</h4>
+                    <p class="section-note">POS-like analysis without external tools. Research shows AI has different word class distributions.</p>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${advStats.wordPatterns?.firstPersonRatio < 0.01 ? 'ai' : (advStats.wordPatterns?.firstPersonRatio > 0.03 ? 'human' : 'neutral')}">
+                            <span class="stat-label">First-Person Pronoun Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.firstPersonRatio)}</span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.wordPatterns?.hedgingRatio > 0.02 ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Hedging Word Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.hedgingRatio)}</span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.wordPatterns?.starterDiversity < 0.4 ? 'ai' : (advStats.wordPatterns?.starterDiversity > 0.7 ? 'human' : 'neutral')}">
+                            <span class="stat-label">Sentence Starter Diversity</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.starterDiversity)}</span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.wordPatterns?.aiStarterRatio > 0.5 ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Common AI Starters Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.aiStarterRatio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Verb-like Words</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.verbRatio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Adjective-like Words</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.adjectiveRatio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Adverb-like Words</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.adverbRatio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Noun-like Words</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.nounRatio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Content Density</span>
+                            <span class="stat-value">${formatPct(advStats.wordPatterns?.contentDensity)}</span>
                         </div>
                     </div>
                 </div>
@@ -1079,6 +1166,28 @@ const App = {
             </div>
         `;
         scoreCard.insertAdjacentHTML('beforeend', warningHtml);
+        
+        // Add domain awareness note
+        this.renderDomainAwarenessNote(scoreCard);
+    },
+
+    /**
+     * Render domain awareness disclaimer
+     * Research shows detection accuracy varies significantly by text domain
+     */
+    renderDomainAwarenessNote(container) {
+        // Don't duplicate
+        if (container.querySelector('.domain-awareness-note')) return;
+        
+        const noteHtml = `
+            <div class="domain-awareness-note">
+                <div class="note-title">ℹ️ Domain Notice</div>
+                <p>Detection accuracy varies by text type. Academic, creative, and technical writing 
+                may produce different results. No detector is 100% reliable—use as one data point, 
+                not as definitive proof.</p>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', noteHtml);
     },
 
     /**

@@ -1389,6 +1389,53 @@ body {
     font-style: italic;
 }
 
+/* Repeated Phrases List */
+.repeated-phrases-list {
+    margin-top: var(--space-md);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--border-light);
+}
+
+.phrase-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-xs) 0 0 0;
+}
+
+.phrase-list li {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding: var(--space-xs) 0;
+    font-family: monospace;
+    background: var(--bg-tertiary);
+    padding: var(--space-xs) var(--space-sm);
+    margin-bottom: var(--space-xs);
+    border-radius: var(--radius-sm);
+    border-left: 2px solid var(--ai-color);
+}
+
+/* Domain Awareness Note */
+.domain-awareness-note {
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+}
+
+.domain-awareness-note .note-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.domain-awareness-note p {
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
 /* References */
 .references {
     font-size: 0.875rem;

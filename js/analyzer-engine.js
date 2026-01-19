@@ -216,11 +216,27 @@ const AnalyzerEngine = {
         // === N-gram Analysis ===
         const bigrams = Utils.ngrams(tokens, 2);
         const trigrams = Utils.ngrams(tokens, 3);
+        const quadgrams = Utils.ngrams(tokens, 4);
+        const pentagrams = Utils.ngrams(tokens, 5);
+
+        // Find repeated phrases (4+ grams that appear more than once)
+        const repeatedPhrases = this.findRepeatedPhrases(tokens);
+
         stats.ngrams = {
             uniqueBigrams: new Set(bigrams).size,
             uniqueTrigrams: new Set(trigrams).size,
+            uniqueQuadgrams: new Set(quadgrams).size,
             bigramRepetitionRate: bigrams.length > 0 ? 1 - (new Set(bigrams).size / bigrams.length) : 0,
-            trigramRepetitionRate: trigrams.length > 0 ? 1 - (new Set(trigrams).size / trigrams.length) : 0
+            trigramRepetitionRate: trigrams.length > 0 ? 1 - (new Set(trigrams).size / trigrams.length) : 0,
+            quadgramRepetitionRate: quadgrams.length > 0 ? 1 - (new Set(quadgrams).size / quadgrams.length) : 0,
+            // Research-backed: repeated higher-order n-grams are strong AI indicators
+            repeatedPhraseCount: repeatedPhrases.count,
+            repeatedPhrases: repeatedPhrases.phrases.slice(0, 10), // Top 10
+            repeatedPhraseScore: repeatedPhrases.score,
+            highOrderRepetition: (quadgrams.length > 0 && pentagrams.length > 0) 
+                ? ((1 - new Set(quadgrams).size / quadgrams.length) + 
+                   (1 - new Set(pentagrams).size / pentagrams.length)) / 2 
+                : 0
         };
 
         // === Readability Approximations ===
@@ -238,12 +254,33 @@ const AnalyzerEngine = {
         const complexWordPct = tokens.length > 0 ? (complexWords / tokens.length) * 100 : 0;
         const gunningFog = 0.4 * ((stats.sentences.mean || 15) + complexWordPct);
 
+        // Coleman-Liau Index (uses letter and sentence counts)
+        const avgLettersPerWord = tokens.reduce((sum, t) => sum + t.replace(/[^a-zA-Z]/g, '').length, 0) / Math.max(1, tokens.length);
+        const L = avgLettersPerWord * 100;  // letters per 100 words
+        const S = (sentences.length / Math.max(1, tokens.length)) * 100;  // sentences per 100 words
+        const colemanLiau = 0.0588 * L - 0.296 * S - 15.8;
+
+        // SMOG Index (Simple Measure of Gobbledygook)
+        const polysyllables = tokens.filter(t => this.syllableCount(t) >= 3).length;
+        const smog = sentences.length >= 3 
+            ? 1.0430 * Math.sqrt(polysyllables * (30 / Math.max(1, sentences.length))) + 3.1291
+            : 0;
+
+        // Automated Readability Index (ARI)
+        const charCount = text.replace(/[^a-zA-Z0-9]/g, '').length;
+        const ari = 4.71 * (charCount / Math.max(1, tokens.length)) + 
+                   0.5 * (tokens.length / Math.max(1, sentences.length)) - 21.43;
+
         stats.readability = {
             avgSyllablesPerWord,
             fleschReadingEase: Math.max(0, Math.min(100, fleschRE)),
             fleschKincaidGrade: Math.max(0, fleschKG),
             gunningFogIndex: gunningFog,
-            complexWordPercentage: complexWordPct
+            colemanLiauIndex: Math.max(0, colemanLiau),
+            smogIndex: Math.max(0, smog),
+            ariIndex: Math.max(0, ari),
+            complexWordPercentage: complexWordPct,
+            polysyllablePercentage: tokens.length > 0 ? (polysyllables / tokens.length) * 100 : 0
         };
 
         // === Burstiness Metrics ===
@@ -261,6 +298,10 @@ const AnalyzerEngine = {
             ratio: tokens.length > 0 ? functionWordCount / tokens.length : 0,
             contentWordRatio: tokens.length > 0 ? contentWordCount / tokens.length : 0
         };
+
+        // === Word Pattern Analysis (POS-like without external tools) ===
+        // Research shows different POS distributions between human and AI text
+        stats.wordPatterns = this.analyzeWordPatterns(tokens, text);
 
         // === Enhanced Statistical Analysis (v2.1) ===
         
@@ -481,6 +522,135 @@ const AnalyzerEngine = {
         if (word.length <= 5) return 200;
         if (word.length <= 7) return 400;
         return 600 + word.length * 50; // Longer/rarer words get higher ranks
+    },
+
+    /**
+     * Find repeated phrases (n-grams of 4+ words appearing multiple times)
+     * Research shows this is a strong AI indicator: AI often reuses exact phrases
+     */
+    findRepeatedPhrases(tokens) {
+        const phrases = {
+            count: 0,
+            phrases: [],
+            score: 0
+        };
+        
+        if (tokens.length < 8) return phrases;
+        
+        // Check 4-grams, 5-grams, and 6-grams
+        for (let n = 4; n <= 6; n++) {
+            const ngrams = Utils.ngrams(tokens, n);
+            const counts = {};
+            
+            ngrams.forEach(gram => {
+                const key = gram.join(' ').toLowerCase();
+                counts[key] = (counts[key] || 0) + 1;
+            });
+            
+            // Find n-grams appearing 2+ times
+            Object.entries(counts).forEach(([phrase, count]) => {
+                if (count >= 2) {
+                    phrases.phrases.push({ 
+                        phrase, 
+                        count, 
+                        length: n,
+                        weight: n * count // Longer repeated phrases are more suspicious
+                    });
+                    phrases.count++;
+                }
+            });
+        }
+        
+        // Sort by weight (longer and more frequent = more suspicious)
+        phrases.phrases.sort((a, b) => b.weight - a.weight);
+        
+        // Calculate overall score (0-1): higher = more likely AI
+        const totalWeight = phrases.phrases.reduce((sum, p) => sum + p.weight, 0);
+        phrases.score = Math.min(1, totalWeight / (tokens.length * 0.02));
+        
+        return phrases;
+    },
+
+    /**
+     * Analyze word patterns (POS-like analysis without external dependencies)
+     * Research shows AI text has different verb/noun/adjective distributions
+     */
+    analyzeWordPatterns(tokens, text) {
+        const patterns = {};
+        const lowerTokens = tokens.map(t => t.toLowerCase());
+        
+        // Common word category sets (approximate POS without external tools)
+        const verbEndings = ['ing', 'ed', 'ize', 'ise', 'ate', 'ify'];
+        const adjEndings = ['ful', 'less', 'ous', 'ive', 'able', 'ible', 'al', 'ial', 'ic', 'ical'];
+        const advEndings = ['ly'];
+        const nounEndings = ['tion', 'sion', 'ment', 'ness', 'ity', 'ty', 'er', 'or', 'ist', 'ism'];
+        
+        // Definite articles and determiners
+        const determiners = new Set(['the', 'a', 'an', 'this', 'that', 'these', 'those', 'my', 'your', 'his', 'her', 'its', 'our', 'their', 'some', 'any', 'no', 'every', 'each', 'all', 'both', 'few', 'many', 'much', 'most']);
+        
+        // Personal pronouns
+        const personalPronouns = new Set(['i', 'me', 'my', 'mine', 'myself', 'you', 'your', 'yours', 'yourself', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'we', 'us', 'our', 'ours', 'ourselves', 'they', 'them', 'their', 'theirs', 'themselves']);
+        
+        // First-person pronouns (humans use more)
+        const firstPerson = new Set(['i', 'me', 'my', 'mine', 'myself', 'we', 'us', 'our', 'ours', 'ourselves']);
+        
+        // Hedging words (AI uses more)
+        const hedgingWords = new Set(['perhaps', 'maybe', 'possibly', 'potentially', 'likely', 'unlikely', 'probably', 'certainly', 'definitely', 'generally', 'typically', 'usually', 'often', 'sometimes', 'occasionally', 'rarely', 'seldom', 'apparently', 'seemingly', 'arguably']);
+        
+        // Count by category
+        let verbLike = 0, adjLike = 0, advLike = 0, nounLike = 0;
+        let determinerCount = 0, pronounCount = 0, firstPersonCount = 0, hedgingCount = 0;
+        
+        lowerTokens.forEach(token => {
+            if (determiners.has(token)) determinerCount++;
+            if (personalPronouns.has(token)) pronounCount++;
+            if (firstPerson.has(token)) firstPersonCount++;
+            if (hedgingWords.has(token)) hedgingCount++;
+            
+            for (const ending of verbEndings) {
+                if (token.endsWith(ending) && token.length > ending.length + 2) { verbLike++; break; }
+            }
+            for (const ending of adjEndings) {
+                if (token.endsWith(ending) && token.length > ending.length + 2) { adjLike++; break; }
+            }
+            for (const ending of advEndings) {
+                if (token.endsWith(ending) && token.length > ending.length + 2) { advLike++; break; }
+            }
+            for (const ending of nounEndings) {
+                if (token.endsWith(ending) && token.length > ending.length + 2) { nounLike++; break; }
+            }
+        });
+        
+        const total = Math.max(1, tokens.length);
+        
+        patterns.verbRatio = verbLike / total;
+        patterns.adjectiveRatio = adjLike / total;
+        patterns.adverbRatio = advLike / total;
+        patterns.nounRatio = nounLike / total;
+        patterns.determinerRatio = determinerCount / total;
+        patterns.pronounRatio = pronounCount / total;
+        patterns.firstPersonRatio = firstPersonCount / total;  // Low in AI text
+        patterns.hedgingRatio = hedgingCount / total;  // High in AI text
+        
+        // Ratio of content words to function words approximation
+        patterns.contentDensity = (verbLike + adjLike + nounLike) / total;
+        
+        // Sentence starters analysis
+        const starters = Utils.splitSentences(text).map(s => {
+            const words = Utils.tokenize(s);
+            return words[0]?.toLowerCase();
+        }).filter(Boolean);
+        
+        // Diversity of sentence starters (humans have more variety)
+        const uniqueStarters = new Set(starters).size;
+        patterns.starterDiversity = starters.length > 0 ? uniqueStarters / starters.length : 0;
+        
+        // Common AI starters
+        const aiStarters = new Set(['the', 'this', 'it', 'in', 'as', 'there', 'when', 'while', 'although', 'however', 'moreover', 'furthermore', 'additionally']);
+        const aiStarterCount = starters.filter(s => aiStarters.has(s)).length;
+        patterns.aiStarterRatio = starters.length > 0 ? aiStarterCount / starters.length : 0;
+        
+        return patterns;
     },
 
     /**
