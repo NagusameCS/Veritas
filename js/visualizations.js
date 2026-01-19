@@ -584,7 +584,7 @@ const Visualizations = {
             highSeverityCount += section.findings.filter(f => f.severity === 'high' || f.severity === 'critical').length;
             
             const signalSummary = aiFindings.length > 0 || humanFindings.length > 0
-                ? `<span class="section-signal-count">🔴 ${aiFindings.length} AI | 🟢 ${humanFindings.length} Human</span>`
+                ? `<span class="section-signal-count"><span class="material-icons" style="font-size:12px;color:var(--ai-color)">circle</span> ${aiFindings.length} AI | <span class="material-icons" style="font-size:12px;color:var(--human-color)">circle</span> ${humanFindings.length} Human</span>`
                 : '';
             
             const findingsHtml = section.findings.length > 0 
@@ -635,9 +635,9 @@ const Visualizations = {
                         <span class="report-probability">${report.overall.aiProbability}% AI Probability</span>
                     </div>
                     <div class="report-signal-summary">
-                        <span class="signal-badge ai">🔴 ${totalAiFindings} AI Indicators</span>
-                        <span class="signal-badge human">🟢 ${totalHumanFindings} Human Indicators</span>
-                        ${highSeverityCount > 0 ? `<span class="signal-badge critical">⚠️ ${highSeverityCount} High Severity</span>` : ''}
+                        <span class="signal-badge ai"><span class="material-icons">smart_toy</span> ${totalAiFindings} AI Indicators</span>
+                        <span class="signal-badge human"><span class="material-icons">person</span> ${totalHumanFindings} Human Indicators</span>
+                        ${highSeverityCount > 0 ? `<span class="signal-badge critical"><span class="material-icons">warning</span> ${highSeverityCount} High Severity</span>` : ''}
                     </div>
                     <p class="signal-note">Note: Indicator counts show patterns detected. Final probability uses ML-derived weights where high-weight categories (Metadata 40%, Lexical 22%, Syntax 21%) have more influence than low-weight categories.</p>
                 </div>
@@ -728,16 +728,16 @@ const Visualizations = {
         if (f.benchmark) {
             const benchEntries = [];
             if (f.benchmark.humanRange) {
-                benchEntries.push(`<span class="bench-human">👤 Human: ${this.escapeHtml(f.benchmark.humanRange)}</span>`);
+                benchEntries.push(`<span class="bench-human"><span class="material-icons">person</span> Human: ${this.escapeHtml(f.benchmark.humanRange)}</span>`);
             }
             if (f.benchmark.aiRange) {
-                benchEntries.push(`<span class="bench-ai">🤖 AI: ${this.escapeHtml(f.benchmark.aiRange)}</span>`);
+                benchEntries.push(`<span class="bench-ai"><span class="material-icons">smart_toy</span> AI: ${this.escapeHtml(f.benchmark.aiRange)}</span>`);
             }
             if (f.benchmark.interpretation) {
-                benchEntries.push(`<span class="bench-note">💡 ${this.escapeHtml(f.benchmark.interpretation)}</span>`);
+                benchEntries.push(`<span class="bench-note"><span class="material-icons">lightbulb</span> ${this.escapeHtml(f.benchmark.interpretation)}</span>`);
             }
             if (f.benchmark.note) {
-                benchEntries.push(`<span class="bench-note">📝 ${this.escapeHtml(f.benchmark.note)}</span>`);
+                benchEntries.push(`<span class="bench-note"><span class="material-icons">notes</span> ${this.escapeHtml(f.benchmark.note)}</span>`);
             }
             
             if (benchEntries.length > 0) {

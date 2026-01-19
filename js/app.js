@@ -1597,7 +1597,7 @@ const App = {
                             ${flagged.map(i => `
                                 <div class="stat-row indicator-ai">
                                     <span class="stat-label" title="${i.desc}">${i.name}</span>
-                                    <span class="stat-value flagged">⚠ Flagged</span>
+                                    <span class="stat-value flagged"><span class="material-icons" style="font-size:14px">warning</span> Flagged</span>
                                 </div>
                             `).join('')}
                             <div class="stat-row">
@@ -2284,7 +2284,7 @@ const App = {
             warnings.forEach(warning => {
                 const badge = document.createElement('span');
                 badge.className = 'metadata-warning';
-                badge.textContent = '⚠ ' + warning;
+                badge.innerHTML = '<span class="material-icons" style="font-size:12px;vertical-align:middle">warning</span> ' + warning;
                 warningsContainer.appendChild(badge);
             });
         }
@@ -2564,7 +2564,7 @@ These findings have important implications for urban planning and public health 
                     infoBar.className = 'print-info-bar';
                     infoBar.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#3b82f6;color:white;padding:10px 20px;font-family:system-ui,sans-serif;font-size:14px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 2px 10px rgba(0,0,0,0.2);';
                     infoBar.innerHTML = `
-                        <span>📄 VERITAS Analysis Report — Use <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">Ctrl+P</kbd> / <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">⌘P</kbd> to save as PDF or print</span>
+                        <span><span class="material-icons" style="font-size:14px;vertical-align:middle">description</span> VERITAS Analysis Report — Use <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">Ctrl+P</kbd> / <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">⌘P</kbd> to save as PDF or print</span>
                         <button onclick="this.parentElement.remove()" style="background:#2563eb;border:none;color:white;padding:5px 15px;border-radius:4px;cursor:pointer;font-size:12px;">Dismiss</button>
                     `;
                     reportWindow.document.body.insertBefore(infoBar, reportWindow.document.body.firstChild);
