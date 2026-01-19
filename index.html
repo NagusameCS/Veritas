@@ -46,6 +46,98 @@
                 <div class="analyze-container">
                     <!-- Input Panel -->
                     <div class="panel input-panel">
+                        <!-- Model Carousel Selector - Above Input -->
+                        <div class="model-carousel-container">
+                            <h3 class="model-carousel-title">
+                                <span class="material-icons">wb_sunny</span>
+                                Select Detection Model
+                            </h3>
+                            <div class="model-carousel">
+                                <button class="carousel-nav carousel-prev" id="modelPrev" aria-label="Previous model">
+                                    <span class="material-icons">chevron_left</span>
+                                </button>
+                                <div class="model-carousel-track" id="modelCarouselTrack">
+                                    <div class="model-card active" data-model="helios">
+                                        <input type="radio" name="model" value="helios" id="model-helios" checked hidden>
+                                        <div class="model-card-icon">
+                                            <span class="material-icons">flare</span>
+                                        </div>
+                                        <div class="model-card-content">
+                                            <h4 class="model-card-name">Helios</h4>
+                                            <span class="model-card-badge flagship">Flagship</span>
+                                            <div class="model-card-accuracy">99.24% Accuracy</div>
+                                            <ul class="model-card-features">
+                                                <li><span class="material-icons">check</span> 45 linguistic features</li>
+                                                <li><span class="material-icons">check</span> Tone + hedging analysis</li>
+                                                <li><span class="material-icons">check</span> ROC-AUC: 99.98%</li>
+                                                <li><span class="material-icons">check</span> Best overall performance</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="model-card" data-model="zenith">
+                                        <input type="radio" name="model" value="zenith" id="model-zenith" hidden>
+                                        <div class="model-card-icon">
+                                            <span class="material-icons">brightness_high</span>
+                                        </div>
+                                        <div class="model-card-content">
+                                            <h4 class="model-card-name">Zenith</h4>
+                                            <span class="model-card-badge perplexity">Perplexity-Based</span>
+                                            <div class="model-card-accuracy">99.57% Accuracy</div>
+                                            <ul class="model-card-features">
+                                                <li><span class="material-icons">check</span> Entropy analysis</li>
+                                                <li><span class="material-icons">check</span> Burstiness detection</li>
+                                                <li><span class="material-icons">check</span> 86.7% humanized detection</li>
+                                                <li><span class="material-icons">check</span> Best for bypass tools</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="model-card" data-model="sunrise">
+                                        <input type="radio" name="model" value="sunrise" id="model-sunrise" hidden>
+                                        <div class="model-card-icon">
+                                            <span class="material-icons">wb_sunny</span>
+                                        </div>
+                                        <div class="model-card-content">
+                                            <h4 class="model-card-name">Sunrise</h4>
+                                            <span class="model-card-badge balanced">Balanced</span>
+                                            <div class="model-card-accuracy">98.08% Accuracy</div>
+                                            <ul class="model-card-features">
+                                                <li><span class="material-icons">check</span> Statistical variance</li>
+                                                <li><span class="material-icons">check</span> F1: 98.09%</li>
+                                                <li><span class="material-icons">check</span> Fast processing</li>
+                                                <li><span class="material-icons">check</span> Well-rounded</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="model-card" data-model="dawn">
+                                        <input type="radio" name="model" value="dawn" id="model-dawn" hidden>
+                                        <div class="model-card-icon">
+                                            <span class="material-icons">wb_twilight</span>
+                                        </div>
+                                        <div class="model-card-content">
+                                            <h4 class="model-card-name">Dawn</h4>
+                                            <span class="model-card-badge legacy">Legacy</span>
+                                            <div class="model-card-accuracy">84.9% Accuracy</div>
+                                            <ul class="model-card-features">
+                                                <li><span class="material-icons">check</span> Rule-based heuristics</li>
+                                                <li><span class="material-icons">check</span> Low resource usage</li>
+                                                <li><span class="material-icons">check</span> Lightweight</li>
+                                                <li><span class="material-icons">check</span> Baseline detector</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="carousel-nav carousel-next" id="modelNext" aria-label="Next model">
+                                    <span class="material-icons">chevron_right</span>
+                                </button>
+                            </div>
+                            <div class="model-carousel-dots" id="modelCarouselDots">
+                                <span class="dot active" data-model="helios"></span>
+                                <span class="dot" data-model="zenith"></span>
+                                <span class="dot" data-model="sunrise"></span>
+                                <span class="dot" data-model="dawn"></span>
+                            </div>
+                        </div>
+
                         <div class="panel-header">
                             <h2>Input Text</h2>
                             <div class="panel-actions">
@@ -75,9 +167,6 @@
                                         <button class="upload-option" id="pasteClipboardBtn" data-type="clipboard">
                                             <span class="material-icons upload-icon">content_paste</span> Paste from Clipboard
                                         </button>
-                                        <button class="upload-option" id="googleDocsBtn" data-type="gdocs">
-                                            <span class="material-icons upload-icon">article</span> Google Docs URL
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -92,9 +181,7 @@
                         <div class="textarea-wrapper">
                             <textarea 
                                 id="textInput" 
-                                placeholder="Paste or type text to analyze for AI-generated content... (minimum 10 words)
-
-Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
+                                placeholder="Paste or type text to analyze for AI-generated content... (minimum 10 words)"
                                 spellcheck="false"
                             ></textarea>
                             <div class="textarea-stats">
@@ -104,45 +191,6 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             </div>
                         </div>
                         <div class="analyze-actions">
-                            <!-- Model Selector -->
-                            <div class="model-selector">
-                                <label class="model-option">
-                                    <input type="radio" name="model" value="helios" checked>
-                                    <span class="model-label">
-                                        <span class="material-icons model-icon">flare</span>
-                                        <span class="model-name">Helios</span>
-                                        <span class="model-desc">Flagship • 99.24% Accuracy</span>
-                                        <span class="model-stats">ROC-AUC: 99.98% | 45 Features | Tone + Hedging Analysis</span>
-                                    </span>
-                                </label>
-                                <label class="model-option">
-                                    <input type="radio" name="model" value="zenith">
-                                    <span class="model-label">
-                                        <span class="material-icons model-icon">brightness_high</span>
-                                        <span class="model-name">Zenith</span>
-                                        <span class="model-desc">Perplexity-Based • 99.57% Accuracy</span>
-                                        <span class="model-stats">ROC-AUC: 99.97% | Humanized Detection: 86.7%</span>
-                                    </span>
-                                </label>
-                                <label class="model-option">
-                                    <input type="radio" name="model" value="sunrise">
-                                    <span class="model-label">
-                                        <span class="material-icons model-icon">wb_sunny</span>
-                                        <span class="model-name">Sunrise</span>
-                                        <span class="model-desc">Balanced • 98.08% Accuracy</span>
-                                        <span class="model-stats">F1: 98.09% | Precision: 97.87% | Recall: 98.30%</span>
-                                    </span>
-                                </label>
-                                <label class="model-option">
-                                    <input type="radio" name="model" value="dawn">
-                                    <span class="model-label">
-                                        <span class="material-icons model-icon">wb_twilight</span>
-                                        <span class="model-name">Dawn</span>
-                                        <span class="model-desc">Legacy • 84.9% Accuracy</span>
-                                        <span class="model-stats">Rule-Based Heuristics | Low Resource Usage</span>
-                                    </span>
-                                </label>
-                            </div>
                             <button class="btn btn-primary btn-lg" id="analyzeBtn" disabled>
                                 <span class="btn-text">Analyze Text</span>
                                 <span class="btn-spinner"></span>
@@ -163,6 +211,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             <div class="score-card">
                                 <div class="score-header">
                                     <h3>Detection Result</h3>
+                                    <span class="model-indicator" id="resultModelIndicator"></span>
                                     <div class="text-stats"></div>
                                 </div>
                                 <div class="score-display">
@@ -262,7 +311,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
             <section class="view" id="humanizerView" hidden>
                 <div class="humanizer-container">
                     <div class="humanizer-header">
-                        <h2><span class="material-icons">masks</span> Text Humanizer</h2>
+                        <h2><span class="material-icons">auto_fix_high</span> Text Humanizer</h2>
                         <p class="subtitle">Transform AI-generated text to appear more human-like</p>
                         <p class="disclaimer"><span class="material-icons" style="font-size:14px;vertical-align:middle">warning</span> For educational and testing purposes only. Use responsibly.</p>
                     </div>
@@ -360,36 +409,85 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                 <div class="about-container">
                     <div class="about-hero">
                         <h1>About Veritas</h1>
-                        <p class="subtitle">Advanced AI Text Detection — Powered by Helios ML Model v4.0</p>
+                        <p class="subtitle">Advanced AI Text Detection — <span class="material-icons" style="vertical-align: middle">wb_sunny</span> Powered by the Sun Suite</p>
                     </div>
                     
                     <div class="about-content">
-                        <div class="about-section sunrise-highlight">
-                            <h3><span class="material-icons">flare</span> Helios Model v4.0</h3>
-                            <p>Veritas is powered by the <strong>Helios ML Model</strong>, a state-of-the-art machine learning model trained on 29,976 text samples achieving <strong>99.24% accuracy</strong> and <strong>99.24% F1 score</strong>. The model uses 45 linguistic features including tone analysis, hedging detection, and rhetorical patterns with ML-derived weights optimized for maximum detection accuracy.</p>
-                            <div class="model-stats-grid">
-                                <div class="model-stat-card">
-                                    <span class="stat-value">99.24%</span>
-                                    <span class="stat-label">Accuracy</span>
+                        <!-- Model Suite Carousel -->
+                        <div class="about-section models-showcase">
+                            <h3><span class="material-icons">wb_sunny</span> The Sun Suite — Detection Models</h3>
+                            <p class="section-intro">Veritas offers multiple specialized detection models, each optimized for different use cases. Select the model that best fits your needs when analyzing text.</p>
+                            
+                            <div class="about-model-carousel">
+                                <div class="about-model-card featured">
+                                    <div class="model-header helios">
+                                        <span class="material-icons model-sun-icon">flare</span>
+                                        <h4>Helios</h4>
+                                        <span class="model-badge">Flagship</span>
+                                    </div>
+                                    <div class="model-accuracy">99.24%</div>
+                                    <p class="model-desc-text">45-feature comprehensive analysis with tone, hedging, and rhetorical pattern detection. Our most accurate general-purpose model.</p>
+                                    <ul class="model-highlights">
+                                        <li>ROC-AUC: 99.98%</li>
+                                        <li>45 linguistic features</li>
+                                        <li>Tone & hedging analysis</li>
+                                        <li>Best overall accuracy</li>
+                                    </ul>
                                 </div>
-                                <div class="model-stat-card">
-                                    <span class="stat-value">99.24%</span>
-                                    <span class="stat-label">F1 Score</span>
+                                
+                                <div class="about-model-card">
+                                    <div class="model-header zenith">
+                                        <span class="material-icons model-sun-icon">brightness_high</span>
+                                        <h4>Zenith</h4>
+                                        <span class="model-badge">Perplexity</span>
+                                    </div>
+                                    <div class="model-accuracy">99.57%</div>
+                                    <p class="model-desc-text">Specialized entropy and burstiness analysis optimized for detecting AI text modified by humanizer tools.</p>
+                                    <ul class="model-highlights">
+                                        <li>86.7% humanized detection</li>
+                                        <li>Entropy-focused analysis</li>
+                                        <li>Burstiness metrics</li>
+                                        <li>Best for bypass tools</li>
+                                    </ul>
                                 </div>
-                                <div class="model-stat-card">
-                                    <span class="stat-value">99.98%</span>
-                                    <span class="stat-label">ROC AUC</span>
+                                
+                                <div class="about-model-card">
+                                    <div class="model-header sunrise">
+                                        <span class="material-icons model-sun-icon">wb_sunny</span>
+                                        <h4>Sunrise</h4>
+                                        <span class="model-badge">Balanced</span>
+                                    </div>
+                                    <div class="model-accuracy">98.08%</div>
+                                    <p class="model-desc-text">Statistical variance-based detection with balanced precision and recall. Fast and reliable for general use.</p>
+                                    <ul class="model-highlights">
+                                        <li>F1 Score: 98.09%</li>
+                                        <li>Fast processing</li>
+                                        <li>Well-rounded metrics</li>
+                                        <li>Good all-rounder</li>
+                                    </ul>
                                 </div>
-                                <div class="model-stat-card">
-                                    <span class="stat-value">45</span>
-                                    <span class="stat-label">Features</span>
+                                
+                                <div class="about-model-card">
+                                    <div class="model-header dawn">
+                                        <span class="material-icons model-sun-icon">wb_twilight</span>
+                                        <h4>Dawn</h4>
+                                        <span class="model-badge">Legacy</span>
+                                    </div>
+                                    <div class="model-accuracy">84.9%</div>
+                                    <p class="model-desc-text">Rule-based heuristic detection for low-resource environments. Lightweight baseline detector.</p>
+                                    <ul class="model-highlights">
+                                        <li>Minimal resources</li>
+                                        <li>Rule-based logic</li>
+                                        <li>Fast execution</li>
+                                        <li>Baseline reference</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
 
                         <div class="about-section">
                             <h3>How It Works</h3>
-                            <p>Veritas analyzes text using 14 comprehensive feature categories with ML-optimized weights. The Helios model extracts 45 distinct features covering structural patterns, entropy analysis, lexical diversity, tone consistency, hedging behavior, personal voice markers, and rhetorical patterns. Features are combined using Bayesian probability aggregation with calibrated confidence scoring.</p>
+                            <p>Veritas analyzes text using 14 comprehensive feature categories with ML-optimized weights. Each model extracts distinct features covering structural patterns, entropy analysis, lexical diversity, tone consistency, hedging behavior, personal voice markers, and rhetorical patterns. Features are combined using Bayesian probability aggregation with calibrated confidence scoring.</p>
                         </div>
 
                         <div class="feature-categories-grid">
@@ -1183,14 +1281,16 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                     <div class="footer-brand">
                         <span class="footer-logo">◈</span>
                         <span class="footer-title">VERITAS</span>
-                        <span class="footer-version">Powered by Helios Model v4.0</span>
+                        <span class="footer-version"><span class="material-icons" style="font-size:14px;vertical-align:middle">wb_sunny</span> Powered by the Sun Suite v4.0</span>
                     </div>
                     <div class="footer-model-stats">
-                        <span class="model-stat"><strong>99.24%</strong> Accuracy</span>
+                        <span class="model-stat"><strong>Helios</strong> 99.24%</span>
                         <span class="model-stat-divider">•</span>
-                        <span class="model-stat"><strong>99.98%</strong> ROC-AUC</span>
+                        <span class="model-stat"><strong>Zenith</strong> 99.57%</span>
                         <span class="model-stat-divider">•</span>
-                        <span class="model-stat"><strong>45</strong> Features</span>
+                        <span class="model-stat"><strong>Sunrise</strong> 98.08%</span>
+                        <span class="model-stat-divider">•</span>
+                        <span class="model-stat"><strong>Dawn</strong> 84.9%</span>
                     </div>
                 </div>
                 <div class="footer-notes">

@@ -534,20 +534,34 @@ const Visualizations = {
             container.innerHTML = '<p class="no-findings">No significant findings</p>';
             return;
         }
+        
+        // Filter out invalid findings
+        const validFindings = findings.filter(f => {
+            if (!f) return false;
+            const text = f.text || f.value || f.label || '';
+            return text && text !== 'undefined' && text.trim() !== '';
+        });
+        
+        if (validFindings.length === 0) {
+            container.innerHTML = '<p class="no-findings">No significant findings</p>';
+            return;
+        }
 
-        const displayFindings = findings.slice(0, limit);
+        const displayFindings = validFindings.slice(0, limit);
         
         const html = displayFindings.map(finding => {
             const icon = this.getIndicatorIcon(finding.indicator);
             // Support both text format (legacy) and label/value format (new)
-            const mainText = finding.text || finding.value || finding.label || 'Unknown finding';
-            const category = finding.category || finding.label || '';
+            const mainText = finding.text || finding.value || finding.label || '';
+            const category = (finding.category || finding.label || '');
+            // Don't show category if it's the same as mainText
+            const showCategory = category && category !== mainText;
             return `
                 <div class="finding-item ${finding.indicator || 'neutral'}">
                     <span class="finding-icon">${icon}</span>
                     <div class="finding-content">
                         <span class="finding-text">${this.escapeHtml(mainText)}</span>
-                        ${category ? `<span class="finding-category">${this.escapeHtml(category)}</span>` : ''}
+                        ${showCategory ? `<span class="finding-category">${this.escapeHtml(category)}</span>` : ''}
                     </div>
                 </div>
             `;
@@ -555,8 +569,8 @@ const Visualizations = {
 
         let output = `<div class="findings-list">${html}</div>`;
         
-        if (findings.length > limit) {
-            output += `<p class="findings-more">+${findings.length - limit} more findings in detailed report</p>`;
+        if (validFindings.length > limit) {
+            output += `<p class="findings-more">+${validFindings.length - limit} more findings in detailed report</p>`;
         }
 
         container.innerHTML = output;
@@ -704,15 +718,26 @@ const Visualizations = {
      * Render enhanced finding with stats and benchmarks
      */
     renderEnhancedFinding(f) {
-        const mainText = f.text || f.value || f.label || 'Unknown finding';
+        // Skip findings without meaningful content
+        if (!f || (!f.text && !f.value && !f.label)) {
+            return '';
+        }
+        
+        const mainText = f.text || f.value || f.label || '';
+        
+        // Skip if mainText is empty, undefined, or just 'undefined'
+        if (!mainText || mainText === 'undefined' || mainText.trim() === '') {
+            return '';
+        }
+        
         const severityClass = f.severity ? `severity-${f.severity}` : '';
         const hasDetails = f.stats || f.benchmark;
         
         // Build stats HTML if available
         let statsHtml = '';
-        if (f.stats) {
+        if (f.stats && typeof f.stats === 'object') {
             const statsEntries = Object.entries(f.stats)
-                .filter(([k, v]) => v !== null && v !== undefined && v !== 'N/A')
+                .filter(([k, v]) => v !== null && v !== undefined && v !== 'N/A' && String(v) !== 'undefined')
                 .map(([key, value]) => {
                     const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
                     return `<div class="stat-item"><span class="stat-key">${label}:</span> <span class="stat-val">${this.escapeHtml(String(value))}</span></div>`;
@@ -725,18 +750,18 @@ const Visualizations = {
         
         // Build benchmark HTML if available
         let benchmarkHtml = '';
-        if (f.benchmark) {
+        if (f.benchmark && typeof f.benchmark === 'object') {
             const benchEntries = [];
-            if (f.benchmark.humanRange) {
+            if (f.benchmark.humanRange && f.benchmark.humanRange !== 'undefined') {
                 benchEntries.push(`<span class="bench-human"><span class="material-icons">person</span> Human: ${this.escapeHtml(f.benchmark.humanRange)}</span>`);
             }
-            if (f.benchmark.aiRange) {
+            if (f.benchmark.aiRange && f.benchmark.aiRange !== 'undefined') {
                 benchEntries.push(`<span class="bench-ai"><span class="material-icons">smart_toy</span> AI: ${this.escapeHtml(f.benchmark.aiRange)}</span>`);
             }
-            if (f.benchmark.interpretation) {
+            if (f.benchmark.interpretation && f.benchmark.interpretation !== 'undefined') {
                 benchEntries.push(`<span class="bench-note"><span class="material-icons">lightbulb</span> ${this.escapeHtml(f.benchmark.interpretation)}</span>`);
             }
-            if (f.benchmark.note) {
+            if (f.benchmark.note && f.benchmark.note !== 'undefined') {
                 benchEntries.push(`<span class="bench-note"><span class="material-icons">notes</span> ${this.escapeHtml(f.benchmark.note)}</span>`);
             }
             
@@ -745,17 +770,19 @@ const Visualizations = {
             }
         }
         
+        const labelText = f.label && f.label !== 'undefined' && f.label !== mainText ? f.label : '';
+        
         return `
             <div class="report-finding ${f.indicator || 'neutral'} ${severityClass} ${hasDetails ? 'has-details' : ''}">
                 <div class="finding-header">
                     <span class="finding-icon">${this.getIndicatorIcon(f.indicator)}</span>
                     <div class="finding-content-wrapper">
                         <div class="finding-title-row">
-                            <span class="finding-label">${this.escapeHtml(f.label || '')}</span>
+                            ${labelText ? `<span class="finding-label">${this.escapeHtml(labelText)}</span>` : ''}
                             ${f.severity ? this.getSeverityIcon(f.severity) : ''}
                         </div>
                         <span class="finding-text">${this.escapeHtml(mainText)}</span>
-                        ${f.note ? `<span class="finding-note">${this.escapeHtml(f.note)}</span>` : ''}
+                        ${f.note && f.note !== 'undefined' ? `<span class="finding-note">${this.escapeHtml(f.note)}</span>` : ''}
                     </div>
                 </div>
                 ${hasDetails ? `

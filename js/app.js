@@ -216,39 +216,97 @@ const App = {
     },
     
     /**
-     * Bind model selector events
+     * Bind model selector events - Carousel version
      */
     bindModelSelectorEvents() {
-        const modelOptions = document.querySelectorAll('input[name="model"]');
-        modelOptions.forEach(option => {
-            option.addEventListener('change', (e) => this.handleModelChange(e.target.value));
+        // Carousel card clicks
+        const modelCards = document.querySelectorAll('.model-card');
+        modelCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const model = card.dataset.model;
+                this.selectModel(model);
+            });
+        });
+        
+        // Carousel navigation
+        const prevBtn = document.getElementById('modelPrev');
+        const nextBtn = document.getElementById('modelNext');
+        const track = document.getElementById('modelCarouselTrack');
+        
+        if (prevBtn && track) {
+            prevBtn.addEventListener('click', () => {
+                track.scrollBy({ left: -280, behavior: 'smooth' });
+            });
+        }
+        
+        if (nextBtn && track) {
+            nextBtn.addEventListener('click', () => {
+                track.scrollBy({ left: 280, behavior: 'smooth' });
+            });
+        }
+        
+        // Dot navigation
+        const dots = document.querySelectorAll('.model-carousel-dots .dot');
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const model = dot.dataset.model;
+                this.selectModel(model);
+                // Scroll to the card
+                const card = document.querySelector(`.model-card[data-model="${model}"]`);
+                if (card && track) {
+                    card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            });
         });
         
         // Load saved preference (default to helios as the best model)
         const savedModel = localStorage.getItem('veritas-model') || 'helios';
-        const savedOption = document.querySelector(`input[name="model"][value="${savedModel}"]`);
-        if (savedOption) {
-            savedOption.checked = true;
-            this.handleModelChange(savedModel);
-        }
+        this.selectModel(savedModel, false); // false = don't show toast on initial load
+    },
+    
+    /**
+     * Select a model (carousel version)
+     */
+    selectModel(modelType, showToast = true) {
+        // Update radio input
+        const radio = document.getElementById(`model-${modelType}`);
+        if (radio) radio.checked = true;
+        
+        // Update card active states
+        document.querySelectorAll('.model-card').forEach(card => {
+            card.classList.toggle('active', card.dataset.model === modelType);
+        });
+        
+        // Update dot active states
+        document.querySelectorAll('.model-carousel-dots .dot').forEach(dot => {
+            dot.classList.toggle('active', dot.dataset.model === modelType);
+        });
+        
+        // Save and notify
+        this.handleModelChange(modelType, showToast);
     },
     
     /**
      * Handle model type change
      */
-    handleModelChange(modelType) {
+    handleModelChange(modelType, showToast = true) {
         localStorage.setItem('veritas-model', modelType);
         
         // Model labels for all supported models
         const modelLabels = {
-            'helios': 'Helios (45-Feature)',
-            'zenith': 'Zenith (Perplexity-Based)',
-            'sunrise': 'Sunrise (Statistical)',
-            'dawn': 'Dawn (Legacy)'
+            'helios': 'Helios',
+            'zenith': 'Zenith',
+            'sunrise': 'Sunrise',
+            'dawn': 'Dawn'
         };
         
         const modelLabel = modelLabels[modelType] || modelType;
         console.log(`Model changed to: ${modelLabel}`);
+        
+        // Update the analyzer engine's model
+        if (typeof AnalyzerEngine !== 'undefined') {
+            AnalyzerEngine.setModel(modelType);
+        }
         
         // Update any result displays to indicate current model
         const resultModelIndicator = document.getElementById('resultModelIndicator');
@@ -257,7 +315,9 @@ const App = {
         }
         
         // Show toast notification
-        this.showToast(`Switched to ${modelLabel}`, 'info');
+        if (showToast) {
+            this.showToast(`Switched to ${modelLabel} Model`, 'info');
+        }
     },
     
     /**
@@ -769,29 +829,24 @@ const App = {
         if (scoreContainer) {
             Visualizations.createScoreRing(scoreContainer, result.aiProbability, result.confidence);
         }
-
-        // Check for high disagreement which suggests humanized AI
-        const hasHighDisagreement = result.falsePositiveRisk?.risks?.some(r => r.type === 'analyzer_disagreement');
         
-        // Verdict - modify if high disagreement detected
+        // Update model indicator
+        const modelIndicator = document.getElementById('resultModelIndicator');
+        if (modelIndicator) {
+            const modelName = this.getCurrentModel();
+            const modelLabels = { helios: 'Helios', zenith: 'Zenith', sunrise: 'Sunrise', dawn: 'Dawn' };
+            modelIndicator.textContent = modelLabels[modelName] || modelName;
+        }
+        
+        // Verdict - use the verdict from analyzer engine directly (don't override)
         const verdictEl = document.querySelector('.verdict-label');
         const verdictDescEl = document.querySelector('.verdict-description');
         if (verdictEl && result.verdict) {
-            // If high disagreement and not already marked as humanized, suggest it
-            if (hasHighDisagreement && result.verdict.level !== 'humanized') {
-                verdictEl.textContent = 'Possibly Humanized AI';
-                verdictEl.className = 'verdict-label humanized';
-            } else {
-                verdictEl.textContent = result.verdict.label;
-                verdictEl.className = `verdict-label ${result.verdict.level}`;
-            }
+            verdictEl.textContent = result.verdict.label;
+            verdictEl.className = `verdict-label ${result.verdict.level}`;
         }
         if (verdictDescEl && result.verdict) {
-            if (hasHighDisagreement && result.verdict.level !== 'humanized') {
-                verdictDescEl.textContent = 'High disagreement between analyzers suggests AI text modified by humanizer tools — see detailed report for analysis';
-            } else {
-                verdictDescEl.textContent = result.verdict.description;
-            }
+            verdictDescEl.textContent = result.verdict.description;
         }
 
         // Confidence with interval

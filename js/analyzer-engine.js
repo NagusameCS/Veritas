@@ -5,26 +5,89 @@
  * Philosophy: "Never grade features as 'AI-like' or 'human-like' in isolation.
  * Grade them as deviations from expected human variance."
  * 
- * Powered by: Sunrise Model v3.0 (98.08% accuracy, 29,976 training samples)
+ * Powered by: Veritas Sun Suite (Helios, Zenith, Sunrise, Dawn)
  */
 
 const AnalyzerEngine = {
-    // Use Sunrise model config if available, otherwise fallback to defaults
-    get modelConfig() {
-        return typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
+    // Current model type (default: helios)
+    currentModel: 'helios',
+    
+    /**
+     * Set the active model
+     */
+    setModel(modelType) {
+        const validModels = ['helios', 'zenith', 'sunrise', 'dawn'];
+        if (validModels.includes(modelType)) {
+            this.currentModel = modelType;
+            console.log(`AnalyzerEngine: Model set to ${modelType}`);
+        }
     },
     
-    // Category weights derived from Sunrise Model v3.0 feature importance
-    // These are aggregated from individual feature weights to category level
-    categoryWeights: {
-        syntaxVariance: 0.21,          // sentence_length_*, avg_sentence_length (21%)
-        lexicalDiversity: 0.22,        // hapax_*, unique_word_count, type_token_ratio (22%)
-        repetitionUniformity: 0.02,    // bigram/trigram_repetition, sentence_similarity (2%)
-        toneStability: 0.02,           // burstiness_*, overall_uniformity (2%)
-        grammarEntropy: 0.01,          // complexity_cv (1%)
-        perplexity: 0.02,              // zipf_*, entropy features (2%)
-        authorshipDrift: 0.10,         // stylistic consistency (10%)
-        metadataFormatting: 0.40       // paragraph_*, formatting patterns (40% - highest importance)
+    /**
+     * Get the current model configuration
+     */
+    get modelConfig() {
+        switch (this.currentModel) {
+            case 'helios':
+                return typeof VERITAS_HELIOS_CONFIG !== 'undefined' ? VERITAS_HELIOS_CONFIG : null;
+            case 'zenith':
+                return typeof VERITAS_ZENITH_CONFIG !== 'undefined' ? VERITAS_ZENITH_CONFIG : null;
+            case 'sunrise':
+                return typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
+            case 'dawn':
+                return null; // Dawn uses rule-based defaults
+            default:
+                return typeof VERITAS_HELIOS_CONFIG !== 'undefined' ? VERITAS_HELIOS_CONFIG : null;
+        }
+    },
+    
+    /**
+     * Get model-specific weights
+     */
+    get categoryWeights() {
+        const config = this.modelConfig;
+        
+        // Use model-specific weights if available
+        if (config?.featureWeights) {
+            // Aggregate feature weights to category level based on model
+            if (this.currentModel === 'zenith') {
+                // Zenith focuses on entropy/perplexity
+                return {
+                    syntaxVariance: 0.10,
+                    lexicalDiversity: 0.15,
+                    repetitionUniformity: 0.05,
+                    toneStability: 0.05,
+                    grammarEntropy: 0.02,
+                    perplexity: 0.25,  // Higher weight for entropy
+                    authorshipDrift: 0.08,
+                    metadataFormatting: 0.30
+                };
+            } else if (this.currentModel === 'helios') {
+                // Helios uses full 45-feature analysis
+                return {
+                    syntaxVariance: 0.18,
+                    lexicalDiversity: 0.20,
+                    repetitionUniformity: 0.03,
+                    toneStability: 0.08,  // Tone analysis
+                    grammarEntropy: 0.02,
+                    perplexity: 0.10,
+                    authorshipDrift: 0.12,
+                    metadataFormatting: 0.27
+                };
+            }
+        }
+        
+        // Default weights (Sunrise/Dawn)
+        return {
+            syntaxVariance: 0.21,
+            lexicalDiversity: 0.22,
+            repetitionUniformity: 0.02,
+            toneStability: 0.02,
+            grammarEntropy: 0.01,
+            perplexity: 0.02,
+            authorshipDrift: 0.10,
+            metadataFormatting: 0.40
+        };
     },
 
     // Getter for analyzers - allows graceful handling of missing modules
@@ -531,10 +594,13 @@ const AnalyzerEngine = {
         ].filter(Boolean).length;
         
         // Higher probability when both structural and surface-level contradictions exist
-        const contradictionBoost = contradictionAnalysis.contradictionScore > 0.5 ? 0.2 : 0;
+        // But require more evidence to reduce false positives
+        const contradictionBoost = contradictionAnalysis.contradictionScore > 0.7 ? 0.15 : 0;
         
-        signals.humanizerProbability = Math.min(1, (flagCount / 3.5) + contradictionBoost);
-        signals.isLikelyHumanized = flagCount >= 2 || (contradictionAnalysis.contradictionScore > 0.6);
+        // More conservative humanizer probability calculation
+        signals.humanizerProbability = Math.min(1, (flagCount / 5) + contradictionBoost);
+        // Require 3+ flags to flag as humanized (was 2)
+        signals.isLikelyHumanized = flagCount >= 3 && contradictionAnalysis.contradictionScore > 0.5;
         signals.flagCount = flagCount;
         
         return signals;
@@ -1417,28 +1483,34 @@ const AnalyzerEngine = {
                                'High confidence: ';
 
         // HUMANIZED DETECTION
+        // Only flag as humanized when there's strong evidence
         // Conditions for "Humanized" verdict:
-        // 1. High humanizer probability (2+ flags from second-order analysis)
-        // 2. Strong contradiction (many AI signals AND many human signals)
-        // 3. AI probability in the "mixed" range (0.35-0.75) with contradiction
+        // 1. High humanizer probability (3+ flags from second-order analysis)
+        // 2. Very strong contradiction (many strong AI signals AND many strong human signals)
+        // 3. AI probability in the higher mixed range with strong contradiction evidence
         
-        const humanizerThreshold = 0.4; // 2+ flags out of 5
-        const contradictionThreshold = 0.4;
-        const isContradictory = contradictionScore > contradictionThreshold || hasContradiction;
+        const humanizerThreshold = 0.6; // Requires 3+ flags out of 5 (was 0.4)
+        const contradictionThreshold = 0.6; // Higher threshold (was 0.4)
+        const isContradictory = contradictionScore > contradictionThreshold && hasContradiction;
         
-        // Humanized if: explicit humanizer signals OR (AI-leaning with high contradiction)
-        if (isHumanized || 
-            (humanizerProb >= humanizerThreshold) ||
-            (aiProbability >= 0.35 && aiProbability <= 0.75 && isContradictory)) {
+        // Only flag humanized if: explicit strong humanizer signals AND supporting evidence
+        // Be more conservative to avoid false "humanized" flags on normal AI text
+        const shouldFlagHumanized = (
+            (isHumanized && flagCount >= 3) ||
+            (humanizerProb >= humanizerThreshold && aiProbability >= 0.50) ||
+            (aiProbability >= 0.50 && aiProbability <= 0.70 && isContradictory && flagCount >= 2)
+        );
+        
+        if (shouldFlagHumanized) {
             
             // Determine humanizer confidence level
             const humanizerConfidence = Math.max(humanizerProb, contradictionScore);
-            const humanizerLevel = humanizerConfidence > 0.6 ? 'High confidence: ' : 
-                                  humanizerConfidence > 0.35 ? '' : 'Possible: ';
+            const humanizerLevel = humanizerConfidence > 0.7 ? 'High confidence: ' : 
+                                  humanizerConfidence > 0.5 ? '' : 'Possible: ';
             
             return {
-                label: humanizerLevel + 'AI Humanized',
-                description: 'This text shows AI origin with humanization attempts — likely AI-generated then modified by tools or manual editing',
+                label: humanizerLevel + 'Possibly Humanized',
+                description: 'This text shows patterns consistent with AI-generated content that may have been modified — consider verifying with additional analysis',
                 level: 'humanized',
                 band: 'humanized',
                 probability: aiProbability,
