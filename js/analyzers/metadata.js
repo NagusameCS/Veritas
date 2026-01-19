@@ -1,15 +1,24 @@
 /**
  * VERITAS — Metadata & Formatting Analyzer
  * Detects irregularities in Unicode, whitespace, tabs, and hidden formatting
+ * 
+ * SUNRISE V.4: This analyzer operates as an ABSOLUTE FLAG detector.
+ * It is excluded from the ML training pool - when metadata anomalies are detected,
+ * it adds a definitive flag rather than contributing to weighted probability.
  */
 
 const MetadataAnalyzer = {
     name: 'Metadata & Formatting',
     category: 11,
-    weight: 1.0,
+    weight: 0,  // V.4: Weight is 0 - not included in ML-weighted probability calculation
+    isAbsoluteFlag: true,  // V.4: This category operates as an absolute detection flag
+    
+    // Absolute flag message when metadata anomalies are detected
+    absoluteFlagMessage: 'Unknown metadata was detected within the text, this may likely be an artifact of LLM usage.',
 
     /**
      * Main analysis function
+     * V.4: Now returns absolute flag data when anomalies are detected
      */
     analyze(text, metadata = {}) {
         if (!text || text.length < 10) {
@@ -34,7 +43,40 @@ const MetadataAnalyzer = {
         // AI text typically has very consistent formatting
         const avgUniformity = Utils.mean(Object.values(uniformityScores));
         
+        // V.4: Determine if we should trigger the absolute flag
+        let triggerAbsoluteFlag = false;
+        let absoluteFlagReasons = [];
+        
+        // Check for strong AI indicators that should trigger absolute flag
+        if (aiDecorativeMarkers.found && aiDecorativeMarkers.weight >= 0.25) {
+            triggerAbsoluteFlag = true;
+            absoluteFlagReasons.push('AI decorative markers detected (section dividers, special formatting)');
+        }
+        
+        if (unicodeAnalysis.suspiciousPatterns.length >= 3) {
+            triggerAbsoluteFlag = true;
+            absoluteFlagReasons.push(`${unicodeAnalysis.suspiciousPatterns.length} suspicious Unicode patterns detected`);
+        }
+        
+        if (hiddenCharsAnalysis.count >= 5) {
+            triggerAbsoluteFlag = true;
+            absoluteFlagReasons.push(`${hiddenCharsAnalysis.count} hidden/invisible characters detected`);
+        }
+        
+        // Check for specific high-confidence AI markers
+        const hasThreeEmDash = unicodeAnalysis.suspiciousPatterns.some(p => p.codePoint === 'U+2E3B');
+        const hasBoxDrawing = unicodeAnalysis.suspiciousPatterns.some(p => 
+            p.codePoint && parseInt(p.codePoint.replace('U+', ''), 16) >= 0x2500 && 
+            parseInt(p.codePoint.replace('U+', ''), 16) <= 0x257F
+        );
+        
+        if (hasThreeEmDash || hasBoxDrawing) {
+            triggerAbsoluteFlag = true;
+            absoluteFlagReasons.push('Strong AI formatting artifacts detected (decorative dividers)');
+        }
+
         // Score based on unusual uniformity (AI) or inconsistency (human editing)
+        // V.4: This score is for informational purposes only, not ML weighting
         let aiProbability = 0.5;
         
         // Very high uniformity suggests AI generation
@@ -65,12 +107,28 @@ const MetadataAnalyzer = {
 
         const confidence = this.calculateConfidence(text.length, unicodeAnalysis, whitespaceAnalysis);
         const findings = this.generateFindings(unicodeAnalysis, whitespaceAnalysis, indentationAnalysis, hiddenCharsAnalysis, aiDecorativeMarkers);
+        
+        // V.4: Add absolute flag finding if triggered
+        if (triggerAbsoluteFlag) {
+            findings.unshift({
+                text: this.absoluteFlagMessage,
+                category: this.name,
+                indicator: 'ai',
+                severity: 'absolute',
+                isAbsoluteFlag: true,
+                reasons: absoluteFlagReasons
+            });
+        }
 
         return {
             name: this.name,
             category: this.category,
             aiProbability: Math.max(0, Math.min(1, aiProbability)),
             confidence,
+            isAbsoluteFlag: this.isAbsoluteFlag,
+            absoluteFlagTriggered: triggerAbsoluteFlag,
+            absoluteFlagMessage: triggerAbsoluteFlag ? this.absoluteFlagMessage : null,
+            absoluteFlagReasons: triggerAbsoluteFlag ? absoluteFlagReasons : [],
             details: {
                 unicode: unicodeAnalysis,
                 whitespace: whitespaceAnalysis,
@@ -601,6 +659,10 @@ const MetadataAnalyzer = {
             category: this.category,
             aiProbability: 0.5,
             confidence: 0,
+            isAbsoluteFlag: this.isAbsoluteFlag,
+            absoluteFlagTriggered: false,
+            absoluteFlagMessage: null,
+            absoluteFlagReasons: [],
             details: {},
             findings: [],
             scores: {}

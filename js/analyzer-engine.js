@@ -1,11 +1,11 @@
 /**
- * VERITAS — Analyzer Engine v2.0
+ * VERITAS — Analyzer Engine v2.1 (Sunrise V.4)
  * Variance-Based Detection: Measures deviations from expected human variance
  * 
  * Philosophy: "Never grade features as 'AI-like' or 'human-like' in isolation.
  * Grade them as deviations from expected human variance."
  * 
- * Powered by: Sunrise Model v3.0 (98.08% accuracy, 29,976 training samples)
+ * Powered by: Sunrise Model v4.0 (96 features, Metadata as absolute flag)
  */
 
 const AnalyzerEngine = {
@@ -14,17 +14,18 @@ const AnalyzerEngine = {
         return typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
     },
     
-    // Category weights derived from Sunrise Model v3.0 feature importance
-    // These are aggregated from individual feature weights to category level
+    // Category weights derived from Sunrise Model v4.0 feature importance
+    // Metadata is EXCLUDED from ML weighting (operates as absolute flag)
     categoryWeights: {
-        syntaxVariance: 0.21,          // sentence_length_*, avg_sentence_length (21%)
-        lexicalDiversity: 0.22,        // hapax_*, unique_word_count, type_token_ratio (22%)
-        repetitionUniformity: 0.02,    // bigram/trigram_repetition, sentence_similarity (2%)
-        toneStability: 0.02,           // burstiness_*, overall_uniformity (2%)
-        grammarEntropy: 0.01,          // complexity_cv (1%)
-        perplexity: 0.02,              // zipf_*, entropy features (2%)
-        authorshipDrift: 0.10,         // stylistic consistency (10%)
-        metadataFormatting: 0.40       // paragraph_*, formatting patterns (40% - highest importance)
+        syntaxVariance: 0.28,          // sentence_length_*, avg_sentence_length (28% - increased)
+        lexicalDiversity: 0.30,        // hapax_*, unique_word_count, type_token_ratio (30% - increased)
+        repetitionUniformity: 0.05,    // bigram/trigram_repetition, sentence_similarity (5% - increased)
+        toneStability: 0.05,           // burstiness_*, overall_uniformity (5% - increased)
+        grammarEntropy: 0.05,          // complexity_cv (5% - increased)
+        perplexity: 0.07,              // zipf_*, entropy features (7% - increased)
+        authorshipDrift: 0.15,         // stylistic consistency (15% - increased)
+        partOfSpeech: 0.05,            // POS distribution features (5%)
+        metadataFormatting: 0.0        // V.4: EXCLUDED - operates as absolute flag only
     },
 
     // Getter for analyzers - allows graceful handling of missing modules
@@ -162,6 +163,10 @@ const AnalyzerEngine = {
             falsePositiveRisk,
             verdict,
             humanizerSignals,
+            
+            // V.4: Absolute flag data (e.g., Metadata anomalies)
+            absoluteFlags: overallResult.absoluteFlags || [],
+            hasAbsoluteFlags: (overallResult.absoluteFlags || []).length > 0,
             
             // Variance-specific data
             varianceProfile: overallResult.varianceProfile,
@@ -900,9 +905,23 @@ const AnalyzerEngine = {
      * - Strong individual AI signals should have more impact
      * - Multiple agreeing signals compound their effect
      * - Human signals can only reduce AI probability proportionally
+     * - V.4: Absolute flag analyzers are tracked separately, not included in ML weighting
      */
     calculateVarianceBasedProbability(categoryResults) {
-        const validResults = categoryResults.filter(r => 
+        // V.4: Separate absolute flag analyzers from ML-weighted analyzers
+        const absoluteFlagResults = [];
+        const mlWeightedResults = [];
+        
+        for (const result of categoryResults) {
+            if (result.isAbsoluteFlag) {
+                absoluteFlagResults.push(result);
+            } else {
+                mlWeightedResults.push(result);
+            }
+        }
+        
+        // Filter ML results to those with sufficient confidence
+        const validResults = mlWeightedResults.filter(r => 
             r.confidence > 0.2 && !r.error && r.aiProbability !== undefined
         );
 
@@ -913,7 +932,8 @@ const AnalyzerEngine = {
                 mixedProbability: 0,
                 varianceProfile: null,
                 featureContributions: [],
-                combinationMethod: 'none'
+                combinationMethod: 'none',
+                absoluteFlags: absoluteFlagResults.filter(r => r.absoluteFlagTriggered)
             };
         }
 
@@ -934,6 +954,9 @@ const AnalyzerEngine = {
             // Map categories to weight keys
             const weightKey = this.getCategoryWeightKey(result.category, result.name);
             const baseWeight = this.categoryWeights[weightKey] || 0.1;
+            
+            // V.4: Skip if weight is 0 (absolute flag categories)
+            if (baseWeight === 0) continue;
             
             // Apply confidence as a weight multiplier
             const effectiveWeight = baseWeight * result.confidence;
@@ -1034,7 +1057,14 @@ const AnalyzerEngine = {
                 strongAi: strongAiSignalCount,
                 strongHuman: strongHumanSignalCount,
                 aiRatio: aiSignalRatio
-            }
+            },
+            // V.4: Absolute flag information
+            absoluteFlags: absoluteFlagResults.filter(r => r.absoluteFlagTriggered).map(r => ({
+                name: r.name,
+                category: r.category,
+                message: r.absoluteFlagMessage,
+                reasons: r.absoluteFlagReasons || []
+            }))
         };
     },
 
