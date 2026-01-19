@@ -1,34 +1,44 @@
 # ◈ Veritas
 
-**AI Text Detection Engine — Powered by Sunrise ML Model**
+**AI Text Detection Engine — Multi-Model Analysis System**
 
 [![npm version](https://img.shields.io/npm/v/veritas-ai-detector.svg)](https://www.npmjs.com/package/veritas-ai-detector)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Veritas uses ML-trained statistical variance analysis to detect AI-generated text with **98.08% accuracy**. Unlike pattern-matching approaches, it analyzes the natural variability in human writing—sentence lengths, vocabulary diversity, word frequency distributions, and more.
+Veritas uses ML-trained statistical variance analysis to detect AI-generated text with **up to 99.24% accuracy**. Unlike pattern-matching approaches, it analyzes the natural variability in human writing—sentence lengths, vocabulary diversity, word frequency distributions, entropy patterns, and more.
 
-## 🌅 Sunrise Model v3.0
+## Model Suite
 
-Veritas is powered by the **Sunrise ML Model**, trained on 29,976 samples from diverse datasets:
+Veritas includes multiple specialized models for maximum accuracy:
 
-| Metric | Score |
-|--------|-------|
-| **Accuracy** | 98.08% |
-| **F1 Score** | 98.09% |
-| **ROC AUC** | 99.80% |
-| **Training Samples** | 29,976 |
+| Model | Accuracy | ROC AUC | Specialty |
+|-------|----------|---------|-----------|
+| **Enhanced** | 99.24% | 99.98% | Tone + style detection (45 features) |
+| **Sunset** | 99.57% | 99.97% | GPTZero-style perplexity analysis |
+| **Sunrise** | 98.08% | 99.80% | Statistical variance (primary) |
+| **TriClass** | 96.32% | - | Human/AI/Humanized 3-way |
 
-The model uses ML-derived feature weights to optimize detection across 14 linguistic analysis categories.
+### Model Comparison
+
+```
+                    Human Detection    AI Detection    Humanized Detection
+Sunrise             100%               99.2%           66.7%
+Sunset              100%               100%            86.7%
+Enhanced            99.2%              99.2%           -
+```
+
+**Sunset excels at humanized AI detection** (86.7% vs 66.7% for Sunrise).
 
 ## Key Features
 
-- **ML-Powered Detection**: Sunrise model trained on diverse human/AI text samples
-- **Bidirectional Analysis**: Flags both AI uniformity (too perfect) AND humanizer chaos (too random)
-- **Humanized AI Detection**: Specifically identifies "Humanized AI" text that's been modified to evade detection
-- **Statistical Foundation**: Based on Zipf's Law, TTR, Hapax Ratio, Burstiness coefficients
-- **Confidence Intervals**: Provides 95% CI with honest uncertainty estimates
+- **Multi-Model Ensemble**: 4 specialized models for different detection scenarios
+- **99%+ Accuracy**: Enhanced model with tone detection achieves 99.24%
+- **Humanized AI Detection**: Sunset model specifically catches AI text modified by bypass tools
+- **Bidirectional Analysis**: Flags both AI uniformity AND humanizer chaos
+- **45+ Feature Analysis**: Tone, hedging, personal voice, coherence, and more
+- **Statistical Foundation**: Zipf's Law, TTR, Hapax, Entropy, Burstiness
+- **Confidence Intervals**: 95% CI with honest uncertainty estimates
 - **No External APIs**: Runs entirely client-side (web) or locally (CLI)
-- **Multiple Interfaces**: Web UI + Command Line Tool
 
 ## Live Demo
 
@@ -90,14 +100,30 @@ veritas essay.txt --verbose
 
 ## Detection Categories
 
-Veritas analyzes text across 14 linguistic dimensions:
+Veritas analyzes text across 45+ linguistic dimensions grouped into categories:
 
-| Category | Weight | Description |
-|----------|--------|-------------|
-| Sentence Structure | 22% | Variance in sentence lengths and patterns |
-| Vocabulary Diversity | 18% | TTR, hapax ratio, word choice patterns |
-| Burstiness Patterns | 18% | Temporal clustering of similar structures |
-| Repetition Analysis | 15% | N-gram repetition distribution |
+| Category | Features | Description |
+|----------|----------|-------------|
+| **Structure** | 9 | Paragraph uniformity, sentence patterns |
+| **Vocabulary** | 6 | TTR, hapax ratio, word diversity |
+| **Entropy** | 3 | N-gram predictability (GPTZero-style) |
+| **Tone** | 4 | Formality, emotional intensity, consistency |
+| **Hedging** | 3 | Uncertainty markers (AI signature) |
+| **Personal Voice** | 5 | First-person usage, opinion markers |
+| **Rhetorical** | 4 | Questions, emphasis, engagement |
+| **Coherence** | 3 | Topic drift, lexical chains |
+| **Punctuation** | 4 | Rhythm, diversity, parentheticals |
+| **Style** | 4 | Passive voice, nominalizations |
+
+### Top Discriminating Features
+
+From our Enhanced model training:
+
+1. **paragraph_uniformity** (39.3%) - AI writes uniform paragraphs
+2. **trigram_entropy** (15.4%) - AI has lower 3-gram entropy
+3. **bigram_entropy** (14.9%) - AI word pairs are predictable
+4. **avg_sentence_length** (6.1%) - AI sentence length patterns
+5. **sentence_start_diversity** (5.9%) - AI starts sentences similarly
 | Readability Metrics | 15% | Flesch-Kincaid, complexity variance |
 | Zipf's Law Analysis | 12% | Word frequency distribution conformance |
 
@@ -162,13 +188,16 @@ console.log(result.model.accuracy);    // 0.9808
 - Not designed for code or highly technical content
 - Detection accuracy varies with text length and style
 
-## What's New in v3.0
+## What's New in v4.0
 
-- 🌅 **Sunrise ML Model**: Trained on 29,976 samples with 98.08% accuracy
-- 🔍 **Humanized AI Detection**: Specifically identifies AI text modified by humanizer tools
-- 📊 **Enhanced Trend Analysis**: Shows observed linguistic patterns instead of per-sentence highlighting
-- 📄 **Improved Reports**: Open full report in new tab for easy PDF/print export
-- ⚡ **Performance**: Faster analysis with optimized feature weights
+- **Enhanced Model** (99.24% accuracy): 45 features including tone detection
+- **Sunset Model** (99.57% accuracy): GPTZero-style perplexity analysis
+- **TriClass Detection**: 3-way classification (Human/AI/Humanized)
+- **Humanization Detection**: 86.7% detection rate for bypass tools
+- **Tone Analysis**: Formality, emotional intensity, sentiment variance
+- **Hedging Patterns**: Detects AI's characteristic uncertainty markers
+- **Personal Voice Detection**: First-person usage, opinion markers
+- **Comprehensive Benchmarks**: Full evaluation suite included
 
 ## License
 
@@ -179,5 +208,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 <p align="center">
   <strong>◈ VERITAS</strong><br>
   <em>Variance-based Entity Recognition & Inference for Text Authenticity Scoring</em><br>
-  Powered by Sunrise Model v3.0
+  Multi-Model Detection Suite v4.0
 </p>

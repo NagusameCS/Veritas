@@ -219,14 +219,14 @@ const App = {
      * Bind model selector events
      */
     bindModelSelectorEvents() {
-        const modelOptions = document.querySelectorAll('input[name="modelType"]');
+        const modelOptions = document.querySelectorAll('input[name="model"]');
         modelOptions.forEach(option => {
             option.addEventListener('change', (e) => this.handleModelChange(e.target.value));
         });
         
-        // Load saved preference
-        const savedModel = localStorage.getItem('veritas-model') || 'sunrise';
-        const savedOption = document.querySelector(`input[name="modelType"][value="${savedModel}"]`);
+        // Load saved preference (default to enhanced as the best model)
+        const savedModel = localStorage.getItem('veritas-model') || 'enhanced';
+        const savedOption = document.querySelector(`input[name="model"][value="${savedModel}"]`);
         if (savedOption) {
             savedOption.checked = true;
             this.handleModelChange(savedModel);
@@ -239,8 +239,15 @@ const App = {
     handleModelChange(modelType) {
         localStorage.setItem('veritas-model', modelType);
         
-        // Update UI to reflect model change
-        const modelLabel = modelType === 'sunrise' ? 'Sunrise (3-Class)' : 'Sunset (2-Class)';
+        // Model labels for all supported models
+        const modelLabels = {
+            'enhanced': 'Enhanced (45-Feature)',
+            'sunset': 'Sunset (GPTZero-style)',
+            'sunrise': 'Sunrise (Statistical)',
+            'genesis': 'Genesis (Legacy)'
+        };
+        
+        const modelLabel = modelLabels[modelType] || modelType;
         console.log(`Model changed to: ${modelLabel}`);
         
         // Update any result displays to indicate current model
@@ -257,8 +264,8 @@ const App = {
      * Get current model type
      */
     getCurrentModel() {
-        const selected = document.querySelector('input[name="modelType"]:checked');
-        return selected ? selected.value : 'sunrise';
+        const selected = document.querySelector('input[name="model"]:checked');
+        return selected ? selected.value : 'enhanced';
     },
     
     /**

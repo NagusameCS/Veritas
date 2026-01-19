@@ -107,7 +107,25 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             <!-- Model Selector -->
                             <div class="model-selector">
                                 <label class="model-option">
-                                    <input type="radio" name="model" value="sunrise" checked>
+                                    <input type="radio" name="model" value="enhanced" checked>
+                                    <span class="model-label">
+                                        <span class="material-icons model-icon">auto_awesome</span>
+                                        <span class="model-name">Enhanced</span>
+                                        <span class="model-desc">Latest • 99.2% Accuracy</span>
+                                        <span class="model-stats">F1: 99.2% | ROC: 99.98% | 45 Features</span>
+                                    </span>
+                                </label>
+                                <label class="model-option">
+                                    <input type="radio" name="model" value="sunset">
+                                    <span class="model-label">
+                                        <span class="material-icons model-icon">nightlight</span>
+                                        <span class="model-name">Sunset</span>
+                                        <span class="model-desc">GPTZero-style • 99.6% Accuracy</span>
+                                        <span class="model-stats">Humanized Detection: 86.7% | Perplexity</span>
+                                    </span>
+                                </label>
+                                <label class="model-option">
+                                    <input type="radio" name="model" value="sunrise">
                                     <span class="model-label">
                                         <span class="material-icons model-icon">wb_sunny</span>
                                         <span class="model-name">Sunrise</span>
@@ -1195,6 +1213,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
     <script src="js/variance-utils.js"></script>
     <script src="js/sunrise-model.js"></script>
     <script src="js/sunset-model.js"></script>
+    <script src="js/enhanced-model.js"></script>
     
     <!-- Analyzers -->
     <script src="js/analyzers/grammar.js"></script>
