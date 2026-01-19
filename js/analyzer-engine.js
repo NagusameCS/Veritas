@@ -180,6 +180,7 @@ const AnalyzerEngine = {
             // Statistics
             stats,
             advancedStats,
+            tokens, // For word frequency chart
             metadata: metadata || null,
             analysisTime: (endTime - startTime).toFixed(0) + 'ms'
         };

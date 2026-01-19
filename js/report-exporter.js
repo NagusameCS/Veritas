@@ -268,55 +268,189 @@ const ReportExporter = {
     </div>`;
         }
 
-        // Add advanced statistics if available
+        // Add comprehensive statistics section matching the app's statistics page
         const advStats = analysisResult.advancedStats || {};
+        const basicStats = analysisResult.stats || {};
+        
+        // Helper functions
+        const formatNum = (n, decimals = 2) => n != null ? Number(n).toFixed(decimals) : 'N/A';
+        const formatPct = (n) => n != null ? `${(n * 100).toFixed(1)}%` : 'N/A';
+        const getIndicator = (val, thresholds, higherIsBetter = false) => {
+            if (val == null) return '⚪';
+            const [warn, good] = thresholds;
+            if (higherIsBetter) {
+                return val >= good ? '🟢' : (val >= warn ? '🟡' : '🔴');
+            }
+            return val <= good ? '🟢' : (val <= warn ? '🟡' : '🔴');
+        };
+        
         if (Object.keys(advStats).length > 0) {
             html += `
-    <h2>Advanced Statistical Analysis</h2>
-    <div class="stat-grid">`;
-            
-            if (advStats.sentences?.coefficientOfVariation != null) {
-                const cv = advStats.sentences.coefficientOfVariation;
-                const cvStatus = cv < 0.35 ? '🔴' : (cv > 0.5 ? '🟢' : '🟡');
-                html += `
-        <div class="stat-item"><div class="stat-label">Sentence CV ${cvStatus}</div><div class="stat-value">${(cv * 100).toFixed(1)}%</div></div>`;
-            }
-            
-            if (advStats.sentences?.mean != null) {
-                html += `
-        <div class="stat-item"><div class="stat-label">Avg Sentence Length</div><div class="stat-value">${advStats.sentences.mean.toFixed(1)} words</div></div>`;
-            }
-            
-            if (advStats.burstiness?.sentenceLength != null) {
-                const burst = advStats.burstiness.sentenceLength;
-                const burstStatus = burst < 0 ? '🔴' : (burst > 0.2 ? '🟢' : '🟡');
-                html += `
-        <div class="stat-item"><div class="stat-label">Burstiness ${burstStatus}</div><div class="stat-value">${(burst * 100).toFixed(1)}%</div></div>`;
-            }
-            
-            if (advStats.vocabulary?.ttr != null) {
-                html += `
-        <div class="stat-item"><div class="stat-label">TTR</div><div class="stat-value">${(advStats.vocabulary.ttr * 100).toFixed(1)}%</div></div>`;
-            }
-            
-            if (advStats.vocabulary?.hapaxLegomenaRatio != null) {
-                const hapax = advStats.vocabulary.hapaxLegomenaRatio;
-                const hapaxStatus = hapax < 0.35 ? '🔴' : (hapax > 0.65 ? '🟡' : '🟢');
-                html += `
-        <div class="stat-item"><div class="stat-label">Hapax Ratio ${hapaxStatus}</div><div class="stat-value">${(hapax * 100).toFixed(1)}%</div></div>`;
-            }
-            
-            if (advStats.burstiness?.overallUniformity != null) {
-                const uniformity = advStats.burstiness.overallUniformity;
-                const uniformStatus = uniformity > 0.7 ? '🔴' : (uniformity < 0.4 ? '🟢' : '🟡');
-                html += `
-        <div class="stat-item"><div class="stat-label">Uniformity ${uniformStatus}</div><div class="stat-value">${(uniformity * 100).toFixed(1)}%</div></div>`;
-            }
-            
-            html += `
-    </div>
-    <p style="font-size:8pt;color:#666;margin-top:5px;">🔴 = AI-like | 🟡 = Uncertain | 🟢 = Human-like</p>`;
+    <h2>Complete Statistical Analysis</h2>
+    <p style="font-size:8pt;color:#666;margin-bottom:10px;">🔴 = AI-like | 🟡 = Uncertain | 🟢 = Human-like</p>
+    
+    <!-- Vocabulary Richness -->
+    <h3>📚 Vocabulary Richness</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr><td>Unique Words</td><td>${advStats.vocabulary?.uniqueWords?.toLocaleString() || 0}</td><td>—</td></tr>
+        <tr><td>Type-Token Ratio (TTR)</td><td>${formatPct(advStats.vocabulary?.typeTokenRatio)}</td><td>${getIndicator(advStats.vocabulary?.typeTokenRatio, [0.3, 0.5], true)}</td></tr>
+        <tr><td>Root TTR (Guiraud's R)</td><td>${formatNum(advStats.vocabulary?.rootTTR)}</td><td>—</td></tr>
+        <tr><td>Hapax Legomena Ratio</td><td>${formatPct(advStats.vocabulary?.hapaxLegomenaRatio)}</td><td>${getIndicator(advStats.vocabulary?.hapaxLegomenaRatio, [0.35, 0.5], true)}</td></tr>
+        <tr><td>Dis Legomena Ratio</td><td>${formatPct(advStats.vocabulary?.disLegomenaRatio)}</td><td>—</td></tr>
+        <tr><td>Yule's K</td><td>${formatNum(advStats.vocabulary?.yulesK, 1)}</td><td>${getIndicator(advStats.vocabulary?.yulesK, [150, 100])}</td></tr>
+        <tr><td>Simpson's D</td><td>${formatNum(advStats.vocabulary?.simpsonsD, 4)}</td><td>${getIndicator(advStats.vocabulary?.simpsonsD, [0.02, 0.01])}</td></tr>
+        <tr><td>Honore's R</td><td>${formatNum(advStats.vocabulary?.honoresR, 0)}</td><td>—</td></tr>
+        <tr><td>Brunet's W</td><td>${formatNum(advStats.vocabulary?.brunetsW, 1)}</td><td>—</td></tr>
+    </table>
+    
+    <!-- Sentence Analysis -->
+    <h3>📝 Sentence Analysis</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr><td>Mean Length</td><td>${formatNum(advStats.sentences?.mean, 1)} words</td><td>—</td></tr>
+        <tr><td>Median Length</td><td>${formatNum(advStats.sentences?.median, 1)} words</td><td>—</td></tr>
+        <tr><td>Std Deviation</td><td>${formatNum(advStats.sentences?.stdDev, 2)}</td><td>—</td></tr>
+        <tr><td>Min / Max</td><td>${advStats.sentences?.min || 0} / ${advStats.sentences?.max || 0}</td><td>—</td></tr>
+        <tr><td>Coeff. of Variation</td><td>${formatNum(advStats.sentences?.coefficientOfVariation, 3)}</td><td>${getIndicator(advStats.sentences?.coefficientOfVariation, [0.35, 0.5], true)}</td></tr>
+        <tr><td>Skewness</td><td>${formatNum(advStats.sentences?.skewness, 3)}</td><td>—</td></tr>
+        <tr><td>Kurtosis</td><td>${formatNum(advStats.sentences?.kurtosis, 3)}</td><td>—</td></tr>
+        <tr><td>Gini Coefficient</td><td>${formatNum(advStats.sentences?.gini, 3)}</td><td>${getIndicator(advStats.sentences?.gini, [0.15, 0.25], true)}</td></tr>
+    </table>
+    
+    <!-- Zipf's Law -->
+    <h3>📈 Zipf's Law Analysis</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr><td>Zipf Compliance</td><td>${formatPct(advStats.zipf?.compliance)}</td><td>${getIndicator(advStats.zipf?.compliance, [0.7, 0.85], true)}</td></tr>
+        <tr><td>Log-Log Slope</td><td>${formatNum(advStats.zipf?.slope, 3)} (ideal: -1)</td><td>${getIndicator(Math.abs((advStats.zipf?.slope || 0) + 1), [0.3, 0.15])}</td></tr>
+        <tr><td>R² (Fit Quality)</td><td>${formatNum(advStats.zipf?.rSquared, 3)}</td><td>—</td></tr>
+        <tr><td>Deviation from Ideal</td><td>${formatNum(advStats.zipf?.deviation, 3)}</td><td>—</td></tr>
+    </table>
+    
+    <!-- Readability -->
+    <h3>📖 Readability Metrics</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th></tr>
+        <tr><td>Avg Syllables/Word</td><td>${formatNum(advStats.readability?.avgSyllablesPerWord, 2)}</td></tr>
+        <tr><td>Flesch Reading Ease</td><td>${formatNum(advStats.readability?.fleschReadingEase, 1)}</td></tr>
+        <tr><td>Flesch-Kincaid Grade</td><td>${formatNum(advStats.readability?.fleschKincaidGrade, 1)}</td></tr>
+        <tr><td>Gunning Fog Index</td><td>${formatNum(advStats.readability?.gunningFogIndex, 1)}</td></tr>
+        <tr><td>Coleman-Liau Index</td><td>${formatNum(advStats.readability?.colemanLiauIndex, 1)}</td></tr>
+        <tr><td>SMOG Index</td><td>${formatNum(advStats.readability?.smogIndex, 1)}</td></tr>
+        <tr><td>ARI</td><td>${formatNum(advStats.readability?.ariIndex, 1)}</td></tr>
+        <tr><td>Complex Word %</td><td>${formatNum(advStats.readability?.complexWordPercentage, 1)}%</td></tr>
+    </table>
+    
+    <!-- Burstiness & Uniformity -->
+    <h3>⚡ Burstiness & Uniformity</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr><td>Sentence Length Burstiness</td><td>${formatNum(advStats.burstiness?.sentenceLength, 3)}</td><td>${getIndicator(advStats.burstiness?.sentenceLength, [0.1, 0.25], true)}</td></tr>
+        <tr><td>Word Length Burstiness</td><td>${formatNum(advStats.burstiness?.wordLength, 3)}</td><td>—</td></tr>
+        <tr><td>Overall Uniformity</td><td>${formatPct(advStats.burstiness?.overallUniformity)}</td><td>${getIndicator(advStats.burstiness?.overallUniformity, [0.7, 0.5])}</td></tr>
+    </table>
+    
+    <!-- N-gram Analysis -->
+    <h3>🔗 N-gram & Phrase Analysis</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr><td>Unique Bigrams</td><td>${advStats.ngrams?.uniqueBigrams?.toLocaleString() || 0}</td><td>—</td></tr>
+        <tr><td>Unique Trigrams</td><td>${advStats.ngrams?.uniqueTrigrams?.toLocaleString() || 0}</td><td>—</td></tr>
+        <tr><td>Bigram Repetition Rate</td><td>${formatPct(advStats.ngrams?.bigramRepetitionRate)}</td><td>${getIndicator(advStats.ngrams?.bigramRepetitionRate, [0.4, 0.25])}</td></tr>
+        <tr><td>Trigram Repetition Rate</td><td>${formatPct(advStats.ngrams?.trigramRepetitionRate)}</td><td>${getIndicator(advStats.ngrams?.trigramRepetitionRate, [0.2, 0.1])}</td></tr>
+        <tr><td>Quadgram Repetition Rate</td><td>${formatPct(advStats.ngrams?.quadgramRepetitionRate)}</td><td>${getIndicator(advStats.ngrams?.quadgramRepetitionRate, [0.1, 0.05])}</td></tr>
+        <tr><td><strong>Repeated Phrase Score</strong></td><td><strong>${formatPct(advStats.ngrams?.repeatedPhraseScore)}</strong></td><td>${getIndicator(advStats.ngrams?.repeatedPhraseScore, [0.3, 0.1])}</td></tr>
+        <tr><td>Repeated Phrases (4+ words)</td><td>${advStats.ngrams?.repeatedPhraseCount || 0} found</td><td>${advStats.ngrams?.repeatedPhraseCount > 2 ? '🔴' : '⚪'}</td></tr>
+    </table>
+    ${advStats.ngrams?.repeatedPhrases?.length > 0 ? `
+    <p style="font-size:8pt;margin-top:5px;"><strong>Top repeated phrases:</strong></p>
+    <ul style="font-size:8pt;margin:3px 0 10px 20px;">
+        ${advStats.ngrams.repeatedPhrases.slice(0, 5).map(p => `<li>"${p.phrase}" (${p.count}x)</li>`).join('')}
+    </ul>` : ''}
+    
+    <!-- Word Analysis -->
+    <h3>🔤 Word Analysis</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th></tr>
+        <tr><td>Avg Word Length</td><td>${formatNum(advStats.words?.avgLength, 2)} chars</td></tr>
+        <tr><td>Word Entropy</td><td>${formatNum(advStats.words?.entropy, 2)} bits</td></tr>
+        <tr><td>Function Word Ratio</td><td>${formatPct(advStats.functionWords?.ratio)}</td></tr>
+        <tr><td>Content Word Ratio</td><td>${formatPct(advStats.functionWords?.contentWordRatio)}</td></tr>
+    </table>
+    
+    <!-- Word Pattern Analysis -->
+    <h3>🏷️ Word Pattern Analysis</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr><td>First-Person Pronoun Ratio</td><td>${formatPct(advStats.wordPatterns?.firstPersonRatio)}</td><td>${advStats.wordPatterns?.firstPersonRatio < 0.01 ? '🔴' : (advStats.wordPatterns?.firstPersonRatio > 0.03 ? '🟢' : '🟡')}</td></tr>
+        <tr><td>Hedging Word Ratio</td><td>${formatPct(advStats.wordPatterns?.hedgingRatio)}</td><td>${advStats.wordPatterns?.hedgingRatio > 0.02 ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Sentence Starter Diversity</td><td>${formatPct(advStats.wordPatterns?.starterDiversity)}</td><td>${advStats.wordPatterns?.starterDiversity < 0.4 ? '🔴' : (advStats.wordPatterns?.starterDiversity > 0.7 ? '🟢' : '🟡')}</td></tr>
+        <tr><td>Common AI Starters Ratio</td><td>${formatPct(advStats.wordPatterns?.aiStarterRatio)}</td><td>${advStats.wordPatterns?.aiStarterRatio > 0.5 ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Verb-like Words</td><td>${formatPct(advStats.wordPatterns?.verbRatio)}</td><td>—</td></tr>
+        <tr><td>Adjective-like Words</td><td>${formatPct(advStats.wordPatterns?.adjectiveRatio)}</td><td>—</td></tr>
+        <tr><td>Adverb-like Words</td><td>${formatPct(advStats.wordPatterns?.adverbRatio)}</td><td>—</td></tr>
+        <tr><td>Content Density</td><td>${formatPct(advStats.wordPatterns?.contentDensity)}</td><td>—</td></tr>
+    </table>
+    
+    <!-- Advanced Statistical Tests -->
+    <h3>🔬 Advanced Statistical Tests</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr><td>Periodicity Score</td><td>${formatPct(advStats.autocorrelation?.periodicityScore)}</td><td>${getIndicator(advStats.autocorrelation?.periodicityScore, [0.6, 0.3])}</td></tr>
+        <tr><td>N-gram Predictability</td><td>${formatPct(advStats.perplexity?.predictability)}</td><td>${getIndicator(advStats.perplexity?.predictability, [0.6, 0.4])}</td></tr>
+        <tr><td>Perplexity (approx)</td><td>${formatNum(advStats.perplexity?.perplexity, 1)}</td><td>—</td></tr>
+        <tr><td>Randomness Score</td><td>${formatPct(advStats.runsTest?.randomnessScore)}</td><td>${getIndicator(advStats.runsTest?.randomnessScore, [0.4, 0.6], true)}</td></tr>
+        <tr><td>χ² Uniformity</td><td>${formatPct(advStats.chiSquared?.uniformityScore)}</td><td>${getIndicator(advStats.chiSquared?.uniformityScore, [0.7, 0.4])}</td></tr>
+        <tr><td>Variance Stability</td><td>${formatPct(advStats.varianceStability)}</td><td>${getIndicator(advStats.varianceStability, [0.7, 0.5])}</td></tr>
+        <tr><td>Mahalanobis Distance</td><td>${formatNum(advStats.mahalanobisDistance, 2)}σ</td><td>${getIndicator(advStats.mahalanobisDistance, [2.0, 1.0])}</td></tr>
+    </table>
+    
+    <!-- Human Likelihood -->
+    <h3>📊 Human Likelihood (Bell Curve Analysis)</h3>
+    <p style="font-size:8pt;color:#666;margin-bottom:5px;">Measures how close features are to typical human writing. Values near 1.0 = normal human range.</p>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr style="background:#f5f5f5;"><td><strong>Overall Human Likelihood</strong></td><td><strong>${formatPct(advStats.overallHumanLikelihood)}</strong></td><td>${getIndicator(advStats.overallHumanLikelihood, [0.4, 0.6], true)}</td></tr>
+        <tr><td>Sentence Length Variance</td><td>${formatPct(advStats.humanLikelihood?.sentenceLengthCV)}</td><td>${getIndicator(advStats.humanLikelihood?.sentenceLengthCV, [0.4, 0.7], true)}</td></tr>
+        <tr><td>Unique Word Distribution</td><td>${formatPct(advStats.humanLikelihood?.hapaxRatio)}</td><td>${getIndicator(advStats.humanLikelihood?.hapaxRatio, [0.4, 0.7], true)}</td></tr>
+        <tr><td>Word Usage Burstiness</td><td>${formatPct(advStats.humanLikelihood?.burstiness)}</td><td>${getIndicator(advStats.humanLikelihood?.burstiness, [0.4, 0.7], true)}</td></tr>
+        <tr><td>Zipf's Law Compliance</td><td>${formatPct(advStats.humanLikelihood?.zipfSlope)}</td><td>${getIndicator(advStats.humanLikelihood?.zipfSlope, [0.4, 0.7], true)}</td></tr>
+        <tr><td>Vocabulary Richness</td><td>${formatPct(advStats.humanLikelihood?.ttr)}</td><td>${getIndicator(advStats.humanLikelihood?.ttr, [0.4, 0.7], true)}</td></tr>
+        <tr><td>Variance Naturalness</td><td>${formatPct(advStats.varianceNaturalness)}</td><td>${getIndicator(advStats.varianceNaturalness, [0.4, 0.7], true)}</td></tr>
+        <tr><td>Extreme Variance Warning</td><td>${formatPct(advStats.extremeVarianceIndicator)}</td><td>${getIndicator(advStats.extremeVarianceIndicator, [0.6, 0.4])}</td></tr>
+    </table>
+    
+    <!-- AI Signature Metrics -->
+    <h3>🤖 AI Signature Metrics</h3>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
+        <tr><td>Hedging Density</td><td>${formatPct(advStats.aiSignatures?.hedgingDensity)}</td><td>${getIndicator(advStats.aiSignatures?.hedgingDensity, [0.02, 0.01])}</td></tr>
+        <tr><td>Discourse Marker Density</td><td>${formatNum(advStats.aiSignatures?.discourseMarkerDensity, 2)}/sentence</td><td>${getIndicator(advStats.aiSignatures?.discourseMarkerDensity, [0.4, 0.2])}</td></tr>
+        <tr><td>Unicode Anomaly Density</td><td>${formatNum(advStats.aiSignatures?.unicodeAnomalyDensity, 2)}/1000 chars</td><td>${getIndicator(advStats.aiSignatures?.unicodeAnomalyDensity, [1, 0.3])}</td></tr>
+        <tr><td>Decorative Dividers</td><td>${advStats.aiSignatures?.decorativeDividerCount || 0}</td><td>${getIndicator(advStats.aiSignatures?.decorativeDividerCount, [1, 0])}</td></tr>
+        <tr><td>Contraction Rate</td><td>${formatNum(advStats.aiSignatures?.contractionRate, 2)}/sentence</td><td>${getIndicator(advStats.aiSignatures?.contractionRate, [0.3, 0.5], true)}</td></tr>
+        <tr><td>Sentence Starter Variety</td><td>${formatPct(advStats.aiSignatures?.sentenceStarterVariety)}</td><td>${getIndicator(advStats.aiSignatures?.sentenceStarterVariety, [0.4, 0.6], true)}</td></tr>
+        <tr><td>Passive Voice Rate</td><td>${formatNum(advStats.aiSignatures?.passiveVoiceRate, 2)}/sentence</td><td>—</td></tr>
+    </table>
+    
+    <!-- Humanizer Detection -->
+    <h3 style="${advStats.humanizerSignals?.isLikelyHumanized ? 'color:#7c3aed;' : ''}">🔄 Humanizer Detection</h3>
+    <p style="font-size:8pt;color:#666;margin-bottom:5px;">Detects AI text that has been post-processed to evade detection.</p>
+    <table>
+        <tr><th>Metric</th><th>Value</th><th>Status</th></tr>
+        <tr style="${advStats.humanizerSignals?.isLikelyHumanized ? 'background:#faf5ff;' : ''}"><td><strong>Humanizer Probability</strong></td><td><strong>${formatPct(advStats.humanizerSignals?.humanizerProbability)}</strong></td><td>${advStats.humanizerSignals?.isLikelyHumanized ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Variance Stability (2nd order)</td><td>${advStats.humanizerSignals?.stableVarianceFlag ? 'Suspicious' : 'Normal'}</td><td>${advStats.humanizerSignals?.stableVarianceFlag ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Autocorrelation Pattern</td><td>${advStats.humanizerSignals?.flatAutocorrelationFlag ? 'Random noise' : 'Natural'}</td><td>${advStats.humanizerSignals?.flatAutocorrelationFlag ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Feature Correlations</td><td>${advStats.humanizerSignals?.brokenCorrelationFlag ? 'Broken' : 'Intact'}</td><td>${advStats.humanizerSignals?.brokenCorrelationFlag ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Sophistication Consistency</td><td>${advStats.humanizerSignals?.synonymSubstitutionFlag ? 'Word-level chaos' : 'Consistent'}</td><td>${advStats.humanizerSignals?.synonymSubstitutionFlag ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Contraction Pattern</td><td>${advStats.humanizerSignals?.artificialContractionFlag ? 'Artificial' : 'Natural'}</td><td>${advStats.humanizerSignals?.artificialContractionFlag ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Warning Flags</td><td>${advStats.humanizerSignals?.flagCount || 0} / 5</td><td>—</td></tr>
+    </table>`;
         }
+
+        // Add Word Frequency Distribution Chart (Zipf)
+        html += this.generateZipfChartHtml(analysisResult);
 
         html += `
     <h2>Category Weight Overview</h2>
@@ -378,41 +512,8 @@ const ReportExporter = {
     </div>`;
         }
 
-        // Add verbose signal summary before sentence breakdown
+        // Add verbose signal summary
         html += this.generateSignalSummaryHtml(analysisResult, verboseEvidence);
-
-        // Sentence breakdown if available
-        if (analysisResult.sentenceScores && analysisResult.sentenceScores.length > 0) {
-            const aiSentences = analysisResult.sentenceScores.filter(s => s.classification === 'ai').length;
-            const humanSentences = analysisResult.sentenceScores.filter(s => s.classification === 'human').length;
-            const mixedSentences = analysisResult.sentenceScores.filter(s => s.classification === 'mixed').length;
-            const total = analysisResult.sentenceScores.length;
-            
-            html += `
-    <h2>Sentence-Level Analysis</h2>
-    <p>Each sentence was individually analyzed and classified:</p>
-    <table>
-        <tr><th>Classification</th><th>Count</th><th>Percentage</th><th>Visual</th></tr>
-        <tr>
-            <td>Likely AI</td>
-            <td>${aiSentences}</td>
-            <td>${Math.round(aiSentences/total*100)}%</td>
-            <td><div style="height:15px;background:#ef4444;width:${aiSentences/total*100}%;border-radius:3px;"></div></td>
-        </tr>
-        <tr>
-            <td>Uncertain/Mixed</td>
-            <td>${mixedSentences}</td>
-            <td>${Math.round(mixedSentences/total*100)}%</td>
-            <td><div style="height:15px;background:#f59e0b;width:${mixedSentences/total*100}%;border-radius:3px;"></div></td>
-        </tr>
-        <tr>
-            <td>Likely Human</td>
-            <td>${humanSentences}</td>
-            <td>${Math.round(humanSentences/total*100)}%</td>
-            <td><div style="height:15px;background:#10b981;width:${humanSentences/total*100}%;border-radius:3px;"></div></td>
-        </tr>
-    </table>`;
-        }
 
         html += `
     <div class="methodology">
@@ -595,6 +696,95 @@ const ReportExporter = {
         }
 
         return evidence;
+    },
+
+    /**
+     * Generate Zipf distribution chart HTML
+     */
+    generateZipfChartHtml(analysisResult) {
+        const tokens = analysisResult.tokens || [];
+        if (!tokens || tokens.length < 50) {
+            return '';
+        }
+
+        // Build frequency distribution
+        const freq = {};
+        for (const token of tokens) {
+            const word = token.toLowerCase();
+            freq[word] = (freq[word] || 0) + 1;
+        }
+        
+        const sortedFreqs = Object.entries(freq)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 30);
+
+        if (sortedFreqs.length < 10) {
+            return '';
+        }
+
+        const maxFreq = sortedFreqs[0][1];
+        const chartWidth = 400;
+        const chartHeight = 180;
+        const barWidth = Math.floor(chartWidth / sortedFreqs.length) - 2;
+
+        let html = `
+    <h3>📊 Word Frequency Distribution (Zipf Chart)</h3>
+    <p style="font-size:8pt;color:#666;margin-bottom:10px;">Shows top 30 words by frequency. Natural text follows Zipf's law (rank × frequency ≈ constant).</p>
+    <div style="background:#f9fafb;border:1px solid #e5e5e5;border-radius:4px;padding:10px;margin:10px 0;">
+        <svg viewBox="0 0 ${chartWidth} ${chartHeight}" style="width:100%;max-width:${chartWidth}px;height:auto;">
+            <!-- Title -->
+            <text x="${chartWidth/2}" y="15" text-anchor="middle" style="font-size:10px;fill:#333;">Word Frequency (Top 30)</text>
+            
+            <!-- Y-axis label -->
+            <text x="5" y="${chartHeight/2}" text-anchor="middle" transform="rotate(-90, 12, ${chartHeight/2})" style="font-size:8px;fill:#666;">Frequency</text>
+            
+            <!-- X-axis label -->
+            <text x="${chartWidth/2}" y="${chartHeight - 5}" text-anchor="middle" style="font-size:8px;fill:#666;">Word Rank</text>
+            
+            <!-- Bars -->`;
+
+        const plotTop = 25;
+        const plotBottom = chartHeight - 25;
+        const plotHeight = plotBottom - plotTop;
+        const logMax = Math.log(maxFreq + 1);
+
+        sortedFreqs.forEach(([word, count], i) => {
+            const x = 30 + i * (barWidth + 2);
+            const barHeight = (Math.log(count + 1) / logMax) * plotHeight;
+            const y = plotBottom - barHeight;
+            
+            // Color gradient from high to low frequency
+            const hue = 200 + (i / sortedFreqs.length) * 80; // Blue to purple
+            const color = `hsl(${hue}, 60%, 50%)`;
+            
+            html += `
+            <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" fill="${color}" rx="1">
+                <title>${word}: ${count}</title>
+            </rect>`;
+        });
+
+        // Expected Zipf line (reference)
+        let pathData = '';
+        sortedFreqs.forEach(([word, count], i) => {
+            const expectedFreq = maxFreq / (i + 1);
+            const x = 30 + i * (barWidth + 2) + barWidth / 2;
+            const y = plotBottom - (Math.log(expectedFreq + 1) / logMax) * plotHeight;
+            pathData += `${i === 0 ? 'M' : 'L'} ${x},${y}`;
+        });
+        
+        html += `
+            <!-- Expected Zipf curve -->
+            <path d="${pathData}" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
+            
+            <!-- Legend -->
+            <rect x="${chartWidth - 100}" y="20" width="10" height="10" fill="hsl(220, 60%, 50%)" rx="1"/>
+            <text x="${chartWidth - 85}" y="28" style="font-size:7px;fill:#666;">Actual</text>
+            <line x1="${chartWidth - 100}" y1="38" x2="${chartWidth - 90}" y2="38" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <text x="${chartWidth - 85}" y="41" style="font-size:7px;fill:#666;">Expected (Zipf)</text>
+        </svg>
+    </div>`;
+
+        return html;
     },
 
     /**
