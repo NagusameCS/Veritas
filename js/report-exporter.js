@@ -912,51 +912,90 @@ const ReportExporter = {
 
     /**
      * Generate signal summary HTML section
+     * Uses actual findings from categoryResults for consistency with detailed report
      */
     generateSignalSummaryHtml(analysisResult, evidence) {
-        if (!evidence || (evidence.aiSignals.length === 0 && evidence.humanSignals.length === 0)) {
+        // Count actual findings from categoryResults (same as detailed report)
+        const categoryFindings = analysisResult.categoryResults?.flatMap(r => r.findings || []) || [];
+        const actualAiFindings = categoryFindings.filter(f => f.indicator === 'ai');
+        const actualHumanFindings = categoryFindings.filter(f => f.indicator === 'human');
+        
+        // Use actual findings count for the headline, but show statistical evidence
+        const aiCount = actualAiFindings.length;
+        const humanCount = actualHumanFindings.length;
+        
+        if (aiCount === 0 && humanCount === 0 && 
+            (!evidence || (evidence.aiSignals.length === 0 && evidence.humanSignals.length === 0))) {
             return '';
         }
 
         let html = `
     <div class="signal-summary">
         <h3>Detection Signal Summary</h3>
-        <p style="font-size:9pt;color:#666;">Specific statistical evidence supporting the classification:</p>
+        <p style="font-size:9pt;color:#666;">Key findings from the analysis supporting the classification:</p>
         <div class="signal-grid">`;
 
-        // AI signals column
+        // AI signals column - use actual findings count
         html += `<div>
-            <h4 style="color:#b91c1c;font-size:10pt;margin-bottom:6px;">AI Indicators (${evidence.aiSignals.length})</h4>`;
+            <h4 style="color:#b91c1c;font-size:10pt;margin-bottom:6px;">AI Indicators (${aiCount})</h4>`;
         
-        for (const signal of evidence.aiSignals.slice(0, 10)) {
-            const severityColor = signal.severity === 'high' ? '#991b1b' : (signal.severity === 'medium' ? '#b91c1c' : '#dc2626');
+        // Show actual findings first
+        for (const finding of actualAiFindings.slice(0, 8)) {
+            const text = finding.text || finding.value || finding.label || 'AI pattern detected';
             html += `
             <div class="signal-item ai-signal">
-                <div class="signal-label">${signal.label}</div>
-                <div class="signal-value" style="color:${severityColor}">${signal.value}</div>
+                <div class="signal-label">${this.escapeHtml(text)}</div>
             </div>`;
+        }
+        
+        // If no actual findings, show statistical evidence
+        if (actualAiFindings.length === 0 && evidence?.aiSignals?.length > 0) {
+            for (const signal of evidence.aiSignals.slice(0, 6)) {
+                html += `
+            <div class="signal-item ai-signal">
+                <div class="signal-label">${signal.label}</div>
+                <div class="signal-value" style="color:#991b1b">${signal.value}</div>
+            </div>`;
+            }
+        }
+        
+        if (aiCount === 0 && (!evidence || evidence.aiSignals.length === 0)) {
+            html += `<p style="font-size:9pt;color:#888;padding:6px;">No significant AI indicators found</p>`;
         }
         html += `</div>`;
 
-        // Human signals column
+        // Human signals column - use actual findings count
         html += `<div>
-            <h4 style="color:#047857;font-size:10pt;margin-bottom:6px;">Human Indicators (${evidence.humanSignals.length})</h4>`;
+            <h4 style="color:#047857;font-size:10pt;margin-bottom:6px;">Human Indicators (${humanCount})</h4>`;
         
-        for (const signal of evidence.humanSignals.slice(0, 10)) {
+        // Show actual findings first
+        for (const finding of actualHumanFindings.slice(0, 8)) {
+            const text = finding.text || finding.value || finding.label || 'Human pattern detected';
             html += `
+            <div class="signal-item human-signal">
+                <div class="signal-label">${this.escapeHtml(text)}</div>
+            </div>`;
+        }
+        
+        // If no actual findings, show statistical evidence
+        if (actualHumanFindings.length === 0 && evidence?.humanSignals?.length > 0) {
+            for (const signal of evidence.humanSignals.slice(0, 6)) {
+                html += `
             <div class="signal-item human-signal">
                 <div class="signal-label">${signal.label}</div>
                 <div class="signal-value" style="color:#047857">${signal.value}</div>
             </div>`;
+            }
         }
         
-        if (evidence.humanSignals.length === 0) {
+        if (humanCount === 0 && (!evidence || evidence.humanSignals.length === 0)) {
             html += `<p style="font-size:9pt;color:#888;padding:6px;">No significant human indicators found</p>`;
         }
         html += `</div>`;
 
         html += `
         </div>
+        <p style="font-size:8pt;color:#888;margin-top:10px;font-style:italic;">Note: Indicator counts show patterns detected. Final AI probability uses ML-derived category weights (Metadata 40%, Lexical 22%, Syntax 21%), so high-weight categories have more influence on the score than raw indicator counts.</p>
     </div>`;
 
         return html;

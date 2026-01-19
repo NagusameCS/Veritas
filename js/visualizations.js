@@ -642,6 +642,7 @@ const Visualizations = {
                         <span class="signal-badge ai">🔴 ${totalAiFindings} AI Indicators</span>
                         <span class="signal-badge human">🟢 ${totalHumanFindings} Human Indicators</span>
                     </div>
+                    <p class="signal-note">Note: Indicator counts show patterns detected. Final probability uses ML-derived weights where high-weight categories (Metadata 40%, Lexical 22%, Syntax 21%) have more influence than low-weight categories.</p>
                 </div>
                 <div class="accordion">
                     ${sectionsHtml}

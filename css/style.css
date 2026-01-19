@@ -2952,6 +2952,14 @@ body {
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
+.signal-note {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: var(--space-sm);
+    font-style: italic;
+    line-height: 1.4;
+}
+
 .section-signal-count {
     font-size: 0.7rem;
     color: var(--text-muted);
