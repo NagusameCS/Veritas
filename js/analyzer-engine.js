@@ -542,8 +542,9 @@ const AnalyzerEngine = {
             const ngrams = Utils.ngrams(tokens, n);
             const counts = {};
             
+            // ngrams are already joined strings from Utils.ngrams
             ngrams.forEach(gram => {
-                const key = gram.join(' ').toLowerCase();
+                const key = gram.toLowerCase();
                 counts[key] = (counts[key] || 0) + 1;
             });
             

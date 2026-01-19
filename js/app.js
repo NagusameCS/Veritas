@@ -1104,11 +1104,11 @@ const App = {
             </div>
 
             <div class="stats-legend">
-                <h5>Legend</h5>
+                <h5>Indicator Key</h5>
                 <div class="legend-items">
-                    <span class="legend-item indicator-ai">🔴 Suggests AI</span>
-                    <span class="legend-item indicator-human">🟢 Suggests Human</span>
-                    <span class="legend-item indicator-neutral">⚪ Neutral</span>
+                    <span class="legend-item indicator-ai">Suggests AI</span>
+                    <span class="legend-item indicator-human">Suggests Human</span>
+                    <span class="legend-item indicator-neutral">Neutral</span>
                 </div>
             </div>
         `;
