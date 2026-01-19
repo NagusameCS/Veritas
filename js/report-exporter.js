@@ -142,6 +142,11 @@ const ReportExporter = {
         
         // Build verbose evidence summaries for each category
         const verboseEvidence = this.buildVerboseEvidence(report, analysisResult);
+        console.log('[VERITAS Report] Building evidence from advStats:', !!analysisResult.advancedStats);
+        console.log('[VERITAS Report] AI Signals:', verboseEvidence.aiSignals.length, 'Human Signals:', verboseEvidence.humanSignals.length);
+        if (verboseEvidence.aiSignals.length > 0) {
+            console.log('[VERITAS Report] Sample AI Signal:', verboseEvidence.aiSignals[0]);
+        }
         
         let html = `<!DOCTYPE html>
 <html>
@@ -704,6 +709,113 @@ const ReportExporter = {
                     value: `${(uniformity * 100).toFixed(1)}% (human avg: 40-60%)`,
                     severity: uniformity > 0.8 ? 'high' : 'medium'
                 });
+            } else if (uniformity < 0.5) {
+                evidence.humanSignals.push({
+                    label: 'Natural Uniformity',
+                    value: `${(uniformity * 100).toFixed(1)}%`
+                });
+            }
+        }
+
+        // Vocabulary richness
+        if (advStats.vocabulary?.typeTokenRatio) {
+            const ttr = advStats.vocabulary.typeTokenRatio;
+            if (ttr < 0.3) {
+                evidence.aiSignals.push({
+                    label: 'Low Vocabulary Diversity',
+                    value: `TTR: ${(ttr * 100).toFixed(1)}% (human avg: 45-60%)`,
+                    severity: ttr < 0.2 ? 'high' : 'medium'
+                });
+            } else if (ttr > 0.5) {
+                evidence.humanSignals.push({
+                    label: 'Rich Vocabulary',
+                    value: `TTR: ${(ttr * 100).toFixed(1)}%`
+                });
+            }
+        }
+
+        // N-gram repetition
+        if (advStats.ngrams?.trigramRepetitionRate) {
+            const trigram = advStats.ngrams.trigramRepetitionRate;
+            if (trigram > 0.2) {
+                evidence.aiSignals.push({
+                    label: 'High N-gram Repetition',
+                    value: `${(trigram * 100).toFixed(1)}% repeated trigrams`,
+                    severity: trigram > 0.3 ? 'high' : 'medium'
+                });
+            } else if (trigram < 0.1) {
+                evidence.humanSignals.push({
+                    label: 'Natural Phrase Variety',
+                    value: `${(trigram * 100).toFixed(1)}% repeated trigrams`
+                });
+            }
+        }
+
+        // Sentence length Gini
+        if (advStats.sentences?.gini) {
+            const gini = advStats.sentences.gini;
+            if (gini < 0.15) {
+                evidence.aiSignals.push({
+                    label: 'Uniform Sentence Lengths',
+                    value: `Gini: ${(gini * 100).toFixed(1)}% (human avg: 20-35%)`,
+                    severity: gini < 0.1 ? 'high' : 'medium'
+                });
+            } else if (gini > 0.25) {
+                evidence.humanSignals.push({
+                    label: 'Varied Sentence Lengths',
+                    value: `Gini: ${(gini * 100).toFixed(1)}%`
+                });
+            }
+        }
+
+        // Zipf's law compliance
+        if (advStats.zipf?.compliance) {
+            const zipf = advStats.zipf.compliance;
+            if (zipf < 0.7) {
+                evidence.aiSignals.push({
+                    label: 'Unnatural Word Distribution',
+                    value: `Zipf compliance: ${(zipf * 100).toFixed(1)}%`,
+                    severity: zipf < 0.5 ? 'high' : 'medium'
+                });
+            } else if (zipf > 0.85) {
+                evidence.humanSignals.push({
+                    label: 'Natural Word Distribution',
+                    value: `Zipf compliance: ${(zipf * 100).toFixed(1)}%`
+                });
+            }
+        }
+
+        // Human likelihood score
+        if (advStats.overallHumanLikelihood) {
+            const hl = advStats.overallHumanLikelihood;
+            if (hl < 0.4) {
+                evidence.aiSignals.push({
+                    label: 'Low Human Likelihood',
+                    value: `${(hl * 100).toFixed(1)}% (bell curve distance)`,
+                    severity: hl < 0.25 ? 'high' : 'medium'
+                });
+            } else if (hl > 0.6) {
+                evidence.humanSignals.push({
+                    label: 'High Human Likelihood',
+                    value: `${(hl * 100).toFixed(1)}% (within normal range)`
+                });
+            }
+        }
+
+        // Predictability
+        if (advStats.perplexity?.predictability) {
+            const pred = advStats.perplexity.predictability;
+            if (pred > 0.6) {
+                evidence.aiSignals.push({
+                    label: 'High Predictability',
+                    value: `${(pred * 100).toFixed(1)}% (AI text is often predictable)`,
+                    severity: pred > 0.75 ? 'high' : 'medium'
+                });
+            } else if (pred < 0.4) {
+                evidence.humanSignals.push({
+                    label: 'Natural Unpredictability',
+                    value: `${(pred * 100).toFixed(1)}%`
+                });
             }
         }
 
@@ -715,14 +827,42 @@ const ReportExporter = {
                     value: `${advStats.aiSignatures.contractionRate.toFixed(2)} per sentence (human avg: 0.2-0.5)`,
                     severity: 'low'
                 });
+            } else if (advStats.aiSignatures.contractionRate > 0.3) {
+                evidence.humanSignals.push({
+                    label: 'Natural Contractions',
+                    value: `${advStats.aiSignatures.contractionRate.toFixed(2)} per sentence`
+                });
             }
+            
             if (advStats.aiSignatures.sentenceStarterVariety < 0.4) {
                 evidence.aiSignals.push({
                     label: 'Repetitive Sentence Starters',
                     value: `${(advStats.aiSignatures.sentenceStarterVariety * 100).toFixed(1)}% variety`,
                     severity: 'medium'
                 });
+            } else if (advStats.aiSignatures.sentenceStarterVariety > 0.6) {
+                evidence.humanSignals.push({
+                    label: 'Varied Sentence Starters',
+                    value: `${(advStats.aiSignatures.sentenceStarterVariety * 100).toFixed(1)}% variety`
+                });
             }
+
+            if (advStats.aiSignatures.hedgingDensity > 0.02) {
+                evidence.aiSignals.push({
+                    label: 'Excessive Hedging',
+                    value: `${(advStats.aiSignatures.hedgingDensity * 100).toFixed(2)}% hedging words`,
+                    severity: advStats.aiSignatures.hedgingDensity > 0.03 ? 'high' : 'medium'
+                });
+            }
+        }
+
+        // Humanizer detection signals
+        if (advStats.humanizerSignals?.isLikelyHumanized) {
+            evidence.aiSignals.push({
+                label: '⚠️ Humanizer Detected',
+                value: `${(advStats.humanizerSignals.humanizerProbability * 100).toFixed(0)}% probability of AI + humanizer`,
+                severity: 'high'
+            });
         }
 
         // Category-specific evidence
@@ -854,7 +994,7 @@ const ReportExporter = {
         html += `<div>
             <h4 style="color:#b91c1c;font-size:10pt;margin-bottom:6px;">🔴 AI Indicators (${evidence.aiSignals.length})</h4>`;
         
-        for (const signal of evidence.aiSignals.slice(0, 6)) {
+        for (const signal of evidence.aiSignals.slice(0, 10)) {
             const severityColor = signal.severity === 'high' ? '#991b1b' : (signal.severity === 'medium' ? '#b91c1c' : '#dc2626');
             html += `
             <div class="signal-item ai-signal">
@@ -868,7 +1008,7 @@ const ReportExporter = {
         html += `<div>
             <h4 style="color:#047857;font-size:10pt;margin-bottom:6px;">🟢 Human Indicators (${evidence.humanSignals.length})</h4>`;
         
-        for (const signal of evidence.humanSignals.slice(0, 6)) {
+        for (const signal of evidence.humanSignals.slice(0, 10)) {
             html += `
             <div class="signal-item human-signal">
                 <div class="signal-label">${signal.label}</div>

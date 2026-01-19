@@ -1,5 +1,5 @@
 /**
- * VERITAS — Main Application v2.0
+ * VERITAS — Main Application v3.0 (Sunrise)
  * Application initialization with enhanced file support and reporting
  */
 
@@ -17,7 +17,7 @@ const App = {
         this.loadHistory();
         this.initTheme();
         this.initTabs();
-        console.log('VERITAS v2.0 initialized');
+        console.log('VERITAS v3.0 (Sunrise) initialized');
     },
 
     /**
