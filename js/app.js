@@ -1083,6 +1083,11 @@ These findings have important implications for urban planning and public health 
             // Check if ReportExporter is available
             if (typeof ReportExporter !== 'undefined') {
                 switch (format) {
+                    case 'pdf':
+                        await ReportExporter.exportPdf(this.currentResult, originalText);
+                        this.showToast('PDF report generated', 'success');
+                        break;
+                    
                     case 'docx':
                         await ReportExporter.exportDocx(this.currentResult, originalText);
                         this.showToast('DOCX report downloaded', 'success');
