@@ -548,15 +548,28 @@ const App = {
             Visualizations.createScoreRing(scoreContainer, result.aiProbability, result.confidence);
         }
 
-        // Verdict
+        // Check for high disagreement which suggests humanized AI
+        const hasHighDisagreement = result.falsePositiveRisk?.risks?.some(r => r.type === 'analyzer_disagreement');
+        
+        // Verdict - modify if high disagreement detected
         const verdictEl = document.querySelector('.verdict-label');
         const verdictDescEl = document.querySelector('.verdict-description');
         if (verdictEl && result.verdict) {
-            verdictEl.textContent = result.verdict.label;
-            verdictEl.className = `verdict-label ${result.verdict.level}`;
+            // If high disagreement and not already marked as humanized, suggest it
+            if (hasHighDisagreement && result.verdict.level !== 'humanized') {
+                verdictEl.textContent = 'Possibly Humanized AI';
+                verdictEl.className = 'verdict-label humanized';
+            } else {
+                verdictEl.textContent = result.verdict.label;
+                verdictEl.className = `verdict-label ${result.verdict.level}`;
+            }
         }
         if (verdictDescEl && result.verdict) {
-            verdictDescEl.textContent = result.verdict.description;
+            if (hasHighDisagreement && result.verdict.level !== 'humanized') {
+                verdictDescEl.textContent = 'High disagreement between analyzers suggests AI text modified by humanizer tools — see detailed report for analysis';
+            } else {
+                verdictDescEl.textContent = result.verdict.description;
+            }
         }
 
         // Confidence with interval
@@ -1200,7 +1213,8 @@ const App = {
         const warningHtml = `
             <div class="false-positive-warning">
                 <div class="false-positive-warning-title">
-                    <span class="material-icons">warning</span> Detection Caveats
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                    Detection Caveats
                 </div>
                 <ul class="false-positive-warning-list">
                     ${risks.map(r => `<li>${r.message}</li>`).join('')}
@@ -1223,7 +1237,7 @@ const App = {
         
         const noteHtml = `
             <div class="domain-awareness-note">
-                <div class="note-title"><span class="material-icons">info</span> Domain Notice</div>
+                <div class="note-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg> Domain Notice</div>
                 <p>Detection accuracy varies by text type. Academic, creative, and technical writing 
                 may produce different results. No detector is 100% reliable—use as one data point, 
                 not as definitive proof.</p>

@@ -1188,7 +1188,7 @@ const AnalyzerEngine = {
             });
         }
 
-        // Check for disagreement between analyzers
+        // Check for disagreement between analyzers - may indicate humanized AI
         const validResults = categoryResults.filter(r => r.confidence > 0.3);
         if (validResults.length > 3) {
             const probs = validResults.map(r => r.aiProbability);
@@ -1196,8 +1196,9 @@ const AnalyzerEngine = {
             if (spread > 0.4) {
                 risks.push({
                     type: 'analyzer_disagreement',
-                    message: 'High disagreement between detection methods',
-                    severity: 'medium'
+                    message: 'High disagreement between detection methods — this pattern is common in humanized AI text. See detailed report for more context.',
+                    severity: 'high',
+                    suggestsHumanized: true
                 });
             }
         }

@@ -1722,6 +1722,14 @@ body {
     color: var(--text-tertiary);
     margin-bottom: var(--space-xs);
     font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.domain-awareness-note .note-title svg {
+    flex-shrink: 0;
+    color: var(--accent);
 }
 
 .domain-awareness-note p {

@@ -4,22 +4,23 @@
  */
 
 const ReportExporter = {
-    // Category weights used in analysis (for reporting purposes)
+    // Sunrise Model v3.0 - ML-derived category weights (98.08% accuracy)
+    // These weights are used for display purposes to show how each category contributes
     categoryWeightInfo: {
-        1: { name: 'Grammar & Error Patterns', weight: 0.08, description: 'Analyzes grammatical consistency and error distribution. AI text typically has near-perfect grammar, while humans make natural errors.' },
-        2: { name: 'Sentence Structure & Syntax', weight: 0.15, description: 'Measures variance in sentence length and structure. AI tends toward uniform lengths; humans show "burstiness".' },
-        3: { name: 'Lexical Choice & Vocabulary', weight: 0.12, description: 'Evaluates vocabulary diversity and word choice patterns. AI often overuses certain formal/academic terms.' },
-        4: { name: 'Dialect & Regional Consistency', weight: 0.05, description: 'Checks for consistent regional spelling and terminology. AI may mix American/British conventions.' },
-        5: { name: 'Archaic / Historical Grammar', weight: 0.03, description: 'Detects anachronistic language use. AI may misuse historical terms or mix time periods.' },
+        1: { name: 'Grammar & Error Patterns', weight: 0.06, description: 'Analyzes grammatical consistency and error distribution. AI text typically has near-perfect grammar, while humans make natural errors.' },
+        2: { name: 'Sentence Structure & Syntax', weight: 0.22, description: 'ML-derived highest weight. Measures variance in sentence length and structure. AI tends toward uniform lengths; humans show "burstiness".' },
+        3: { name: 'Lexical Choice & Vocabulary', weight: 0.18, description: 'High ML importance. Evaluates vocabulary diversity, TTR, and hapax ratio. AI often shows predictable word choice patterns.' },
+        4: { name: 'Dialect & Regional Consistency', weight: 0.03, description: 'Checks for consistent regional spelling and terminology. AI may mix American/British conventions.' },
+        5: { name: 'Archaic / Historical Grammar', weight: 0.02, description: 'Detects anachronistic language use. AI may misuse historical terms or mix time periods.' },
         6: { name: 'Discourse & Coherence', weight: 0.05, description: 'Analyzes logical flow and paragraph transitions. AI often uses formulaic transition patterns.' },
-        7: { name: 'Semantic & Pragmatic Features', weight: 0.08, description: 'Examines meaning depth and contextual appropriateness. AI may lack nuanced understanding.' },
-        8: { name: 'Statistical Language Model Indicators', weight: 0.08, description: 'Measures perplexity and token predictability. AI text often shows lower entropy.' },
-        9: { name: 'Authorship Consistency', weight: 0.10, description: 'Tracks stylistic drift throughout the document. AI maintains unnaturally consistent style.' },
-        10: { name: 'Meta-Patterns Unique to AI', weight: 0.05, description: 'Detects AI-specific patterns like hedging phrases, balanced arguments, and safety disclaimers.' },
-        11: { name: 'Metadata & Formatting', weight: 0.25, description: 'Identifies Unicode anomalies, decorative dividers (⸻), and hidden characters. Strong AI signal when present.' },
-        12: { name: 'Repetition Patterns', weight: 0.12, description: 'Analyzes phrase repetition distribution. AI shows uniform spacing; humans cluster repetitions.' },
-        13: { name: 'Tone Stability', weight: 0.12, description: 'Measures emotional and stylistic consistency. AI maintains flat, stable tone throughout.' },
-        14: { name: 'Part of Speech Patterns', weight: 0.08, description: 'Examines verb/adverb patterns. AI overuses hedging verbs and front-loads adverbs.' }
+        7: { name: 'Semantic & Pragmatic Features', weight: 0.06, description: 'Examines meaning depth and contextual appropriateness. AI may lack nuanced understanding.' },
+        8: { name: 'Statistical Language Model Indicators', weight: 0.12, description: 'ML-derived Zipf analysis. Measures word frequency distribution and statistical patterns.' },
+        9: { name: 'Authorship Consistency', weight: 0.08, description: 'Tracks stylistic drift throughout the document. AI maintains unnaturally consistent style.' },
+        10: { name: 'Meta-Patterns Unique to AI', weight: 0.04, description: 'Detects AI-specific patterns like hedging phrases, balanced arguments, and safety disclaimers.' },
+        11: { name: 'Metadata & Formatting', weight: 0.05, description: 'Identifies Unicode anomalies, decorative dividers (⸻), and hidden characters.' },
+        12: { name: 'Repetition Patterns', weight: 0.15, description: 'High ML importance. Analyzes phrase repetition distribution and n-gram patterns.' },
+        13: { name: 'Tone Stability', weight: 0.08, description: 'Measures emotional and stylistic consistency. AI maintains flat, stable tone throughout.' },
+        14: { name: 'Part of Speech Patterns', weight: 0.06, description: 'Examines verb/adverb patterns. AI overuses hedging verbs and front-loads adverbs.' }
     },
 
     /**
@@ -187,11 +188,11 @@ const ReportExporter = {
         .evidence-stats strong { color: #333; }
         .chart { margin: 8px 0; }
         .bar-chart { width: 100%; }
-        .bar-row { display: flex; align-items: center; margin: 2px 0; }
-        .bar-label { width: 130px; font-size: 7pt; text-align: right; padding-right: 6px; white-space: nowrap; overflow: hidden; }
-        .bar-track { flex: 1; height: 12px; background: #f0f0f0; border-radius: 2px; overflow: hidden; }
-        .bar-fill-ai { background: #737373; min-width: 1px; }
-        .bar-value { width: 40px; text-align: right; font-size: 8pt; font-weight: bold; padding-left: 5px; }
+        .bar-row { display: flex; align-items: center; margin: 3px 0; }
+        .bar-label { width: 160px; font-size: 8pt; text-align: right; padding-right: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bar-track { flex: 1; height: 14px; background: #e5e5e5; border-radius: 3px; overflow: hidden; }
+        .bar-fill-ai { height: 100%; background: linear-gradient(90deg, #6b7280, #374151); border-radius: 3px; min-width: 2px; }
+        .bar-value { width: 45px; text-align: right; font-size: 9pt; font-weight: bold; padding-left: 6px; }
         .disclaimer { background: #fff8e6; border: 1px solid #ffd666; border-radius: 4px; padding: 8px; margin: 10px 0; font-size: 8pt; page-break-inside: avoid; }
         .methodology { background: #f0f7ff; border-radius: 4px; padding: 8px; margin: 10px 0; font-size: 8pt; page-break-inside: avoid; }
         .signal-summary { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 4px; padding: 8px; margin: 8px 0; page-break-inside: avoid; }
@@ -239,24 +240,74 @@ const ReportExporter = {
         <div class="stat-item"><div class="stat-label">Sentences</div><div class="stat-value">${report.statistics.sentenceCount}</div></div>
         <div class="stat-item"><div class="stat-label">Paragraphs</div><div class="stat-value">${report.statistics.paragraphCount}</div></div>
         <div class="stat-item"><div class="stat-label">Analysis Time</div><div class="stat-value">${report.statistics.analysisTime}</div></div>
-    </div>
+    </div>`;
 
+        // Add advanced statistics if available
+        const advStats = analysisResult.advancedStats || {};
+        if (Object.keys(advStats).length > 0) {
+            html += `
+    <h2>Advanced Statistical Analysis</h2>
+    <div class="stat-grid">`;
+            
+            if (advStats.sentences?.coefficientOfVariation != null) {
+                const cv = advStats.sentences.coefficientOfVariation;
+                const cvStatus = cv < 0.35 ? '🔴' : (cv > 0.5 ? '🟢' : '🟡');
+                html += `
+        <div class="stat-item"><div class="stat-label">Sentence CV ${cvStatus}</div><div class="stat-value">${(cv * 100).toFixed(1)}%</div></div>`;
+            }
+            
+            if (advStats.sentences?.mean != null) {
+                html += `
+        <div class="stat-item"><div class="stat-label">Avg Sentence Length</div><div class="stat-value">${advStats.sentences.mean.toFixed(1)} words</div></div>`;
+            }
+            
+            if (advStats.burstiness?.sentenceLength != null) {
+                const burst = advStats.burstiness.sentenceLength;
+                const burstStatus = burst < 0 ? '🔴' : (burst > 0.2 ? '🟢' : '🟡');
+                html += `
+        <div class="stat-item"><div class="stat-label">Burstiness ${burstStatus}</div><div class="stat-value">${(burst * 100).toFixed(1)}%</div></div>`;
+            }
+            
+            if (advStats.vocabulary?.ttr != null) {
+                html += `
+        <div class="stat-item"><div class="stat-label">TTR</div><div class="stat-value">${(advStats.vocabulary.ttr * 100).toFixed(1)}%</div></div>`;
+            }
+            
+            if (advStats.vocabulary?.hapaxLegomenaRatio != null) {
+                const hapax = advStats.vocabulary.hapaxLegomenaRatio;
+                const hapaxStatus = hapax < 0.35 ? '🔴' : (hapax > 0.65 ? '🟡' : '🟢');
+                html += `
+        <div class="stat-item"><div class="stat-label">Hapax Ratio ${hapaxStatus}</div><div class="stat-value">${(hapax * 100).toFixed(1)}%</div></div>`;
+            }
+            
+            if (advStats.burstiness?.overallUniformity != null) {
+                const uniformity = advStats.burstiness.overallUniformity;
+                const uniformStatus = uniformity > 0.7 ? '🔴' : (uniformity < 0.4 ? '🟢' : '🟡');
+                html += `
+        <div class="stat-item"><div class="stat-label">Uniformity ${uniformStatus}</div><div class="stat-value">${(uniformity * 100).toFixed(1)}%</div></div>`;
+            }
+            
+            html += `
+    </div>
+    <p style="font-size:8pt;color:#666;margin-top:5px;">🔴 = AI-like | 🟡 = Uncertain | 🟢 = Human-like</p>`;
+        }
+
+        html += `
     <h2>Category Weight Overview</h2>
-    <p>Each detection category contributes to the overall AI probability with different weights based on reliability and signal strength:</p>
+    <p>Each detection category contributes to the overall AI probability with ML-derived weights (Sunrise Model v3.0):</p>
     <div class="chart bar-chart">`;
 
-        // Add weight chart
-        const sortedCats = [...report.categoryAnalyses].sort((a, b) => 
-            (this.categoryWeightInfo[b.category]?.weight || 0) - (this.categoryWeightInfo[a.category]?.weight || 0)
-        );
+        // Add weight chart - show by AI probability, sorted
+        const sortedCats = [...report.categoryAnalyses].sort((a, b) => b.aiProbability - a.aiProbability);
         
         for (const cat of sortedCats) {
             const weightInfo = this.categoryWeightInfo[cat.category] || { weight: 0.05 };
             const weightPct = Math.round(weightInfo.weight * 100);
+            const barColor = cat.aiProbability >= 60 ? '#ef4444' : (cat.aiProbability >= 40 ? '#f59e0b' : '#10b981');
             html += `
         <div class="bar-row">
-            <div class="bar-label">${cat.name}</div>
-            <div class="bar-track"><div class="bar-fill-ai" style="width: ${cat.aiProbability}%"></div></div>
+            <div class="bar-label">${cat.name} (${weightPct}%)</div>
+            <div class="bar-track"><div class="bar-fill-ai" style="width: ${Math.max(2, cat.aiProbability)}%; background: ${barColor};"></div></div>
             <div class="bar-value">${cat.aiProbability}%</div>
         </div>`;
         }
