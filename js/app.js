@@ -978,6 +978,42 @@ const App = {
                         </div>
                     </div>
                 </div>
+
+                <!-- Humanizer Detection -->
+                <div class="stats-section highlight-section ${advStats.humanizerSignals?.isLikelyHumanized ? 'humanizer-warning' : ''}">
+                    <h4>🔄 Humanizer Detection</h4>
+                    <p class="section-note">Detects AI text that has been post-processed to evade detection.</p>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${advStats.humanizerSignals?.isLikelyHumanized ? 'ai' : 'neutral'}">
+                            <span class="stat-label"><strong>Humanizer Probability</strong></span>
+                            <span class="stat-value"><strong>${formatPct(advStats.humanizerSignals?.humanizerProbability)}</strong></span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.humanizerSignals?.stableVarianceFlag ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Variance Stability (2nd order)</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.stableVarianceFlag ? '⚠️ Suspicious' : '✓ Normal'}</span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.humanizerSignals?.flatAutocorrelationFlag ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Autocorrelation Pattern</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.flatAutocorrelationFlag ? '⚠️ Random noise' : '✓ Natural'}</span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.humanizerSignals?.brokenCorrelationFlag ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Feature Correlations</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.brokenCorrelationFlag ? '⚠️ Broken' : '✓ Intact'}</span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.humanizerSignals?.synonymSubstitutionFlag ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Sophistication Consistency</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.synonymSubstitutionFlag ? '⚠️ Word-level chaos' : '✓ Consistent'}</span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.humanizerSignals?.artificialContractionFlag ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Contraction Pattern</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.artificialContractionFlag ? '⚠️ Artificial' : '✓ Natural'}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Warning Flags</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.flagCount || 0} / 5</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="stats-legend">

@@ -330,10 +330,157 @@ const AnalyzerEngine = {
         const hlScores = Object.values(stats.humanLikelihood);
         stats.overallHumanLikelihood = hlScores.reduce((a, b) => a + b, 0) / hlScores.length;
 
+        // === HUMANIZER DETECTION (v2.3) ===
+        // Detects AI text that has been post-processed to evade detection
+        stats.humanizerSignals = this.detectHumanizerSignals(text, tokens, sentences, sentLengths, stats);
+
         // === AI Signature Metrics ===
         stats.aiSignatures = this.computeAISignatureMetrics(text, tokens, sentences);
 
         return stats;
+    },
+
+    /**
+     * Detect signals that suggest text was humanized (AI + post-processing)
+     * 
+     * Key insight: Humanizers add first-order variance but fail to replicate
+     * the natural second-order patterns (variance-of-variance, correlations,
+     * autocorrelation decay) found in genuine human writing.
+     */
+    detectHumanizerSignals(text, tokens, sentences, sentLengths, stats) {
+        const signals = {};
+        
+        // 1. VARIANCE STABILITY (Second-order variance)
+        // Human: variable local variance. Humanized: stable variance despite high first-order variance
+        const localVars = VarianceUtils.localVariance(sentLengths, 5);
+        const varianceOfVariance = localVars.length > 1 ? Utils.coefficientOfVariation(localVars) : 0;
+        signals.varianceOfVariance = varianceOfVariance;
+        // Low variance-of-variance with high first-order variance = humanized
+        signals.stableVarianceFlag = (stats.sentences.coefficientOfVariation > 0.4 && varianceOfVariance < 0.3);
+        
+        // 2. AUTOCORRELATION PATTERN
+        // Human: gradual decay. Pure AI: periodic peaks. Humanized: flat (random noise)
+        const acData = stats.autocorrelation || VarianceUtils.autocorrelation(sentLengths, 8);
+        const acCoeffs = acData.coefficients?.map(c => Math.abs(c.value)) || [];
+        const acVariance = acCoeffs.length > 1 ? Utils.variance(acCoeffs) : 0;
+        signals.autocorrelationVariance = acVariance;
+        // Very low AC variance with moderate AC values = random noise = humanized
+        signals.flatAutocorrelationFlag = (acVariance < 0.01 && acData.avgAC > 0.05 && acData.avgAC < 0.25);
+        
+        // 3. FEATURE CORRELATION WEAKNESS
+        // Human writing has correlated features (complex ideas → longer sentences → richer vocabulary)
+        // Humanizers break these natural correlations
+        const wordLengths = tokens.map(t => t.length);
+        const localTTRs = [];
+        const windowSize = Math.floor(tokens.length / 5);
+        for (let i = 0; i < 5 && windowSize > 10; i++) {
+            const windowTokens = tokens.slice(i * windowSize, (i + 1) * windowSize);
+            localTTRs.push(new Set(windowTokens).size / windowTokens.length);
+        }
+        
+        // Compute correlation between sentence length and local vocabulary richness
+        if (localTTRs.length >= 5 && sentLengths.length >= 5) {
+            const sentChunks = [];
+            const chunkSize = Math.floor(sentLengths.length / 5);
+            for (let i = 0; i < 5; i++) {
+                sentChunks.push(Utils.mean(sentLengths.slice(i * chunkSize, (i + 1) * chunkSize)));
+            }
+            signals.sentenceTTRCorrelation = this.pearsonCorrelation(sentChunks, localTTRs);
+        } else {
+            signals.sentenceTTRCorrelation = 0.5; // neutral
+        }
+        // Low or negative correlation when variance is high = humanized
+        signals.brokenCorrelationFlag = (stats.sentences.coefficientOfVariation > 0.4 && 
+                                         Math.abs(signals.sentenceTTRCorrelation) < 0.2);
+        
+        // 4. WORD SOPHISTICATION CONSISTENCY
+        // Humanizers do synonym substitution, creating word-level chaos in sophistication
+        // Humans maintain paragraph-level sophistication consistency
+        const wordRanks = tokens.map(t => this.getWordFrequencyRank(t.toLowerCase()));
+        const sophVariance = Utils.coefficientOfVariation(wordRanks);
+        signals.sophisticationVariance = sophVariance;
+        // Very high word-level sophistication variance = synonym substitution = humanized
+        signals.synonymSubstitutionFlag = sophVariance > 1.2;
+        
+        // 5. CONTRACTION PATTERN ANALYSIS
+        // Humanizers often add contractions uniformly; humans use them contextually
+        const contractionPositions = [];
+        const contractionPattern = /\b(don't|won't|can't|wouldn't|couldn't|shouldn't|isn't|aren't|wasn't|weren't|haven't|hasn't|hadn't|I'm|you're|we're|they're|he's|she's|it's|that's|there's|here's|what's|who's|let's)\b/gi;
+        let match;
+        while ((match = contractionPattern.exec(text)) !== null) {
+            contractionPositions.push(match.index / text.length);
+        }
+        if (contractionPositions.length >= 3) {
+            const contractionSpacing = [];
+            for (let i = 1; i < contractionPositions.length; i++) {
+                contractionSpacing.push(contractionPositions[i] - contractionPositions[i-1]);
+            }
+            signals.contractionUniformity = 1 - Utils.coefficientOfVariation(contractionSpacing);
+        } else {
+            signals.contractionUniformity = 0.5;
+        }
+        // High contraction uniformity = artificial insertion = humanized
+        signals.artificialContractionFlag = (contractionPositions.length >= 3 && signals.contractionUniformity > 0.7);
+        
+        // 6. OVERALL HUMANIZER PROBABILITY
+        const flagCount = [
+            signals.stableVarianceFlag,
+            signals.flatAutocorrelationFlag,
+            signals.brokenCorrelationFlag,
+            signals.synonymSubstitutionFlag,
+            signals.artificialContractionFlag
+        ].filter(Boolean).length;
+        
+        signals.humanizerProbability = Math.min(1, flagCount / 3); // 3+ flags = high probability
+        signals.isLikelyHumanized = flagCount >= 2;
+        signals.flagCount = flagCount;
+        
+        return signals;
+    },
+
+    /**
+     * Pearson correlation coefficient
+     */
+    pearsonCorrelation(x, y) {
+        if (!x || !y || x.length !== y.length || x.length < 2) return 0;
+        
+        const n = x.length;
+        const sumX = x.reduce((a, b) => a + b, 0);
+        const sumY = y.reduce((a, b) => a + b, 0);
+        const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
+        const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
+        const sumY2 = y.reduce((sum, yi) => sum + yi * yi, 0);
+        
+        const numerator = n * sumXY - sumX * sumY;
+        const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+        
+        return denominator === 0 ? 0 : numerator / denominator;
+    },
+
+    /**
+     * Get approximate word frequency rank (lower = more common)
+     * Uses a simplified frequency list based on common English words
+     */
+    getWordFrequencyRank(word) {
+        // Top 100 most common English words get low ranks
+        const commonWords = new Set([
+            'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
+            'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at',
+            'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she',
+            'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their', 'what',
+            'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me',
+            'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take',
+            'people', 'into', 'year', 'your', 'good', 'some', 'could', 'them', 'see', 'other',
+            'than', 'then', 'now', 'look', 'only', 'come', 'its', 'over', 'think', 'also',
+            'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way',
+            'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us'
+        ]);
+        
+        if (commonWords.has(word)) return 50;
+        if (word.length <= 3) return 100;
+        if (word.length <= 5) return 200;
+        if (word.length <= 7) return 400;
+        return 600 + word.length * 50; // Longer/rarer words get higher ranks
     },
 
     /**

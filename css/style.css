@@ -1217,6 +1217,194 @@ body {
     padding-bottom: var(--space-3xl);
 }
 
+/* Academic Paper Styling */
+.methodology-container.academic-paper {
+    max-width: 800px;
+    font-family: var(--font-sans);
+    line-height: 1.8;
+}
+
+.methodology-container.academic-paper .paper-meta {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+    margin-top: var(--space-sm);
+}
+
+.methodology-container.academic-paper .paper-section h2 {
+    font-size: 1.375rem;
+    margin-top: var(--space-2xl);
+}
+
+.methodology-container.academic-paper .paper-section h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: var(--space-xl) 0 var(--space-md);
+}
+
+.methodology-container.academic-paper p {
+    margin-bottom: var(--space-md);
+    text-align: justify;
+}
+
+.methodology-container.academic-paper ul,
+.methodology-container.academic-paper ol {
+    margin: var(--space-md) 0 var(--space-md) var(--space-xl);
+    color: var(--text-secondary);
+}
+
+.methodology-container.academic-paper li {
+    margin-bottom: var(--space-sm);
+    line-height: 1.7;
+}
+
+/* Abstract Box */
+.abstract-box {
+    background: var(--bg-tertiary);
+    border-left: 4px solid var(--accent);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-xl);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.abstract-box p {
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+/* Equation Blocks for KaTeX */
+.equation-block {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+    text-align: center;
+}
+
+.equation-block .equation-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: left;
+    margin-bottom: var(--space-md);
+}
+
+.equation-block .equation-note {
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+    margin-top: var(--space-md);
+    font-style: italic;
+}
+
+/* KaTeX styling */
+.katex-display {
+    margin: var(--space-md) 0 !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.katex {
+    font-size: 1.1em !important;
+}
+
+/* Bell Curve Principle Diagram */
+.principle-diagram {
+    display: flex;
+    gap: var(--space-md);
+    margin: var(--space-xl) 0;
+}
+
+.curve-region {
+    flex: 1;
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.curve-region.left {
+    background: var(--ai-bg);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.curve-region.center {
+    background: var(--human-bg);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.curve-region.right {
+    background: var(--mixed-bg);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.curve-region .label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+}
+
+.curve-region .indicator {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: var(--space-xs);
+}
+
+.curve-region .desc {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.curve-region.left .indicator { color: var(--ai-color); }
+.curve-region.center .indicator { color: var(--human-color); }
+.curve-region.right .indicator { color: var(--mixed-color); }
+
+/* Humanized AI card */
+.interp-card.humanized {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.interp-card.humanized h4 {
+    color: var(--mixed-color);
+}
+
+/* Humanizer Warning Section */
+.stats-section.humanizer-warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)) !important;
+    border: 1px solid rgba(245, 158, 11, 0.4) !important;
+}
+
+.stats-section.humanizer-warning h4 {
+    color: var(--mixed-color);
+}
+
+.section-note {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-md);
+    font-style: italic;
+}
+
+/* References */
+.references {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.references p {
+    margin-bottom: var(--space-sm);
+    padding-left: var(--space-lg);
+    text-indent: calc(-1 * var(--space-lg));
+}
+
+.references em {
+    font-style: italic;
+}
+
 .methodology-hero {
     text-align: center;
     padding: var(--space-3xl) 0;
