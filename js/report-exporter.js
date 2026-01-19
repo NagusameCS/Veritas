@@ -130,7 +130,15 @@ const ReportExporter = {
      */
     generateHtmlReport(report, analysisResult) {
         const probability = report.summary.probability;
-        const barColor = probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981');
+        
+        // Check for humanized AI signals
+        const humanizerSignals = analysisResult.humanizerSignals || {};
+        const falsePositiveRisk = analysisResult.falsePositiveRisk || {};
+        const hasHighDisagreement = falsePositiveRisk.risks?.some(r => r.type === 'analyzer_disagreement' && r.severity === 'high');
+        const isLikelyHumanized = humanizerSignals.isLikelyHumanized || hasHighDisagreement;
+        
+        // Choose bar color - purple for humanized, red/yellow/green otherwise
+        const barColor = isLikelyHumanized ? '#9333ea' : (probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981'));
         
         // Build verbose evidence summaries for each category
         const verboseEvidence = this.buildVerboseEvidence(report, analysisResult);
@@ -164,6 +172,9 @@ const ReportExporter = {
         .verdict.high { color: #ef4444; }
         .verdict.moderate { color: #f59e0b; }
         .verdict.low { color: #10b981; }
+        .verdict.humanized { color: #9333ea; }
+        .humanized-warning { background: #faf5ff; border: 1px solid #d8b4fe; border-radius: 4px; padding: 8px; margin: 8px 0; font-size: 9pt; }
+        .humanized-warning h4 { color: #7c3aed; margin-bottom: 4px; }
         .probability-bar { height: 14px; background: #e5e5e5; border-radius: 7px; overflow: hidden; margin: 5px 0; }
         .probability-fill { height: 100%; background: ${barColor}; min-width: 1px; }
         .stat-grid { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
@@ -231,7 +242,8 @@ const ReportExporter = {
             <div class="probability-fill" style="width: ${Math.max(1, probability)}%"></div>
         </div>
         <p><strong>AI Probability: ${probability}%</strong> (${report.summary.band}) | Confidence: ${report.summary.confidence}%</p>
-        <p class="verdict ${probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low')}">${report.verdict.label}</p>
+        <p class="verdict ${isLikelyHumanized ? 'humanized' : (probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low'))}">${isLikelyHumanized ? 'Possibly Humanized AI' : report.verdict.label}</p>
+        ${isLikelyHumanized ? `<p style="font-size:9pt;color:#7c3aed;"><strong>⚠️ Humanization Detected:</strong> This text shows signs of AI-generated content that has been modified to appear more human-like. High disagreement between detection categories suggests post-processing or editing of AI output.</p>` : ''}
         <p style="font-size:9pt;">${report.summary.text}</p>
     </div>
 
@@ -241,6 +253,20 @@ const ReportExporter = {
         <div class="stat-item"><div class="stat-label">Paragraphs</div><div class="stat-value">${report.statistics.paragraphCount}</div></div>
         <div class="stat-item"><div class="stat-label">Analysis Time</div><div class="stat-value">${report.statistics.analysisTime}</div></div>
     </div>`;
+
+        // Add detection caveats/warnings if any
+        if (falsePositiveRisk.hasRisks && falsePositiveRisk.risks?.length > 0) {
+            html += `
+    <div class="disclaimer" style="background: ${isLikelyHumanized ? '#faf5ff' : '#fff8e6'}; border-color: ${isLikelyHumanized ? '#d8b4fe' : '#ffd666'};">
+        <h4 style="margin: 0 0 5px 0; color: ${isLikelyHumanized ? '#7c3aed' : '#b45309'};">⚠️ Detection Caveats</h4>`;
+            for (const risk of falsePositiveRisk.risks) {
+                const riskColor = risk.severity === 'high' ? '#b91c1c' : (risk.severity === 'medium' ? '#b45309' : '#666');
+                html += `
+        <p style="font-size:8pt;margin:3px 0;color:${riskColor};">• ${risk.message}</p>`;
+            }
+            html += `
+    </div>`;
+        }
 
         // Add advanced statistics if available
         const advStats = analysisResult.advancedStats || {};
