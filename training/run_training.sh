@@ -46,7 +46,7 @@ start_training() {
     # Clear log file
     > "$LOG_FILE"
     
-    # Start training in background
+    # Start training in background (note: 'start' was already shifted off, so $@ contains only training args)
     cd "$SCRIPT_DIR"
     nohup python3 train_sunrise.py "$@" > "$LOG_FILE" 2>&1 &
     
@@ -126,12 +126,18 @@ stop_training() {
         print_status "Stopping training (PID: $PID)..."
         kill "$PID"
         
-        # Wait for process to stop
-        sleep 2
+        # Wait for process to stop (with timeout)
+        local timeout=10
+        local elapsed=0
+        while ps -p "$PID" > /dev/null 2>&1 && [ $elapsed -lt $timeout ]; do
+            sleep 1
+            elapsed=$((elapsed + 1))
+        done
         
         if ps -p "$PID" > /dev/null 2>&1; then
-            print_warning "Process didn't stop, force killing..."
+            print_warning "Process didn't stop gracefully, force killing..."
             kill -9 "$PID"
+            sleep 1
         fi
         
         print_status "Training stopped"

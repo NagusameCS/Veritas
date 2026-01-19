@@ -18,7 +18,7 @@ echo "Found: Python $PYTHON_VERSION"
 # Check pip
 echo ""
 echo "Checking pip..."
-if ! command -v pip3 &> /dev/null; then
+if ! command -v pip3 > /dev/null 2>&1; then
     echo "ERROR: pip3 not found. Please install pip first."
     exit 1
 fi
