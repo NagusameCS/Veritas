@@ -6,3 +6,7 @@ training/__pycache__/
 training/models/
 training/training_log.txt
 *.log
+# Training automation temporary files
+training/.training.pid
+training/.training_status
+training/sunrise_log.txt
