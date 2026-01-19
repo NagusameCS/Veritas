@@ -181,6 +181,221 @@ const App = {
         if (viewFullReportBtn) {
             viewFullReportBtn.addEventListener('click', () => this.openFullReport());
         }
+        
+        // Humanizer events
+        this.bindHumanizerEvents();
+        
+        // Model selector events
+        this.bindModelSelectorEvents();
+    },
+    
+    /**
+     * Bind humanizer-related events
+     */
+    bindHumanizerEvents() {
+        const humanizeBtn = document.getElementById('humanizeBtn');
+        if (humanizeBtn) {
+            humanizeBtn.addEventListener('click', () => this.humanizeText());
+        }
+        
+        const copyHumanizedBtn = document.getElementById('copyHumanizedBtn');
+        if (copyHumanizedBtn) {
+            copyHumanizedBtn.addEventListener('click', () => this.copyHumanizedText());
+        }
+        
+        const analyzeHumanizedBtn = document.getElementById('analyzeHumanizedBtn');
+        if (analyzeHumanizedBtn) {
+            analyzeHumanizedBtn.addEventListener('click', () => this.analyzeHumanizedText());
+        }
+        
+        // Update stats as user types in humanizer input
+        const humanizerInput = document.getElementById('humanizerInput');
+        if (humanizerInput) {
+            humanizerInput.addEventListener('input', () => this.updateHumanizerInputStats());
+        }
+    },
+    
+    /**
+     * Bind model selector events
+     */
+    bindModelSelectorEvents() {
+        const modelOptions = document.querySelectorAll('input[name="modelType"]');
+        modelOptions.forEach(option => {
+            option.addEventListener('change', (e) => this.handleModelChange(e.target.value));
+        });
+        
+        // Load saved preference
+        const savedModel = localStorage.getItem('veritas-model') || 'sunrise';
+        const savedOption = document.querySelector(`input[name="modelType"][value="${savedModel}"]`);
+        if (savedOption) {
+            savedOption.checked = true;
+            this.handleModelChange(savedModel);
+        }
+    },
+    
+    /**
+     * Handle model type change
+     */
+    handleModelChange(modelType) {
+        localStorage.setItem('veritas-model', modelType);
+        
+        // Update UI to reflect model change
+        const modelLabel = modelType === 'sunrise' ? 'Sunrise (3-Class)' : 'Sunset (2-Class)';
+        console.log(`Model changed to: ${modelLabel}`);
+        
+        // Update any result displays to indicate current model
+        const resultModelIndicator = document.getElementById('resultModelIndicator');
+        if (resultModelIndicator) {
+            resultModelIndicator.textContent = modelLabel;
+        }
+        
+        // Show toast notification
+        this.showToast(`Switched to ${modelLabel}`, 'info');
+    },
+    
+    /**
+     * Get current model type
+     */
+    getCurrentModel() {
+        const selected = document.querySelector('input[name="modelType"]:checked');
+        return selected ? selected.value : 'sunrise';
+    },
+    
+    /**
+     * Update humanizer input stats
+     */
+    updateHumanizerInputStats() {
+        const input = document.getElementById('humanizerInput');
+        const statsEl = document.getElementById('humanizerInputStats');
+        
+        if (!input || !statsEl) return;
+        
+        const text = input.value;
+        const chars = text.length;
+        const words = text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
+        
+        statsEl.textContent = `${chars.toLocaleString()} characters | ${words.toLocaleString()} words`;
+    },
+    
+    /**
+     * Humanize text using the Humanizer module
+     */
+    humanizeText() {
+        const input = document.getElementById('humanizerInput');
+        const output = document.getElementById('humanizerOutput');
+        const intensity = document.getElementById('humanizeIntensity');
+        const style = document.getElementById('humanizeStyle');
+        const statsEl = document.getElementById('humanizeStats');
+        const actionsEl = document.getElementById('humanizedActions');
+        
+        if (!input || !output) return;
+        
+        const text = input.value.trim();
+        if (!text) {
+            this.showToast('Please enter text to humanize', 'warning');
+            return;
+        }
+        
+        // Check if Humanizer is available
+        if (typeof Humanizer === 'undefined') {
+            this.showToast('Humanizer module not loaded', 'error');
+            return;
+        }
+        
+        try {
+            const options = {
+                intensity: intensity ? intensity.value : 'medium',
+                style: style ? style.value : 'natural'
+            };
+            
+            const result = Humanizer.humanize(text, options);
+            
+            // Display output
+            output.value = result.text;
+            
+            // Show stats
+            if (statsEl) {
+                statsEl.innerHTML = `
+                    <div class="humanize-stat">
+                        <span class="stat-label">Contractions Added</span>
+                        <span class="stat-value">${result.stats.contractionsAdded}</span>
+                    </div>
+                    <div class="humanize-stat">
+                        <span class="stat-label">AI Phrases Removed</span>
+                        <span class="stat-value">${result.stats.aiPhrasesRemoved}</span>
+                    </div>
+                    <div class="humanize-stat">
+                        <span class="stat-label">Disfluencies Added</span>
+                        <span class="stat-value">${result.stats.disfluenciesAdded}</span>
+                    </div>
+                    <div class="humanize-stat">
+                        <span class="stat-label">Hedging Added</span>
+                        <span class="stat-value">${result.stats.hedgingAdded}</span>
+                    </div>
+                    <div class="humanize-stat">
+                        <span class="stat-label">Sentences Varied</span>
+                        <span class="stat-value">${result.stats.sentencesVaried}</span>
+                    </div>
+                    <div class="humanize-stat">
+                        <span class="stat-label">Overall Changes</span>
+                        <span class="stat-value">${result.stats.totalChanges}</span>
+                    </div>
+                `;
+                statsEl.style.display = 'grid';
+            }
+            
+            // Show action buttons
+            if (actionsEl) {
+                actionsEl.style.display = 'flex';
+            }
+            
+            this.showToast(`Text humanized with ${result.stats.totalChanges} changes`, 'success');
+            
+        } catch (error) {
+            console.error('Humanization error:', error);
+            this.showToast('Error humanizing text: ' + error.message, 'error');
+        }
+    },
+    
+    /**
+     * Copy humanized text to clipboard
+     */
+    copyHumanizedText() {
+        const output = document.getElementById('humanizerOutput');
+        if (!output || !output.value) {
+            this.showToast('No humanized text to copy', 'warning');
+            return;
+        }
+        
+        navigator.clipboard.writeText(output.value).then(() => {
+            this.showToast('Humanized text copied to clipboard', 'success');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            this.showToast('Failed to copy text', 'error');
+        });
+    },
+    
+    /**
+     * Analyze the humanized text
+     */
+    analyzeHumanizedText() {
+        const output = document.getElementById('humanizerOutput');
+        if (!output || !output.value) {
+            this.showToast('No humanized text to analyze', 'warning');
+            return;
+        }
+        
+        // Switch to analyze view and populate input
+        const textInput = document.getElementById('textInput');
+        if (textInput) {
+            textInput.value = output.value;
+            this.updateAnalyzeButton();
+        }
+        
+        this.showView('analyze');
+        
+        // Auto-trigger analysis
+        setTimeout(() => this.analyze(), 100);
     },
 
     /**
@@ -1153,6 +1368,134 @@ const App = {
                         <div class="stat-row">
                             <span class="stat-label">Warning Flags</span>
                             <span class="stat-value">${advStats.humanizerSignals?.flagCount || 0} / 5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- V3 Advanced Detection (Neural & Perplexity) -->
+                <div class="stats-section highlight-section">
+                    <h4><span class="material-icons section-icon">psychology</span> Neural & Perplexity Analysis (V3)</h4>
+                    <p class="section-note">Advanced detection methods using embedding coherence and language model perplexity.</p>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${getIndicator(advStats.neuralFeatures?.embeddingCoherence, [0.85, 0.7], false)}">
+                            <span class="stat-label">Embedding Coherence</span>
+                            <span class="stat-value">${formatNum(advStats.neuralFeatures?.embeddingCoherence, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.neuralFeatures?.embeddingDiversity, [0.2, 0.4], true)}">
+                            <span class="stat-label">Embedding Diversity</span>
+                            <span class="stat-value">${formatNum(advStats.neuralFeatures?.embeddingDiversity, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.neuralFeatures?.embeddingDrift, [0.1, 0.3], true)}">
+                            <span class="stat-label">Topic Drift</span>
+                            <span class="stat-value">${formatNum(advStats.neuralFeatures?.embeddingDrift, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.neuralFeatures?.embeddingUniformity, [0.8, 0.5], false)}">
+                            <span class="stat-label">Embedding Uniformity</span>
+                            <span class="stat-value">${formatNum(advStats.neuralFeatures?.embeddingUniformity, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.perplexityFeatures?.meanPerplexity, [60, 120], true)}">
+                            <span class="stat-label">Mean Perplexity</span>
+                            <span class="stat-value">${formatNum(advStats.perplexityFeatures?.meanPerplexity, 1)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.perplexityFeatures?.perplexityStd, [15, 40], true)}">
+                            <span class="stat-label">Perplexity Variance</span>
+                            <span class="stat-value">${formatNum(advStats.perplexityFeatures?.perplexityStd, 1)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.perplexityFeatures?.lowPerplexityRatio, [0.5, 0.2], false)}">
+                            <span class="stat-label">Low Perplexity Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.perplexityFeatures?.lowPerplexityRatio)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- V3 Watermark & Semantic Coherence -->
+                <div class="stats-section highlight-section">
+                    <h4><span class="material-icons section-icon">security</span> Watermark & Coherence Detection (V3)</h4>
+                    <p class="section-note">Detects statistical watermarks and semantic structure anomalies.</p>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${advStats.watermarkFeatures?.zeroWidthChars > 0 ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Zero-Width Characters</span>
+                            <span class="stat-value">${advStats.watermarkFeatures?.zeroWidthChars || 0}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.watermarkFeatures?.repeatedTransitions, [0.3, 0.1], false)}">
+                            <span class="stat-label">Token Transition Bias</span>
+                            <span class="stat-value">${formatNum(advStats.watermarkFeatures?.repeatedTransitions, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.watermarkFeatures?.wordLengthAutocorr, [0.4, 0.2], false)}">
+                            <span class="stat-label">Word Length Autocorrelation</span>
+                            <span class="stat-value">${formatNum(advStats.watermarkFeatures?.wordLengthAutocorr, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.semanticCoherence?.topicDrift, [0.1, 0.3], true)}">
+                            <span class="stat-label">Semantic Topic Drift</span>
+                            <span class="stat-value">${formatNum(advStats.semanticCoherence?.topicDrift, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.semanticCoherence?.coherenceVariance, [0.1, 0.25], true)}">
+                            <span class="stat-label">Coherence Variance</span>
+                            <span class="stat-value">${formatNum(advStats.semanticCoherence?.coherenceVariance, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.semanticCoherence?.semanticGaps, [0.1, 0.25], true)}">
+                            <span class="stat-label">Semantic Gap Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.semanticCoherence?.semanticGaps)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- V3 Null Combination Patterns -->
+                <div class="stats-section highlight-section">
+                    <h4><span class="material-icons section-icon">compare</span> Null Combination Patterns (V3)</h4>
+                    <p class="section-note">Feature absence patterns for class discrimination (A ∧ ¬B logic).</p>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${advStats.nullPatterns?.formalNoContractions > 0.5 ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Formal + No Contractions</span>
+                            <span class="stat-value">${formatNum(advStats.nullPatterns?.formalNoContractions, 2)} <small>(AI signal)</small></span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.nullPatterns?.aiPhrasesNoDisfluencies > 0.5 ? 'ai' : 'neutral'}">
+                            <span class="stat-label">AI Phrases + No Disfluencies</span>
+                            <span class="stat-value">${formatNum(advStats.nullPatterns?.aiPhrasesNoDisfluencies, 2)} <small>(AI signal)</small></span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.nullPatterns?.contractionsNoAI > 0.5 ? 'human' : 'neutral'}">
+                            <span class="stat-label">Contractions + No AI Phrases</span>
+                            <span class="stat-value">${formatNum(advStats.nullPatterns?.contractionsNoAI, 2)} <small>(Human signal)</small></span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.nullPatterns?.pureAINullScore > 0.7 ? 'ai' : 'neutral'}">
+                            <span class="stat-label"><strong>Pure AI Null Score</strong></span>
+                            <span class="stat-value"><strong>${formatNum(advStats.nullPatterns?.pureAINullScore, 2)}</strong></span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.nullPatterns?.pureHumanNullScore > 0.5 ? 'human' : 'neutral'}">
+                            <span class="stat-label"><strong>Pure Human Null Score</strong></span>
+                            <span class="stat-value"><strong>${formatNum(advStats.nullPatterns?.pureHumanNullScore, 2)}</strong></span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.nullPatterns?.humanizedNullScore > 0.5 ? 'ai' : 'neutral'}">
+                            <span class="stat-label"><strong>Humanized Null Score</strong></span>
+                            <span class="stat-value"><strong>${formatNum(advStats.nullPatterns?.humanizedNullScore, 2)}</strong> <small>(Mixed signals)</small></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- V3 Partial Humanization Detection -->
+                <div class="stats-section highlight-section">
+                    <h4><span class="material-icons section-icon">tune</span> Partial Humanization Analysis (V3)</h4>
+                    <p class="section-note">Detects selectively edited AI content with mixed authorship.</p>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${getIndicator(advStats.partialHumanization?.humanizationVariance, [0.3, 0.1], false)}">
+                            <span class="stat-label">Humanization Variance</span>
+                            <span class="stat-value">${formatNum(advStats.partialHumanization?.humanizationVariance, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.partialHumanization?.segmentInconsistency, [0.3, 0.15], false)}">
+                            <span class="stat-label">Segment Inconsistency</span>
+                            <span class="stat-value">${formatNum(advStats.partialHumanization?.segmentInconsistency, 3)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">AI Segment Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.partialHumanization?.aiSegmentRatio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Human Segment Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.partialHumanization?.humanSegmentRatio)}</span>
+                        </div>
+                        <div class="stat-row indicator-${advStats.partialHumanization?.mixedSegmentRatio > 0.3 ? 'ai' : 'neutral'}">
+                            <span class="stat-label">Mixed Segment Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.partialHumanization?.mixedSegmentRatio)}</span>
                         </div>
                     </div>
                 </div>

@@ -26,6 +26,7 @@
             </div>
             <nav class="nav">
                 <a href="#" class="nav-link active" data-view="analyze">Analyze</a>
+                <a href="#" class="nav-link" data-view="humanizer">Humanizer</a>
                 <a href="#" class="nav-link" data-view="history">History</a>
                 <a href="#" class="nav-link" data-view="methodology">Methodology</a>
                 <a href="#" class="nav-link" data-view="about">About</a>
@@ -99,6 +100,25 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             </div>
                         </div>
                         <div class="analyze-actions">
+                            <!-- Model Selector -->
+                            <div class="model-selector">
+                                <label class="model-option">
+                                    <input type="radio" name="model" value="sunrise" checked>
+                                    <span class="model-label">
+                                        <span class="model-icon">🌅</span>
+                                        <span class="model-name">Sunrise</span>
+                                        <span class="model-desc">3-Class (Human/AI/Humanized)</span>
+                                    </span>
+                                </label>
+                                <label class="model-option">
+                                    <input type="radio" name="model" value="sunset">
+                                    <span class="model-label">
+                                        <span class="model-icon">🌇</span>
+                                        <span class="model-name">Sunset</span>
+                                        <span class="model-desc">2-Class (Human/AI)</span>
+                                    </span>
+                                </label>
+                            </div>
                             <button class="btn btn-primary btn-lg" id="analyzeBtn" disabled>
                                 <span class="btn-text">Analyze Text</span>
                                 <span class="btn-spinner"></span>
@@ -202,6 +222,86 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 <button class="btn btn-sm btn-primary" id="viewFullReportBtn">
                                     View Full Report
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Humanizer View -->
+            <section class="view" id="humanizerView" hidden>
+                <div class="humanizer-container">
+                    <div class="humanizer-header">
+                        <h2>🎭 Text Humanizer</h2>
+                        <p class="subtitle">Transform AI-generated text to appear more human-like</p>
+                        <p class="disclaimer">⚠️ For educational and testing purposes only. Use responsibly.</p>
+                    </div>
+                    
+                    <div class="humanizer-content">
+                        <div class="humanizer-input-panel">
+                            <h3>Input Text</h3>
+                            <textarea id="humanizerInput" placeholder="Paste AI-generated text here..."></textarea>
+                            <div class="humanizer-input-stats" id="humanizerInputStats">0 characters | 0 words</div>
+                            
+                            <div class="humanizer-options">
+                                <label class="humanizer-option">
+                                    <span>Intensity:</span>
+                                    <select id="humanizeIntensity">
+                                        <option value="light">Light - Subtle changes</option>
+                                        <option value="medium" selected>Medium - Balanced</option>
+                                        <option value="heavy">Heavy - Major rewrite</option>
+                                        <option value="stealth">Stealth - Professional bypass</option>
+                                    </select>
+                                </label>
+                                
+                                <label class="humanizer-option">
+                                    <span>Style Profile:</span>
+                                    <select id="humanizeStyle">
+                                        <option value="random" selected>Random Mix</option>
+                                        <option value="casual">Casual/Conversational</option>
+                                        <option value="academic">Academic/Formal</option>
+                                        <option value="professional">Professional</option>
+                                    </select>
+                                </label>
+                            </div>
+                            
+                            <button class="btn btn-primary" id="humanizeBtn">
+                                <span class="btn-text">Humanize Text</span>
+                                <span class="btn-spinner"></span>
+                            </button>
+                        </div>
+                        
+                        <div class="humanizer-output-panel">
+                            <h3>Humanized Output</h3>
+                            <textarea id="humanizerOutput" readonly placeholder="Humanized text will appear here..."></textarea>
+                            
+                            <div class="humanize-stats" id="humanizeStats"></div>
+                            
+                            <div class="humanized-actions" id="humanizedActions">
+                                <button class="btn btn-ghost" id="copyHumanizedBtn">Copy to Clipboard</button>
+                                <button class="btn btn-ghost" id="analyzeHumanizedBtn">Analyze Result</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="humanizer-info">
+                        <h3>How It Works</h3>
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h4>Contraction Injection</h4>
+                                <p>Converts formal phrases like "do not" to "don't" and "it is" to "it's"</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Disfluency Addition</h4>
+                                <p>Adds natural fillers like "well", "basically", "I mean"</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Synonym Variation</h4>
+                                <p>Replaces words with contextually appropriate alternatives</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>Sentence Restructuring</h4>
+                                <p>Varies sentence length and structure patterns</p>
                             </div>
                         </div>
                     </div>
@@ -354,7 +454,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                     <div class="methodology-hero">
                         <h1>VERITAS: A Statistical Framework for AI-Generated Text Detection</h1>
                         <p class="subtitle">Technical Methodology & Mathematical Foundations</p>
-                        <p class="paper-meta">Version 3.0 • Powered by Sunrise ML Model • 98.08% Accuracy • 29,976 Training Samples</p>
+                        <p class="paper-meta">Version 3.0 (Sunrise) • 96-Feature Analysis • 3-Class Detection (Human / AI / Humanized)</p>
                     </div>
 
                     <div class="methodology-content">
@@ -774,6 +874,124 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             <p>Distance > 2σ indicates statistically unusual text (either extreme of the bell curve).</p>
                         </div>
 
+                        <!-- 7.5 Advanced Detection Methods (V3 Features) -->
+                        <div class="methodology-section paper-section">
+                            <h2>7.5 Advanced Detection Methods (Sunrise V3)</h2>
+                            
+                            <p>Version 3 of the Sunrise model introduces advanced detection techniques covering 96 features across 12 categories. These methods address sophisticated AI text and humanizer evasion.</p>
+
+                            <h3>7.5.1 Neural Embedding Analysis</h3>
+                            <p>We use sentence-level embeddings to analyze semantic patterns:</p>
+                            
+                            <div class="equation-block">
+                                <p class="equation-label">Definition 7.5 (Embedding Coherence)</p>
+                                $$C_{emb} = \frac{1}{n-1}\sum_{i=1}^{n-1} \cos(\vec{e}_i, \vec{e}_{i+1})$$
+                            </div>
+                            
+                            <p>where $\vec{e}_i$ is the embedding of sentence $i$. Higher coherence indicates smooth semantic flow.</p>
+                            
+                            <div class="weight-table">
+                                <table>
+                                    <thead>
+                                        <tr><th>Metric</th><th>Description</th><th>Human</th><th>AI</th><th>Humanized</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Embedding Coherence</td><td>Adjacent sentence similarity</td><td>0.6-0.8</td><td>0.85+</td><td>0.5-0.7</td></tr>
+                                        <tr><td>Embedding Diversity</td><td>Variance in embedding space</td><td>High</td><td>Low</td><td>Medium</td></tr>
+                                        <tr><td>Embedding Drift</td><td>Topic shift over document</td><td>Gradual</td><td>Minimal</td><td>Erratic</td></tr>
+                                        <tr><td>Embedding Clustering</td><td>Semantic grouping strength</td><td>Moderate</td><td>High</td><td>Low</td></tr>
+                                        <tr><td>Embedding Uniformity</td><td>Consistency of distribution</td><td>Variable</td><td>Uniform</td><td>Artificially varied</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h3>7.5.2 Perplexity Scoring</h3>
+                            <p>Perplexity measures how "surprising" text is to a language model. AI text is typically less surprising:</p>
+                            
+                            <div class="equation-block">
+                                <p class="equation-label">Definition 7.6 (Sentence Perplexity)</p>
+                                $$PP(s) = \exp\left(-\frac{1}{N}\sum_{i=1}^{N} \log P(w_i | w_1, \ldots, w_{i-1})\right)$$
+                            </div>
+                            
+                            <ul>
+                                <li><strong>Perplexity Mean:</strong> Average perplexity across sentences. AI text: 20-60, Human text: 80-200</li>
+                                <li><strong>Perplexity Std Dev:</strong> Variance in perplexity. Human text shows higher variance</li>
+                                <li><strong>Perplexity Burstiness:</strong> Clustering of low/high perplexity regions</li>
+                                <li><strong>Low Perplexity Ratio:</strong> Fraction of text with unusually low perplexity</li>
+                            </ul>
+
+                            <h3>7.5.3 Watermark Detection</h3>
+                            <p>AI-generated text may contain statistical watermarks—subtle patterns inserted during generation:</p>
+                            
+                            <div class="weight-table">
+                                <table>
+                                    <thead>
+                                        <tr><th>Detection Method</th><th>Description</th><th>Detection Signal</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Zero-Width Characters</td><td>Invisible Unicode characters between words</td><td>Presence indicates watermarking</td></tr>
+                                        <tr><td>Token Repetition Patterns</td><td>Unusual token transition frequencies</td><td>Non-random token selection bias</td></tr>
+                                        <tr><td>Word Length Autocorrelation</td><td>Serial correlation in word lengths</td><td>Periodic patterns = watermark</td></tr>
+                                        <tr><td>Green/Red Token Lists</td><td>Token probability manipulation</td><td>Statistical bias toward "green" tokens</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h3>7.5.4 Semantic Coherence Analysis</h3>
+                            <p>Beyond local coherence, we measure document-level semantic structure:</p>
+                            
+                            <div class="equation-block">
+                                <p class="equation-label">Definition 7.7 (Topic Drift)</p>
+                                $$D_{topic} = \frac{1}{k-1}\sum_{i=1}^{k-1} (1 - \cos(\vec{t}_i, \vec{t}_{i+1}))$$
+                            </div>
+                            
+                            <ul>
+                                <li><strong>Topic Drift:</strong> Rate of topic change across paragraphs. Human: gradual, AI: minimal, Humanized: erratic</li>
+                                <li><strong>Coherence Variance:</strong> Consistency of semantic flow. Human: variable, AI: stable, Humanized: unstable</li>
+                                <li><strong>Semantic Gaps:</strong> Sudden topic jumps. Human: intentional, AI: rare, Humanized: artificial</li>
+                            </ul>
+
+                            <h3>7.5.5 Null Combination Patterns</h3>
+                            <p>A key V3 innovation: detecting feature <em>absence</em> patterns that strongly indicate specific classes:</p>
+                            
+                            <div class="equation-block">
+                                <p class="equation-label">Definition 7.8 (Null Combination Score)</p>
+                                $$NCS = f(A \land \neg B) = 
+                                \begin{cases}
+                                    1 & \text{if feature A present AND feature B absent} \\
+                                    0 & \text{otherwise}
+                                \end{cases}$$
+                            </div>
+                            
+                            <div class="weight-table">
+                                <table>
+                                    <thead>
+                                        <tr><th>Combination</th><th>Logic</th><th>Indicates</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>formal_no_contractions</td><td>Formal + No contractions</td><td>Pure AI</td></tr>
+                                        <tr><td>ai_phrases_no_disfluencies</td><td>AI phrases + No disfluencies</td><td>Pure AI</td></tr>
+                                        <tr><td>contractions_no_ai</td><td>Contractions + No AI phrases</td><td>Pure Human</td></tr>
+                                        <tr><td>ai_with_contractions</td><td>AI phrases + Contractions present</td><td>Humanized</td></tr>
+                                        <tr><td>formal_with_disfluencies</td><td>Formal style + Disfluencies</td><td>Humanized</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <h3>7.5.6 Partial Humanization Detection</h3>
+                            <p>Detects text that is only partially humanized—common when users manually edit AI output:</p>
+                            
+                            <ul>
+                                <li><strong>Humanization Variance:</strong> Inconsistency in humanization level across document</li>
+                                <li><strong>Segment Inconsistency:</strong> Adjacent segments with different detected authorship</li>
+                                <li><strong>AI Segment Ratio:</strong> Proportion of text segments classified as AI</li>
+                                <li><strong>Human Segment Ratio:</strong> Proportion classified as human</li>
+                                <li><strong>Mixed Segment Ratio:</strong> Proportion showing mixed signals</li>
+                            </ul>
+                            
+                            <p>High segment inconsistency with varying AI/human ratios indicates selective editing of AI content.</p>
+                        </div>
+
                         <!-- 8. Sunrise ML Model -->
                         <div class="methodology-section paper-section">
                             <h2>8. Sunrise ML Model Training</h2>
@@ -794,15 +1012,20 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             </div>
 
                             <h3>8.2 Feature Engineering</h3>
-                            <p>37 linguistic features were extracted from each text sample, spanning:</p>
+                            <p>96 linguistic features are extracted from each text sample in V3, spanning 12 categories:</p>
                             <ul>
-                                <li><strong>Structural features:</strong> Paragraph count, sentence count, word count, average lengths</li>
-                                <li><strong>Variance metrics:</strong> Sentence length CV, paragraph length CV, complexity CV</li>
-                                <li><strong>Vocabulary measures:</strong> TTR, hapax ratio, unique word count, dis legomena ratio</li>
-                                <li><strong>Burstiness scores:</strong> Sentence length burstiness, word length burstiness</li>
-                                <li><strong>Zipf's Law:</strong> Slope, R², residual standard deviation</li>
-                                <li><strong>Readability:</strong> Flesch-Kincaid grade, ARI, syllable ratio</li>
-                                <li><strong>Punctuation patterns:</strong> Comma rate, exclamation rate, question rate</li>
+                                <li><strong>Basic Statistical (13 features):</strong> Character/word/sentence counts, averages, CV, burstiness</li>
+                                <li><strong>AI Signatures (9 features):</strong> AI phrase density, formal word density, hedging ratio, transition patterns</li>
+                                <li><strong>Humanization Artifacts (10 features):</strong> Contractions, disfluencies, hedging, typos, exclamation patterns</li>
+                                <li><strong>Consistency Analysis (6 features):</strong> Register inconsistency, formality shift, vocabulary/complexity consistency</li>
+                                <li><strong>Combination Patterns (7 features):</strong> AI-human cooccurrence, formal-informal mixing, contraction-formality patterns</li>
+                                <li><strong>Null Combinations (6 features):</strong> Feature absence detection (formal_no_contractions, contractions_no_ai, etc.)</li>
+                                <li><strong>Neural Embeddings (5 features):</strong> Embedding coherence, diversity, drift, clustering, uniformity</li>
+                                <li><strong>Perplexity Features (6 features):</strong> Mean, std, min, max, burstiness, low_perplexity_ratio</li>
+                                <li><strong>Watermark Detection (3 features):</strong> Zero-width chars, repeated transitions, word length autocorrelation</li>
+                                <li><strong>Semantic Coherence (3 features):</strong> Topic drift, coherence variance, semantic gaps</li>
+                                <li><strong>Partial Humanization (5 features):</strong> Humanization variance, segment inconsistency, AI/human/mixed ratios</li>
+                                <li><strong>Vocabulary Analysis (23 features):</strong> TTR, hapax ratio, vocabulary richness, Zipf compliance, readability metrics</li>
                             </ul>
 
                             <h3>8.3 Model Performance</h3>
@@ -982,6 +1205,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
     <script src="js/advanced-visualizations.js"></script>
     <script src="js/file-parser.js"></script>
     <script src="js/report-exporter.js"></script>
+    <script src="js/humanizer.js"></script>
     <script src="js/app.js"></script>
     
     <!-- KaTeX Auto-render for methodology page -->
