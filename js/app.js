@@ -1940,6 +1940,9 @@ const App = {
         const flagCount = humanizerSignals.flagCount || 0;
         const prob = result.aiProbability;
         
+        // Check if analyzer disagreement suggests humanization
+        const analyzerDisagreement = result.falsePositiveRisk?.risks?.some(r => r.suggestsHumanized) || false;
+        
         // Calculate humanization likelihood
         const signals = {
             stableVariance: humanizerSignals.stableVarianceFlag,
@@ -1951,28 +1954,37 @@ const App = {
         
         const activeSignals = Object.entries(signals).filter(([k, v]) => v);
         
+        // Effective flag count includes analyzer disagreement as an additional signal
+        const effectiveFlagCount = analyzerDisagreement ? Math.max(flagCount, 2) : flagCount;
+        
         // Determine advisory level
         let advisoryLevel = 'none';
         let advisoryColor = 'var(--text-tertiary)';
         let advisoryText = '';
         let advisoryIcon = 'check';
         
-        if (flagCount === 0 && prob < 0.4) {
+        if (effectiveFlagCount === 0 && prob < 0.4) {
             advisoryLevel = 'none';
             advisoryIcon = 'verified_user';
             advisoryColor = 'var(--human-color)';
             advisoryText = 'No humanization signals detected. This text appears to be authentically human-written.';
-        } else if (flagCount === 0 && prob >= 0.4) {
+        } else if (effectiveFlagCount === 0 && prob >= 0.4) {
             advisoryLevel = 'none';
             advisoryIcon = 'smart_toy';
             advisoryColor = 'var(--ai-color)';
             advisoryText = 'No humanization signals detected. This appears to be unmodified AI-generated text.';
-        } else if (flagCount <= 2) {
+        } else if (analyzerDisagreement && flagCount === 0) {
+            // Special case: analyzer disagreement but no explicit humanization signals
+            advisoryLevel = 'possible';
+            advisoryIcon = 'help_outline';
+            advisoryColor = 'var(--warning-color, #f59e0b)';
+            advisoryText = 'Inconsistent detection patterns observed. This could indicate humanized AI text, mixed authorship, or an unusual writing style.';
+        } else if (effectiveFlagCount <= 2) {
             advisoryLevel = 'possible';
             advisoryIcon = 'search';
             advisoryColor = 'var(--warning-color, #f59e0b)';
             advisoryText = `Possible humanization detected (${flagCount}/5 signals). This could be AI text that was lightly edited or run through a paraphrasing tool.`;
-        } else if (flagCount <= 3) {
+        } else if (effectiveFlagCount <= 3) {
             advisoryLevel = 'likely';
             advisoryIcon = 'warning';
             advisoryColor = 'var(--warning-color, #f59e0b)';
@@ -2005,6 +2017,27 @@ const App = {
             </div>
         ` : '';
         
+        // Add analyzer disagreement to displayed signals if applicable
+        const displayedSignals = analyzerDisagreement && flagCount === 0 ? 
+            [...activeSignals, ['analyzerDisagreement', true]] : activeSignals;
+        
+        const allSignalExplanations = {
+            ...signalExplanations,
+            analyzerDisagreement: { name: 'Detection Inconsistency', desc: 'Different analysis methods produced conflicting results' }
+        };
+        
+        const signalDetailsHtml = displayedSignals.length > 0 ? `
+            <div class="signal-details">
+                <h5>Detected Signals:</h5>
+                <ul class="signal-list">
+                    ${displayedSignals.map(([key, _]) => {
+                        const info = allSignalExplanations[key];
+                        return info ? `<li><strong>${info.name}:</strong> ${info.desc}</li>` : '';
+                    }).join('')}
+                </ul>
+            </div>
+        ` : '';
+        
         container.innerHTML = `
             <div class="humanization-advisory-content ${advisoryLevel}">
                 <h4 class="advisory-title">
@@ -2013,7 +2046,7 @@ const App = {
                 </h4>
                 <div class="advisory-meter">
                     <div class="meter-track">
-                        <div class="meter-fill" style="width: ${(flagCount / 5) * 100}%; background: ${advisoryColor}"></div>
+                        <div class="meter-fill" style="width: ${(effectiveFlagCount / 5) * 100}%; background: ${advisoryColor}"></div>
                     </div>
                     <div class="meter-labels">
                         <span>Authentic</span>
@@ -2021,7 +2054,7 @@ const App = {
                     </div>
                 </div>
                 <p class="advisory-text" style="border-left-color: ${advisoryColor}">${advisoryText}</p>
-                ${signalDetails}
+                ${signalDetailsHtml}
                 <p class="advisory-disclaimer">
                     <em>Note: This is an advisory indicator, not a definitive classification. Some human-written text may trigger false positives, 
                     and sophisticated humanization may evade detection.</em>
