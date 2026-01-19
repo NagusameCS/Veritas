@@ -564,6 +564,65 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 </div>
                                 <p class="formula-note">Where z = 1.96 for 95% CI, n = number of analyzers, p = probability estimate.</p>
                             </div>
+
+                            <div class="formula-card">
+                                <h3>Bayesian Probability Combination</h3>
+                                <p>Uses log-odds for more accurate signal combination than weighted average.</p>
+                                <div class="formula">
+                                    <span class="math">P(AI) = 1 / (1 + exp(-Σ wᵢ·log(pᵢ/(1-pᵢ))))</span>
+                                </div>
+                                <p class="formula-note">Converts probabilities to log-odds, combines with weights, converts back. Better handles correlated signals.</p>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Statistical Tests -->
+                        <div class="methodology-section">
+                            <h2>Advanced Statistical Tests (v2.1)</h2>
+
+                            <div class="formula-card">
+                                <h3>Autocorrelation Analysis</h3>
+                                <p>Detects periodic patterns in sequences (e.g., sentence lengths).</p>
+                                <div class="formula">
+                                    <span class="math">ρ(k) = Σ(xᵢ-μ)(xᵢ₊ₖ-μ) / ((n-k)·σ²)</span>
+                                </div>
+                                <p class="formula-note">High autocorrelation at any lag suggests periodic/predictable patterns typical of AI text.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>N-gram Perplexity Approximation</h3>
+                                <p>Approximates neural LM perplexity using Markov chain entropy.</p>
+                                <div class="formula">
+                                    <span class="math">PP = 2^H where H = -1/N · Σ log₂ P(wᵢ|context)</span>
+                                </div>
+                                <p class="formula-note">Lower perplexity = more predictable text. AI typically shows perplexity 30-80; humans 100-300.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Runs Test for Randomness</h3>
+                                <p>Counts runs of consecutive values above/below median.</p>
+                                <div class="formula">
+                                    <span class="math">Z = (R - E[R]) / σᵣ where E[R] = 2n₀n₁/n + 1</span>
+                                </div>
+                                <p class="formula-note">Fewer runs than expected indicates non-random (patterned) structure typical of AI.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Chi-Squared Uniformity Test</h3>
+                                <p>Tests if distribution significantly differs from uniform.</p>
+                                <div class="formula">
+                                    <span class="math">χ² = Σ (Oᵢ - Eᵢ)² / Eᵢ</span>
+                                </div>
+                                <p class="formula-note">Higher χ² = less uniform = more human-like variation in features.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Mahalanobis Distance</h3>
+                                <p>Measures how far text deviates from expected human distribution.</p>
+                                <div class="formula">
+                                    <span class="math">D = √(Σ((xᵢ - μᵢ)/σᵢ)² / k)</span>
+                                </div>
+                                <p class="formula-note">Uses empirically-derived baselines for human writing. Distance > 2σ is statistically unusual.</p>
+                            </div>
                         </div>
 
                         <!-- Variance Analysis -->

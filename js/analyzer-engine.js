@@ -262,12 +262,62 @@ const AnalyzerEngine = {
             contentWordRatio: tokens.length > 0 ? contentWordCount / tokens.length : 0
         };
 
+        // === Enhanced Statistical Analysis (v2.1) ===
+        
+        // Autocorrelation analysis - detects periodic patterns
+        stats.autocorrelation = VarianceUtils.autocorrelation(sentLengths, 8);
+        
+        // N-gram perplexity approximation
+        stats.perplexity = VarianceUtils.ngramPerplexity(tokens, 2);
+        
+        // Runs test for randomness
+        stats.runsTest = VarianceUtils.runsTest(sentLengths);
+        
+        // Chi-squared uniformity test on sentence lengths (binned)
+        const lengthBins = this.binValues(sentLengths, 5);
+        stats.chiSquared = VarianceUtils.chiSquaredUniformity(lengthBins);
+        
+        // Variance stability across document
+        stats.varianceStability = VarianceUtils.varianceStability(sentLengths, 5);
+        
+        // Length normalization factor
+        stats.lengthNormalization = VarianceUtils.lengthNormalization(tokens.length);
+        
+        // Mahalanobis distance from human baseline
+        const featureVector = {
+            sentenceLengthCV: stats.sentences.coefficientOfVariation,
+            hapaxRatio: stats.vocabulary.hapaxLegomenaRatio,
+            burstiness: stats.burstiness.sentenceLength,
+            zipfSlope: stats.zipf.slope,
+            ttrNormalized: stats.vocabulary.typeTokenRatio
+        };
+        stats.mahalanobisDistance = VarianceUtils.mahalanobisDistance(featureVector);
+
         // === AI Signature Metrics ===
         stats.aiSignatures = this.computeAISignatureMetrics(text, tokens, sentences);
 
         return stats;
     },
 
+    /**
+     * Bin continuous values into histogram buckets
+     */
+    binValues(values, numBins) {
+        if (!values || values.length === 0) return [];
+        
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const binWidth = (max - min) / numBins || 1;
+        
+        const bins = new Array(numBins).fill(0);
+        
+        values.forEach(v => {
+            const binIndex = Math.min(numBins - 1, Math.floor((v - min) / binWidth));
+            bins[binIndex]++;
+        });
+        
+        return bins;
+    },
     /**
      * Compute AI-specific signature metrics
      */
@@ -354,6 +404,8 @@ const AnalyzerEngine = {
     /**
      * Calculate overall AI probability using variance-based methodology
      * Key principle: High uniformity = AI, High variance = Human
+     * 
+     * ENHANCED v2.1: Uses Bayesian combination and calibrated confidence
      */
     calculateVarianceBasedProbability(categoryResults) {
         const validResults = categoryResults.filter(r => 
@@ -366,14 +418,15 @@ const AnalyzerEngine = {
                 confidence: 0, 
                 mixedProbability: 0,
                 varianceProfile: null,
-                featureContributions: []
+                featureContributions: [],
+                combinationMethod: 'none'
             };
         }
 
         // Calculate feature contributions using category weights
         const featureContributions = [];
-        let weightedSum = 0;
-        let totalWeight = 0;
+        const probabilities = [];
+        const weights = [];
 
         for (const result of validResults) {
             // Map categories to weight keys
@@ -383,43 +436,87 @@ const AnalyzerEngine = {
             // Apply confidence as a weight multiplier
             const effectiveWeight = baseWeight * result.confidence;
             
-            // Calculate contribution
-            const contribution = result.aiProbability * effectiveWeight;
+            probabilities.push(result.aiProbability);
+            weights.push(effectiveWeight);
             
             featureContributions.push({
                 category: result.category,
                 name: result.name,
                 aiProbability: result.aiProbability,
                 weight: effectiveWeight,
-                contribution,
+                contribution: result.aiProbability * effectiveWeight,
                 uniformityScores: result.uniformityScores || null
             });
-
-            weightedSum += contribution;
-            totalWeight += effectiveWeight;
         }
 
-        const aiProbability = totalWeight > 0 ? weightedSum / totalWeight : 0.5;
+        // Use Bayesian combination for more accurate probability aggregation
+        // This handles correlated signals better than weighted average
+        const bayesianProb = VarianceUtils.bayesianCombine(probabilities, weights);
         
-        // Calculate confidence based on result agreement
-        const probabilities = validResults.map(r => r.aiProbability);
-        const agreement = 1 - Utils.standardDeviation(probabilities);
-        const avgConfidence = Utils.mean(validResults.map(r => r.confidence));
-        const overallConfidence = (agreement * 0.4 + avgConfidence * 0.6);
+        // Also calculate weighted average for comparison
+        const weightedAvgProb = weights.reduce((sum, w, i) => sum + w * probabilities[i], 0) / 
+                               weights.reduce((sum, w) => sum + w, 0);
         
-        // Mixed probability increases with disagreement
-        const mixedProbability = Math.min(0.3, Utils.standardDeviation(probabilities));
+        // Blend methods: Bayesian for extremes, weighted for middle
+        // This prevents over-confidence at the extremes
+        const blendFactor = Math.abs(bayesianProb - 0.5) * 2; // 0 at center, 1 at extremes
+        const aiProbability = bayesianProb * blendFactor + weightedAvgProb * (1 - blendFactor);
+        
+        // Calculate calibrated confidence based on multiple factors
+        const confidence = this.calculateCalibratedConfidence(validResults, probabilities);
+        
+        // Mixed probability: higher when analyzers disagree
+        const stdDev = Utils.standardDeviation(probabilities);
+        const mixedProbability = Math.min(0.35, stdDev * 1.5);
 
         // Build variance profile
         const varianceProfile = this.buildVarianceProfile(validResults);
 
         return {
             aiProbability: Math.max(0, Math.min(1, aiProbability)),
-            confidence: overallConfidence,
+            confidence,
             mixedProbability,
             varianceProfile,
-            featureContributions: featureContributions.sort((a, b) => b.contribution - a.contribution)
+            featureContributions: featureContributions.sort((a, b) => b.contribution - a.contribution),
+            combinationMethod: 'bayesian-blend',
+            rawBayesian: bayesianProb,
+            rawWeighted: weightedAvgProb
         };
+    },
+
+    /**
+     * Calculate calibrated confidence score
+     * Based on: analyzer agreement, sample sizes, signal strength
+     */
+    calculateCalibratedConfidence(results, probabilities) {
+        // Factor 1: Analyzer agreement (low std dev = high agreement)
+        const stdDev = Utils.standardDeviation(probabilities);
+        const agreementScore = 1 - Math.min(1, stdDev * 2.5);
+        
+        // Factor 2: Average analyzer confidence
+        const avgAnalyzerConf = Utils.mean(results.map(r => r.confidence));
+        
+        // Factor 3: Signal strength (distance from 0.5)
+        const avgProb = Utils.mean(probabilities);
+        const signalStrength = Math.abs(avgProb - 0.5) * 2;
+        
+        // Factor 4: Number of analyzers (more = more confident)
+        const analyzerCountFactor = Math.min(1, results.length / 10);
+        
+        // Factor 5: Consistency of direction (all pointing same way)
+        const aiLeaning = probabilities.filter(p => p > 0.5).length / probabilities.length;
+        const directionConsistency = Math.abs(aiLeaning - 0.5) * 2;
+        
+        // Weighted combination
+        const calibratedConfidence = (
+            agreementScore * 0.25 +
+            avgAnalyzerConf * 0.25 +
+            signalStrength * 0.15 +
+            analyzerCountFactor * 0.15 +
+            directionConsistency * 0.20
+        );
+        
+        return Math.max(0, Math.min(1, calibratedConfidence));
     },
 
     /**

@@ -865,6 +865,45 @@ const App = {
                     </div>
                 </div>
 
+                <!-- Advanced Statistical Tests -->
+                <div class="stats-section highlight-section">
+                    <h4>🔬 Advanced Statistical Tests</h4>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${getIndicator(advStats.autocorrelation?.periodicityScore, [0.6, 0.3])}">
+                            <span class="stat-label">Periodicity Score</span>
+                            <span class="stat-value">${formatPct(advStats.autocorrelation?.periodicityScore)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.perplexity?.predictability, [0.6, 0.4])}">
+                            <span class="stat-label">N-gram Predictability</span>
+                            <span class="stat-value">${formatPct(advStats.perplexity?.predictability)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Perplexity (approx)</span>
+                            <span class="stat-value">${formatNum(advStats.perplexity?.perplexity, 1)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.runsTest?.randomnessScore, [0.4, 0.6], true)}">
+                            <span class="stat-label">Randomness Score</span>
+                            <span class="stat-value">${formatPct(advStats.runsTest?.randomnessScore)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.chiSquared?.uniformityScore, [0.7, 0.4])}">
+                            <span class="stat-label">χ² Uniformity</span>
+                            <span class="stat-value">${formatPct(advStats.chiSquared?.uniformityScore)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.varianceStability, [0.7, 0.5])}">
+                            <span class="stat-label">Variance Stability</span>
+                            <span class="stat-value">${formatPct(advStats.varianceStability)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.mahalanobisDistance, [2.0, 1.0])}">
+                            <span class="stat-label">Mahalanobis Distance</span>
+                            <span class="stat-value">${formatNum(advStats.mahalanobisDistance, 2)}σ</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Length Normalization</span>
+                            <span class="stat-value">${formatPct(advStats.lengthNormalization)}</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- AI Signature Metrics -->
                 <div class="stats-section highlight-section">
                     <h4>🤖 AI Signature Metrics</h4>
