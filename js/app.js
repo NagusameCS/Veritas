@@ -1759,8 +1759,9 @@ const App = {
         const file = event.target.files[0];
         if (!file) return;
 
-        // Check file size (max 5MB for PDFs/DOCX)
-        const maxSize = fileType === 'txt' ? 100000 : 5000000;
+        // Check file size (max 5MB for PDFs/DOCX, 1MB for subtitles, 100KB for txt)
+        const sizeMap = { 'txt': 100000, 'subtitle': 1000000, 'pdf': 5000000, 'docx': 5000000 };
+        const maxSize = sizeMap[fileType] || 5000000;
         if (file.size > maxSize) {
             this.showToast(`File too large. Maximum size is ${maxSize / 1000000}MB`, 'error');
             return;

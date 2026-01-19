@@ -1,6 +1,6 @@
 /**
  * VERITAS — File Parser
- * Handles parsing of various file formats: TXT, DOCX, PDF, and clipboard/web content
+ * Handles parsing of various file formats: TXT, DOCX, PDF, VTT, SRT, and clipboard/web content
  */
 
 const FileParser = {
@@ -10,6 +10,8 @@ const FileParser = {
     supportedTypes: {
         'text/plain': 'txt',
         'text/markdown': 'md',
+        'text/vtt': 'vtt',
+        'application/x-subrip': 'srt',
         'application/pdf': 'pdf',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
         'application/msword': 'doc'
@@ -25,6 +27,10 @@ const FileParser = {
             case 'text/plain':
             case 'text/markdown':
                 return await this.parseText(file);
+            
+            case 'text/vtt':
+            case 'application/x-subrip':
+                return await this.parseSubtitle(file);
             
             case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
                 return await this.parseDocx(file);
@@ -46,6 +52,8 @@ const FileParser = {
         const typeMap = {
             'txt': 'text/plain',
             'md': 'text/markdown',
+            'vtt': 'text/vtt',
+            'srt': 'application/x-subrip',
             'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'doc': 'application/msword',
             'pdf': 'application/pdf'
@@ -73,6 +81,239 @@ const FileParser = {
             reader.onerror = () => reject(new Error('Failed to read text file'));
             reader.readAsText(file);
         });
+    },
+
+    /**
+     * Parse VTT (WebVTT) or SRT subtitle file
+     * Strips timestamps and cue identifiers, extracts only the spoken text
+     */
+    async parseSubtitle(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const rawContent = e.target.result;
+                const ext = file.name.split('.').pop().toLowerCase();
+                
+                let text;
+                let cueCount = 0;
+                
+                if (ext === 'vtt') {
+                    const result = this.parseVTT(rawContent);
+                    text = result.text;
+                    cueCount = result.cueCount;
+                } else {
+                    const result = this.parseSRT(rawContent);
+                    text = result.text;
+                    cueCount = result.cueCount;
+                }
+                
+                resolve({
+                    text: text,
+                    metadata: {
+                        filename: file.name,
+                        size: file.size,
+                        type: ext,
+                        lastModified: new Date(file.lastModified).toISOString(),
+                        originalFormat: ext.toUpperCase(),
+                        cueCount: cueCount,
+                        note: `Extracted ${cueCount} subtitle cues, timestamps stripped`
+                    }
+                });
+            };
+            reader.onerror = () => reject(new Error('Failed to read subtitle file'));
+            reader.readAsText(file);
+        });
+    },
+
+    /**
+     * Parse WebVTT format
+     * Format:
+     * WEBVTT
+     * 
+     * 00:00:00.000 --> 00:00:05.000
+     * This is the subtitle text
+     * 
+     * 00:00:05.000 --> 00:00:10.000
+     * More text here
+     */
+    parseVTT(content) {
+        const lines = content.split('\n');
+        const textLines = [];
+        let cueCount = 0;
+        let inCue = false;
+        
+        // VTT timestamp pattern: 00:00:00.000 --> 00:00:00.000
+        const timestampPattern = /^\d{2}:\d{2}:\d{2}\.\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}\.\d{3}/;
+        // Also match HH:MM:SS,mmm format (sometimes used)
+        const altTimestampPattern = /^\d{2}:\d{2}:\d{2},\d{3}\s*-->\s*\d{2}:\d{2}:\d{2},\d{3}/;
+        // Short format: MM:SS.mmm --> MM:SS.mmm
+        const shortTimestampPattern = /^\d{2}:\d{2}\.\d{3}\s*-->\s*\d{2}:\d{2}\.\d{3}/;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Skip WEBVTT header and metadata
+            if (line === 'WEBVTT' || line.startsWith('NOTE') || line.startsWith('STYLE')) {
+                continue;
+            }
+            
+            // Skip empty lines
+            if (line === '') {
+                inCue = false;
+                continue;
+            }
+            
+            // Skip cue identifiers (numbers or strings before timestamps)
+            if (timestampPattern.test(line) || altTimestampPattern.test(line) || shortTimestampPattern.test(line)) {
+                inCue = true;
+                cueCount++;
+                continue;
+            }
+            
+            // Skip lines that look like cue identifiers (just numbers)
+            if (/^\d+$/.test(line)) {
+                continue;
+            }
+            
+            // Skip positioning tags like align:start position:0%
+            if (line.includes('-->') || /^(align|position|line|size):/.test(line)) {
+                continue;
+            }
+            
+            // This is actual subtitle text
+            if (inCue || (i > 0 && !timestampPattern.test(line))) {
+                // Strip VTT tags like <v Speaker>, <c.yellow>, <b>, <i>, etc.
+                let cleanLine = line
+                    .replace(/<v\s+[^>]+>/g, '')     // <v Speaker Name>
+                    .replace(/<\/v>/g, '')           // </v>
+                    .replace(/<c\.[^>]+>/g, '')      // <c.classname>
+                    .replace(/<\/c>/g, '')           // </c>
+                    .replace(/<[biu]>/g, '')         // <b>, <i>, <u>
+                    .replace(/<\/[biu]>/g, '')       // </b>, </i>, </u>
+                    .replace(/<ruby>/g, '')          // ruby text
+                    .replace(/<\/ruby>/g, '')
+                    .replace(/<rt>/g, '')
+                    .replace(/<\/rt>/g, '')
+                    .replace(/<lang[^>]*>/g, '')     // language tags
+                    .replace(/<\/lang>/g, '')
+                    .replace(/&nbsp;/g, ' ')         // HTML entities
+                    .replace(/&amp;/g, '&')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .trim();
+                
+                if (cleanLine) {
+                    textLines.push(cleanLine);
+                }
+            }
+        }
+        
+        // Join lines intelligently - don't add extra space between continued sentences
+        const text = this.joinSubtitleLines(textLines);
+        
+        return { text, cueCount };
+    },
+
+    /**
+     * Parse SRT (SubRip) format
+     * Format:
+     * 1
+     * 00:00:00,000 --> 00:00:05,000
+     * This is the subtitle text
+     * 
+     * 2
+     * 00:00:05,000 --> 00:00:10,000
+     * More text here
+     */
+    parseSRT(content) {
+        const lines = content.split('\n');
+        const textLines = [];
+        let cueCount = 0;
+        let inCue = false;
+        
+        // SRT timestamp pattern: 00:00:00,000 --> 00:00:00,000
+        const timestampPattern = /^\d{2}:\d{2}:\d{2},\d{3}\s*-->\s*\d{2}:\d{2}:\d{2},\d{3}/;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Skip empty lines
+            if (line === '') {
+                inCue = false;
+                continue;
+            }
+            
+            // Skip cue numbers
+            if (/^\d+$/.test(line)) {
+                continue;
+            }
+            
+            // Skip timestamps
+            if (timestampPattern.test(line)) {
+                inCue = true;
+                cueCount++;
+                continue;
+            }
+            
+            // This is subtitle text
+            if (inCue) {
+                // Strip common HTML-like tags in SRT
+                let cleanLine = line
+                    .replace(/<[^>]+>/g, '')         // Remove all HTML tags
+                    .replace(/\{[^}]+\}/g, '')       // Remove ASS/SSA style tags {\\an8}
+                    .replace(/&nbsp;/g, ' ')
+                    .replace(/&amp;/g, '&')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>')
+                    .trim();
+                
+                if (cleanLine) {
+                    textLines.push(cleanLine);
+                }
+            }
+        }
+        
+        const text = this.joinSubtitleLines(textLines);
+        
+        return { text, cueCount };
+    },
+
+    /**
+     * Intelligently join subtitle lines into flowing text
+     * - Lines ending with punctuation get a space after
+     * - Lines ending mid-word/sentence get joined directly or with space
+     */
+    joinSubtitleLines(lines) {
+        if (lines.length === 0) return '';
+        
+        const result = [];
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            const prevLine = i > 0 ? lines[i - 1] : '';
+            
+            // Check if previous line ends with sentence-ending punctuation
+            const prevEndsWithPunctuation = /[.!?]$/.test(prevLine);
+            // Check if previous line ends with continuation punctuation
+            const prevEndsWithContinuation = /[,;:\-–—]$/.test(prevLine);
+            // Check if current line starts with lowercase (continuation)
+            const startsWithLowercase = /^[a-z]/.test(line);
+            
+            if (i === 0) {
+                result.push(line);
+            } else if (prevEndsWithPunctuation) {
+                // New sentence - add space
+                result.push(' ' + line);
+            } else if (prevEndsWithContinuation || startsWithLowercase) {
+                // Continuation - add space
+                result.push(' ' + line);
+            } else {
+                // Default - add space
+                result.push(' ' + line);
+            }
+        }
+        
+        return result.join('').trim();
     },
 
     /**
