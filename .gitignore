@@ -1,0 +1,6 @@
+.cache/
+__pycache__/
+*.pyc
+training/.cache/
+training/__pycache__/
+training/models/
