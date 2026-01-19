@@ -49,6 +49,9 @@ const AnalyzerEngine = {
         if (typeof ToneAnalyzer !== 'undefined') all.push(ToneAnalyzer);
         if (typeof PartOfSpeechAnalyzer !== 'undefined') all.push(PartOfSpeechAnalyzer);
         
+        // Humanization detection (Category 15)
+        if (typeof HumanizationAnalyzer !== 'undefined') all.push(HumanizationAnalyzer);
+        
         return all;
     },
 

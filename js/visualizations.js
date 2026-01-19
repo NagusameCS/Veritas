@@ -39,7 +39,7 @@ const Visualizations = {
         bgCircle.setAttribute('stroke', this.colors.bg);
         bgCircle.setAttribute('stroke-width', strokeWidth);
         
-        // AI portion (dark)
+        // AI portion (dark) - starts at full offset (hidden), animates to target
         const aiCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         aiCircle.setAttribute('cx', size / 2);
         aiCircle.setAttribute('cy', size / 2);
@@ -49,22 +49,23 @@ const Visualizations = {
         aiCircle.setAttribute('stroke-width', strokeWidth);
         aiCircle.setAttribute('stroke-linecap', 'round');
         aiCircle.setAttribute('stroke-dasharray', circumference);
-        aiCircle.setAttribute('stroke-dashoffset', aiOffset);
+        aiCircle.setAttribute('stroke-dashoffset', circumference); // Start hidden
         aiCircle.setAttribute('transform', `rotate(-90 ${size/2} ${size/2})`);
         aiCircle.classList.add('score-ring-progress');
-        aiCircle.style.setProperty('--target-offset', aiOffset);
         
-        // Human portion (light)
+        // Human portion (light) - inner ring
+        const innerRadius = radius - 20;
+        const innerCircumference = 2 * Math.PI * innerRadius;
         const humanCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         humanCircle.setAttribute('cx', size / 2);
         humanCircle.setAttribute('cy', size / 2);
-        humanCircle.setAttribute('r', radius - 20);
+        humanCircle.setAttribute('r', innerRadius);
         humanCircle.setAttribute('fill', 'none');
         humanCircle.setAttribute('stroke', this.colors.human);
         humanCircle.setAttribute('stroke-width', strokeWidth);
         humanCircle.setAttribute('stroke-linecap', 'round');
-        humanCircle.setAttribute('stroke-dasharray', (radius - 20) * 2 * Math.PI);
-        humanCircle.setAttribute('stroke-dashoffset', (radius - 20) * 2 * Math.PI * aiProbability);
+        humanCircle.setAttribute('stroke-dasharray', innerCircumference);
+        humanCircle.setAttribute('stroke-dashoffset', innerCircumference); // Start hidden
         humanCircle.setAttribute('transform', `rotate(-90 ${size/2} ${size/2})`);
         humanCircle.classList.add('score-ring-progress');
         
@@ -96,9 +97,14 @@ const Visualizations = {
         container.innerHTML = '';
         container.appendChild(svg);
         
-        // Animate after a frame
+        // Animate after a frame - AI ring fills to show AI %, human ring fills to show human %
         requestAnimationFrame(() => {
-            aiCircle.style.strokeDashoffset = aiOffset;
+            requestAnimationFrame(() => {
+                // AI ring: offset decreases as AI probability increases
+                aiCircle.style.strokeDashoffset = aiOffset;
+                // Human ring: shows (1 - aiProbability) = human probability
+                humanCircle.style.strokeDashoffset = innerCircumference * aiProbability;
+            });
         });
     },
 
