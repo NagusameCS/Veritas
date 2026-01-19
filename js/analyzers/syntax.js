@@ -308,35 +308,84 @@ const SyntaxAnalyzer = {
     },
 
     /**
-     * Generate findings
+     * Generate findings with detailed statistics
      */
     generateFindings(lengthMetrics, structuralDiversity, coordinationPatterns, syntacticComplexity) {
         const findings = [];
 
         // Length uniformity
-        if (lengthMetrics.coefficientOfVariation < 0.35) {
+        const cv = lengthMetrics.coefficientOfVariation;
+        if (cv < 0.35) {
             findings.push({
-                label: 'Sentence Length',
+                label: 'Sentence Length Uniformity',
                 value: 'Highly uniform sentence lengths detected',
-                note: `CV: ${(lengthMetrics.coefficientOfVariation * 100).toFixed(1)}% - AI typically produces consistent lengths`,
-                indicator: 'ai'
+                note: `AI typically produces consistent lengths with CV < 35%`,
+                indicator: 'ai',
+                severity: cv < 0.25 ? 'high' : 'medium',
+                stats: {
+                    measured: `CV: ${(cv * 100).toFixed(1)}%`,
+                    mean: `${lengthMetrics.mean.toFixed(1)} words/sentence`,
+                    stdDev: `±${lengthMetrics.stdDev.toFixed(1)} words`,
+                    range: `${lengthMetrics.min}–${lengthMetrics.max} words`
+                },
+                benchmark: {
+                    humanRange: 'CV: 40%–80%',
+                    aiRange: 'CV: 15%–35%',
+                    interpretation: 'Lower CV = more uniform = more AI-like'
+                }
             });
-        } else if (lengthMetrics.coefficientOfVariation > 0.6) {
+        } else if (cv > 0.6) {
             findings.push({
-                label: 'Sentence Length',
-                value: 'High variation in sentence lengths',
+                label: 'Sentence Length Variation',
+                value: 'High natural variation in sentence lengths',
                 note: 'Natural variation suggests human writing',
-                indicator: 'human'
+                indicator: 'human',
+                severity: 'low',
+                stats: {
+                    measured: `CV: ${(cv * 100).toFixed(1)}%`,
+                    mean: `${lengthMetrics.mean.toFixed(1)} words/sentence`,
+                    range: `${lengthMetrics.min}–${lengthMetrics.max} words`
+                },
+                benchmark: {
+                    humanRange: 'CV: 40%–80%',
+                    aiRange: 'CV: 15%–35%'
+                }
             });
         }
 
         // Burstiness
-        if (lengthMetrics.burstiness < 0.3) {
+        const burst = lengthMetrics.burstiness;
+        if (burst < 0.3) {
             findings.push({
                 label: 'Rhythm Pattern',
                 value: 'Low burstiness detected',
                 note: 'Text flows too evenly, lacking natural rhythm variation',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: burst < 0.15 ? 'high' : 'medium',
+                stats: {
+                    measured: `Burstiness: ${(burst * 100).toFixed(1)}%`,
+                    interpretation: 'Measures irregularity in sentence lengths'
+                },
+                benchmark: {
+                    humanRange: '30%–70%',
+                    aiRange: '5%–25%',
+                    formula: '(σ - μ) / (σ + μ)'
+                }
+            });
+        } else if (burst > 0.5) {
+            findings.push({
+                label: 'Natural Rhythm',
+                value: 'High burstiness detected',
+                note: 'Natural irregular rhythm typical of human writing',
+                indicator: 'human',
+                severity: 'low',
+                stats: {
+                    measured: `Burstiness: ${(burst * 100).toFixed(1)}%`
+                },
+                benchmark: {
+                    humanRange: '30%–70%',
+                    aiRange: '5%–25%'
+                }
             });
         }
 
@@ -345,19 +394,64 @@ const SyntaxAnalyzer = {
             findings.push({
                 label: 'Structural Diversity',
                 value: 'Limited sentence structure variety',
-                note: `Only ${structuralDiversity.uniqueStructures} distinct patterns detected`,
-                indicator: 'ai'
+                note: `Repetitive sentence patterns detected`,
+                indicator: 'ai',
+                severity: structuralDiversity.diversityScore < 0.25 ? 'high' : 'medium',
+                stats: {
+                    measured: `Diversity Score: ${(structuralDiversity.diversityScore * 100).toFixed(1)}%`,
+                    uniqueStructures: structuralDiversity.uniqueStructures,
+                    totalSentences: structuralDiversity.totalSentences,
+                    structureRatio: `${((structuralDiversity.uniqueStructures / Math.max(1, structuralDiversity.totalSentences)) * 100).toFixed(1)}% unique`
+                },
+                benchmark: {
+                    humanRange: '50%–90% diversity',
+                    aiRange: '20%–45% diversity'
+                }
             });
         }
 
         // Conjunction overuse
         if (coordinationPatterns.overuseScore > 0.5) {
+            const topTransitions = coordinationPatterns.transitionalUsed.slice(0, 5);
             findings.push({
-                label: 'Coordination',
+                label: 'Coordination Pattern',
                 value: 'Excessive use of conjunctions/transitions',
-                note: `${coordinationPatterns.transitionalUsed.slice(0, 3).join(', ')}`,
-                indicator: 'ai'
+                note: `Over-reliance on formal connectives is an AI signature`,
+                indicator: 'ai',
+                severity: coordinationPatterns.overuseScore > 0.7 ? 'high' : 'medium',
+                stats: {
+                    measured: `Overuse Score: ${(coordinationPatterns.overuseScore * 100).toFixed(1)}%`,
+                    transitionsFound: topTransitions.length > 0 ? topTransitions.join(', ') : 'none',
+                    perSentence: `${(coordinationPatterns.transitionalCount / Math.max(1, coordinationPatterns.sentenceCount)).toFixed(2)}/sentence`
+                },
+                benchmark: {
+                    humanRange: '0.1–0.3 per sentence',
+                    aiRange: '0.4–0.8 per sentence'
+                }
             });
+        }
+
+        // Syntactic complexity
+        if (syntacticComplexity && syntacticComplexity.avgDepth) {
+            const depth = syntacticComplexity.avgDepth;
+            if (depth < 2.0) {
+                findings.push({
+                    label: 'Syntactic Complexity',
+                    value: 'Low clause depth detected',
+                    note: 'Simple, shallow sentence structures',
+                    indicator: 'neutral',
+                    severity: 'low',
+                    stats: {
+                        measured: `Avg Depth: ${depth.toFixed(2)} levels`,
+                        maxDepth: syntacticComplexity.maxDepth
+                    },
+                    benchmark: {
+                        simple: '< 2.0 levels',
+                        moderate: '2.0–3.5 levels',
+                        complex: '> 3.5 levels'
+                    }
+                });
+            }
         }
 
         return findings;

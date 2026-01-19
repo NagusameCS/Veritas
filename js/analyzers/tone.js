@@ -406,7 +406,7 @@ const ToneAnalyzer = {
     },
 
     /**
-     * Generate findings
+     * Generate findings with detailed statistics
      */
     generateFindings(stability, drift, toneShifts, hedging, emotional) {
         const findings = [];
@@ -414,75 +414,161 @@ const ToneAnalyzer = {
         // Stability findings
         if (stability.overall > 0.85) {
             findings.push({
-                text: `Tone is exceptionally stable (${(stability.overall * 100).toFixed(0)}%) across the document - AI maintains consistent tone`,
-                category: this.name,
+                label: 'Tone Stability',
+                value: 'Exceptionally stable tone throughout document',
+                note: 'AI maintains consistent tone without natural variation',
                 indicator: 'ai',
-                severity: 'high'
+                severity: stability.overall > 0.92 ? 'high' : 'medium',
+                stats: {
+                    measured: `${(stability.overall * 100).toFixed(1)}% stability`,
+                    formalityStability: stability.formality ? `${(stability.formality * 100).toFixed(1)}%` : 'N/A',
+                    sentimentStability: stability.sentiment ? `${(stability.sentiment * 100).toFixed(1)}%` : 'N/A',
+                    varianceDetected: `${((1 - stability.overall) * 100).toFixed(1)}%`
+                },
+                benchmark: {
+                    humanRange: '40%–75% stability',
+                    aiRange: '80%–98% stability',
+                    interpretation: 'Humans naturally fluctuate in tone; AI is more consistent'
+                }
             });
         } else if (stability.overall < 0.4) {
             findings.push({
-                text: `Natural tone variation detected (${(stability.overall * 100).toFixed(0)}% stability) - characteristic of human writing`,
-                category: this.name,
+                label: 'Natural Tone Variation',
+                value: 'Healthy variation in tone detected',
+                note: 'Natural tone fluctuation is characteristic of human writing',
                 indicator: 'human',
-                severity: 'medium'
+                severity: 'low',
+                stats: {
+                    measured: `${(stability.overall * 100).toFixed(1)}% stability`,
+                    varianceDetected: `${((1 - stability.overall) * 100).toFixed(1)}% variance`
+                },
+                benchmark: {
+                    humanRange: '40%–75% stability',
+                    aiRange: '80%–98% stability'
+                }
             });
         }
 
         // Drift findings
         if (drift.hasDrift) {
             findings.push({
-                text: `Tone drifts ${drift.direction} over the document (${(drift.magnitude * 100).toFixed(0)}% shift) - natural human tendency`,
-                category: this.name,
+                label: 'Tone Drift',
+                value: `Tone drifts ${drift.direction} over the document`,
+                note: 'Natural human tendency to shift tone as writing progresses',
                 indicator: 'human',
-                severity: 'medium'
+                severity: 'low',
+                stats: {
+                    magnitude: `${(drift.magnitude * 100).toFixed(1)}% shift`,
+                    direction: drift.direction,
+                    startTone: drift.startTone || 'N/A',
+                    endTone: drift.endTone || 'N/A'
+                },
+                benchmark: {
+                    humanRange: '10%–40% drift common',
+                    aiRange: '0%–10% drift typical',
+                    note: 'AI maintains tone; humans naturally drift'
+                }
             });
         }
 
         // Hedging findings
         if (hedging.isExcessivelyConsistent) {
             findings.push({
-                text: `Hedging language used with unusual consistency (${(hedging.consistency * 100).toFixed(0)}%) - AI pattern`,
-                category: this.name,
+                label: 'Hedging Pattern',
+                value: 'Hedging language used with unusual consistency',
+                note: 'AI often uses hedging words ("perhaps", "may", "could") systematically',
                 indicator: 'ai',
-                severity: 'high'
+                severity: hedging.consistency > 0.9 ? 'high' : 'medium',
+                stats: {
+                    consistency: `${(hedging.consistency * 100).toFixed(1)}%`,
+                    hedgeWordCount: hedging.count || 'N/A',
+                    hedgeWordsFound: hedging.examples ? hedging.examples.slice(0, 5).join(', ') : 'N/A',
+                    density: hedging.density ? `${(hedging.density * 100).toFixed(2)}% of words` : 'N/A'
+                },
+                benchmark: {
+                    humanRange: 'Irregular hedging distribution',
+                    aiRange: 'Even hedging distribution',
+                    note: 'Humans hedge more in uncertain areas; AI hedges uniformly'
+                }
             });
         }
 
         if (hedging.pattern === 'periodic') {
             findings.push({
-                text: `Hedging appears at regular intervals - suggests formulaic generation`,
-                category: this.name,
+                label: 'Periodic Hedging',
+                value: 'Hedging appears at regular intervals',
+                note: 'Suggests formulaic generation with systematic hedging insertion',
                 indicator: 'ai',
-                severity: 'medium'
+                severity: 'medium',
+                stats: {
+                    pattern: 'Periodic/Regular',
+                    interval: hedging.interval ? `Every ~${hedging.interval} sentences` : 'N/A'
+                },
+                benchmark: {
+                    humanRange: 'Random hedging placement',
+                    aiRange: 'Regular hedging intervals'
+                }
             });
         }
 
         // Emotional findings
         if (emotional.isOverNeutral) {
             findings.push({
-                text: `Over-neutral emotional profile with minimal variation - AI tendency toward emotional flattening`,
-                category: this.name,
+                label: 'Emotional Profile',
+                value: 'Over-neutral emotional profile',
+                note: 'AI tends toward emotional flattening and neutral tone',
                 indicator: 'ai',
-                severity: 'high'
+                severity: 'high',
+                stats: {
+                    neutrality: emotional.neutralScore ? `${(emotional.neutralScore * 100).toFixed(1)}%` : 'Very high',
+                    emotionalRange: emotional.range ? `${(emotional.range * 100).toFixed(1)}% range` : 'Minimal',
+                    positiveWords: emotional.positiveCount || 0,
+                    negativeWords: emotional.negativeCount || 0
+                },
+                benchmark: {
+                    humanRange: '30%–70% emotional variation',
+                    aiRange: '80%–95% neutral/flat',
+                    interpretation: 'Humans express more emotional peaks and valleys'
+                }
             });
         }
 
         if (emotional.pattern === 'flat') {
             findings.push({
-                text: `Emotional tone is flat (${(emotional.flatness * 100).toFixed(0)}% uniformity) - lacks natural human expression variance`,
-                category: this.name,
+                label: 'Flat Emotional Tone',
+                value: `Emotional tone is uniformly flat`,
+                note: 'Lacks natural human expression variance',
                 indicator: 'ai',
-                severity: 'medium'
+                severity: 'medium',
+                stats: {
+                    flatness: `${(emotional.flatness * 100).toFixed(1)}% uniformity`,
+                    varianceScore: emotional.variance ? emotional.variance.toFixed(3) : 'Very low'
+                },
+                benchmark: {
+                    humanRange: 'Variable emotional intensity',
+                    aiRange: 'Consistent emotional level'
+                }
             });
         }
 
         // Tone shift findings
         if (toneShifts.hasUnexplainedShifts) {
             findings.push({
-                text: `${toneShifts.count} abrupt tone shifts detected - may indicate human emotion or multiple authors`,
-                category: this.name,
+                label: 'Abrupt Tone Shifts',
+                value: `${toneShifts.count} sudden tone changes detected`,
+                note: 'May indicate human emotion, multiple authors, or editing',
                 indicator: 'human',
-                severity: 'medium'
+                severity: 'low',
+                stats: {
+                    shiftCount: toneShifts.count,
+                    locations: toneShifts.positions ? `At sentences: ${toneShifts.positions.slice(0, 5).join(', ')}` : 'N/A',
+                    avgMagnitude: toneShifts.avgMagnitude ? `${(toneShifts.avgMagnitude * 100).toFixed(1)}% avg shift` : 'N/A'
+                },
+                benchmark: {
+                    humanRange: '2–6 tone shifts per 1000 words',
+                    aiRange: '0–1 tone shifts per 1000 words',
+                    note: 'Human writing has natural emotional rhythm'
+                }
             });
         }
 

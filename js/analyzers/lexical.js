@@ -324,68 +324,154 @@ const LexicalAnalyzer = {
     },
 
     /**
-     * Generate findings
+     * Generate findings with detailed statistics
      */
     generateFindings(diversityMetrics, frequencyAnalysis, aiVocabAnalysis, registerAnalysis) {
         const findings = [];
 
         // Lexical diversity
-        if (parseFloat(diversityMetrics.ttr) < 0.35) {
+        const ttr = parseFloat(diversityMetrics.ttr);
+        if (ttr < 0.35) {
             findings.push({
                 label: 'Lexical Diversity',
                 value: 'Low type-token ratio detected',
-                note: `TTR: ${diversityMetrics.ttr} - Limited vocabulary variety`,
-                indicator: 'ai'
+                note: `Limited vocabulary variety indicates potential AI generation`,
+                indicator: 'ai',
+                severity: ttr < 0.25 ? 'high' : 'medium',
+                stats: {
+                    measured: `TTR: ${(ttr * 100).toFixed(1)}%`,
+                    uniqueWords: diversityMetrics.typeCount,
+                    totalWords: diversityMetrics.tokenCount,
+                    rootTTR: diversityMetrics.rootTTR,
+                    mtld: diversityMetrics.mtld,
+                    entropy: `${diversityMetrics.entropy} bits`
+                },
+                benchmark: {
+                    humanRange: 'TTR: 40%–70%',
+                    aiRange: 'TTR: 25%–40%',
+                    interpretation: 'Higher TTR = more diverse vocabulary = more human-like'
+                }
+            });
+        } else if (ttr > 0.55) {
+            findings.push({
+                label: 'Lexical Diversity',
+                value: 'Rich vocabulary diversity detected',
+                note: `High vocabulary variety suggests human authorship`,
+                indicator: 'human',
+                severity: 'low',
+                stats: {
+                    measured: `TTR: ${(ttr * 100).toFixed(1)}%`,
+                    uniqueWords: diversityMetrics.typeCount,
+                    totalWords: diversityMetrics.tokenCount
+                },
+                benchmark: {
+                    humanRange: 'TTR: 40%–70%',
+                    aiRange: 'TTR: 25%–40%'
+                }
             });
         }
 
         // Vocabulary flattening
         if (frequencyAnalysis.flatteningScore > 0.6) {
             findings.push({
-                label: 'Vocabulary Pattern',
-                value: 'Signs of vocabulary flattening',
-                note: `Low hapax ratio (${frequencyAnalysis.hapaxRatio}) suggests limited unique word use`,
-                indicator: 'ai'
+                label: 'Vocabulary Flattening',
+                value: 'Signs of vocabulary flattening detected',
+                note: `AI tends to use mid-frequency words more evenly`,
+                indicator: 'ai',
+                severity: frequencyAnalysis.flatteningScore > 0.75 ? 'high' : 'medium',
+                stats: {
+                    measured: `Flattening Score: ${(frequencyAnalysis.flatteningScore * 100).toFixed(1)}%`,
+                    hapaxRatio: `${(frequencyAnalysis.hapaxRatio * 100).toFixed(1)}%`,
+                    interpretation: 'Low hapax ratio = fewer unique single-use words'
+                },
+                benchmark: {
+                    humanRange: 'Hapax: 45%–65%',
+                    aiRange: 'Hapax: 25%–40%',
+                    note: 'Hapax legomena = words appearing exactly once'
+                }
             });
         }
 
         // AI vocabulary
         if (aiVocabAnalysis.aiVocabScore > 0.4 && aiVocabAnalysis.foundAIWords.length > 0) {
-            const topAI = aiVocabAnalysis.foundAIWords.slice(0, 3).map(w => w.word);
+            const topAI = aiVocabAnalysis.foundAIWords.slice(0, 5);
             findings.push({
                 label: 'AI-Typical Vocabulary',
                 value: `${aiVocabAnalysis.aiWordCount} AI-associated terms detected`,
-                note: `Examples: ${topAI.join(', ')}`,
-                indicator: 'ai'
+                note: `Words like "crucial", "leverage", "enhance" are overused by AI`,
+                indicator: 'ai',
+                severity: aiVocabAnalysis.aiVocabScore > 0.6 ? 'high' : 'medium',
+                stats: {
+                    measured: `AI Vocab Score: ${(aiVocabAnalysis.aiVocabScore * 100).toFixed(1)}%`,
+                    wordsFound: aiVocabAnalysis.aiWordCount,
+                    examples: topAI.map(w => `"${w.word}" (${w.count}×)`).join(', '),
+                    density: `${((aiVocabAnalysis.aiWordCount / Math.max(1, aiVocabAnalysis.totalWords)) * 100).toFixed(2)}% of text`
+                },
+                benchmark: {
+                    humanRange: '0%–2% AI-typical words',
+                    aiRange: '3%–8% AI-typical words',
+                    note: 'Based on 50+ known AI-overused terms'
+                }
             });
         }
 
         // Synonym rotation
-        if (aiVocabAnalysis.synonymRotation.length > 0) {
+        if (aiVocabAnalysis.synonymRotation && aiVocabAnalysis.synonymRotation.length > 0) {
+            const rotations = aiVocabAnalysis.synonymRotation.slice(0, 3);
             findings.push({
                 label: 'Synonym Rotation',
                 value: 'Excessive synonym variety detected',
                 note: 'Pattern of rotating similar words is common in AI text',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'medium',
+                stats: {
+                    measured: `${rotations.length} rotation patterns detected`,
+                    examples: rotations.map(r => r.words ? r.words.join(', ') : r).join(' | ')
+                },
+                benchmark: {
+                    note: 'AI often uses multiple synonyms where humans would repeat'
+                }
             });
         }
 
-        // Register
+        // Register uniformity
         if (registerAnalysis.uniformityScore > 0.6) {
             findings.push({
                 label: 'Register Consistency',
                 value: `Uniformly ${registerAnalysis.primaryRegister} register`,
                 note: 'Lack of register variation may indicate AI generation',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: registerAnalysis.uniformityScore > 0.8 ? 'high' : 'medium',
+                stats: {
+                    measured: `Uniformity: ${(registerAnalysis.uniformityScore * 100).toFixed(1)}%`,
+                    academicWords: registerAnalysis.academicCount,
+                    conversationalWords: registerAnalysis.conversationalCount,
+                    registerBalance: registerAnalysis.registerBalance
+                },
+                benchmark: {
+                    humanRange: 'Mixed register with casual elements',
+                    aiRange: 'Uniform formal/academic register',
+                    note: 'Humans naturally mix formal and informal language'
+                }
             });
         }
 
+        // Conversational elements (human indicator)
         if (registerAnalysis.conversationalCount > 3) {
             findings.push({
                 label: 'Conversational Elements',
                 value: 'Contains informal language markers',
                 note: 'Natural conversational elements suggest human writing',
-                indicator: 'human'
+                indicator: 'human',
+                severity: 'low',
+                stats: {
+                    measured: `${registerAnalysis.conversationalCount} informal markers found`,
+                    examples: registerAnalysis.conversationalFound ? registerAnalysis.conversationalFound.slice(0, 5).join(', ') : 'various'
+                },
+                benchmark: {
+                    humanRange: '2+ conversational markers per 100 words',
+                    aiRange: '0–1 conversational markers per 100 words'
+                }
             });
         }
 

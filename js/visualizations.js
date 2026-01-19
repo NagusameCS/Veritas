@@ -574,31 +574,21 @@ const Visualizations = {
         // Count signals across all sections
         let totalAiFindings = 0;
         let totalHumanFindings = 0;
+        let highSeverityCount = 0;
         
         const sectionsHtml = report.sections.map(section => {
             const aiFindings = section.findings.filter(f => f.indicator === 'ai');
             const humanFindings = section.findings.filter(f => f.indicator === 'human');
             totalAiFindings += aiFindings.length;
             totalHumanFindings += humanFindings.length;
+            highSeverityCount += section.findings.filter(f => f.severity === 'high' || f.severity === 'critical').length;
             
             const signalSummary = aiFindings.length > 0 || humanFindings.length > 0
                 ? `<span class="section-signal-count">🔴 ${aiFindings.length} AI | 🟢 ${humanFindings.length} Human</span>`
                 : '';
             
             const findingsHtml = section.findings.length > 0 
-                ? section.findings.map(f => {
-                    const mainText = f.text || f.value || f.label || 'Unknown finding';
-                    const severityClass = f.severity ? `severity-${f.severity}` : '';
-                    return `
-                        <div class="report-finding ${f.indicator || 'neutral'} ${severityClass}">
-                            <span class="finding-icon">${this.getIndicatorIcon(f.indicator)}</span>
-                            <div class="finding-content-wrapper">
-                                <span class="finding-text">${this.escapeHtml(mainText)}</span>
-                                ${f.note ? `<span class="finding-note">${this.escapeHtml(f.note)}</span>` : ''}
-                            </div>
-                        </div>
-                    `;
-                }).join('')
+                ? section.findings.map(f => this.renderEnhancedFinding(f)).join('')
                 : '<p class="no-findings">No significant findings in this category</p>';
 
             const barColor = section.aiScore >= 60 ? '#ef4444' : (section.aiScore >= 40 ? '#f59e0b' : '#10b981');
@@ -647,6 +637,7 @@ const Visualizations = {
                     <div class="report-signal-summary">
                         <span class="signal-badge ai">🔴 ${totalAiFindings} AI Indicators</span>
                         <span class="signal-badge human">🟢 ${totalHumanFindings} Human Indicators</span>
+                        ${highSeverityCount > 0 ? `<span class="signal-badge critical">⚠️ ${highSeverityCount} High Severity</span>` : ''}
                     </div>
                     <p class="signal-note">Note: Indicator counts show patterns detected. Final probability uses ML-derived weights where high-weight categories (Metadata 40%, Lexical 22%, Syntax 21%) have more influence than low-weight categories.</p>
                 </div>
@@ -694,6 +685,87 @@ const Visualizations = {
             neutral: '<span class="material-icons finding-indicator neutral">radio_button_unchecked</span>'
         };
         return icons[indicator] || icons.neutral;
+    },
+
+    /**
+     * Helper: Get severity icon
+     */
+    getSeverityIcon(severity) {
+        const icons = {
+            critical: '<span class="material-icons severity-icon critical">error</span>',
+            high: '<span class="material-icons severity-icon high">warning</span>',
+            medium: '<span class="material-icons severity-icon medium">info</span>',
+            low: '<span class="material-icons severity-icon low">check_circle</span>'
+        };
+        return icons[severity] || '';
+    },
+
+    /**
+     * Render enhanced finding with stats and benchmarks
+     */
+    renderEnhancedFinding(f) {
+        const mainText = f.text || f.value || f.label || 'Unknown finding';
+        const severityClass = f.severity ? `severity-${f.severity}` : '';
+        const hasDetails = f.stats || f.benchmark;
+        
+        // Build stats HTML if available
+        let statsHtml = '';
+        if (f.stats) {
+            const statsEntries = Object.entries(f.stats)
+                .filter(([k, v]) => v !== null && v !== undefined && v !== 'N/A')
+                .map(([key, value]) => {
+                    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+                    return `<div class="stat-item"><span class="stat-key">${label}:</span> <span class="stat-val">${this.escapeHtml(String(value))}</span></div>`;
+                }).join('');
+            
+            if (statsEntries) {
+                statsHtml = `<div class="finding-stats">${statsEntries}</div>`;
+            }
+        }
+        
+        // Build benchmark HTML if available
+        let benchmarkHtml = '';
+        if (f.benchmark) {
+            const benchEntries = [];
+            if (f.benchmark.humanRange) {
+                benchEntries.push(`<span class="bench-human">👤 Human: ${this.escapeHtml(f.benchmark.humanRange)}</span>`);
+            }
+            if (f.benchmark.aiRange) {
+                benchEntries.push(`<span class="bench-ai">🤖 AI: ${this.escapeHtml(f.benchmark.aiRange)}</span>`);
+            }
+            if (f.benchmark.interpretation) {
+                benchEntries.push(`<span class="bench-note">💡 ${this.escapeHtml(f.benchmark.interpretation)}</span>`);
+            }
+            if (f.benchmark.note) {
+                benchEntries.push(`<span class="bench-note">📝 ${this.escapeHtml(f.benchmark.note)}</span>`);
+            }
+            
+            if (benchEntries.length > 0) {
+                benchmarkHtml = `<div class="finding-benchmark"><div class="bench-label">Reference Ranges:</div>${benchEntries.join('')}</div>`;
+            }
+        }
+        
+        return `
+            <div class="report-finding ${f.indicator || 'neutral'} ${severityClass} ${hasDetails ? 'has-details' : ''}">
+                <div class="finding-header">
+                    <span class="finding-icon">${this.getIndicatorIcon(f.indicator)}</span>
+                    <div class="finding-content-wrapper">
+                        <div class="finding-title-row">
+                            <span class="finding-label">${this.escapeHtml(f.label || '')}</span>
+                            ${f.severity ? this.getSeverityIcon(f.severity) : ''}
+                        </div>
+                        <span class="finding-text">${this.escapeHtml(mainText)}</span>
+                        ${f.note ? `<span class="finding-note">${this.escapeHtml(f.note)}</span>` : ''}
+                    </div>
+                </div>
+                ${hasDetails ? `
+                <div class="finding-details">
+                    ${statsHtml}
+                    ${benchmarkHtml}
+                </div>
+                ` : ''}
+            </div>
+        `;
     },
 
     /**

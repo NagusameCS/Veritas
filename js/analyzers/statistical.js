@@ -281,59 +281,158 @@ const StatisticalAnalyzer = {
     },
 
     /**
-     * Generate findings
+     * Generate findings with detailed statistics
      */
     generateFindings(perplexityAnalysis, predictabilityAnalysis, repetitionAnalysis, entropyAnalysis) {
         const findings = [];
 
         // Perplexity variance
-        if (perplexityAnalysis.varianceScore < 0.4) {
+        const pplxVar = perplexityAnalysis.varianceScore;
+        if (pplxVar < 0.4) {
             findings.push({
                 label: 'Perplexity Pattern',
                 value: 'Low perplexity variance across sentences',
-                note: `CV: ${perplexityAnalysis.coefficientOfVariation} - Unusual consistency`,
-                indicator: 'ai'
+                note: `AI generates text with consistent "surprise" levels`,
+                indicator: 'ai',
+                severity: pplxVar < 0.25 ? 'high' : 'medium',
+                stats: {
+                    measured: `Variance Score: ${(pplxVar * 100).toFixed(1)}%`,
+                    cv: perplexityAnalysis.coefficientOfVariation,
+                    mean: perplexityAnalysis.meanPerplexity?.toFixed(2) || 'N/A',
+                    stdDev: perplexityAnalysis.stdDevPerplexity?.toFixed(2) || 'N/A',
+                    sentencesAnalyzed: perplexityAnalysis.sentenceCount || 'N/A'
+                },
+                benchmark: {
+                    humanRange: 'CV: 0.4–0.8 (high variance)',
+                    aiRange: 'CV: 0.1–0.35 (low variance)',
+                    interpretation: 'Humans write with varying "surprise" levels; AI is more consistent'
+                }
+            });
+        } else if (pplxVar > 0.6) {
+            findings.push({
+                label: 'Perplexity Variation',
+                value: 'Natural perplexity variation detected',
+                note: 'High variance in sentence complexity is human-like',
+                indicator: 'human',
+                severity: 'low',
+                stats: {
+                    measured: `Variance Score: ${(pplxVar * 100).toFixed(1)}%`,
+                    cv: perplexityAnalysis.coefficientOfVariation
+                },
+                benchmark: {
+                    humanRange: 'CV: 0.4–0.8',
+                    aiRange: 'CV: 0.1–0.35'
+                }
             });
         }
 
         // Predictability
-        if (predictabilityAnalysis.predictabilityScore > 0.5) {
+        const pred = predictabilityAnalysis.predictabilityScore;
+        if (pred > 0.5) {
             findings.push({
                 label: 'Token Predictability',
                 value: 'High next-token predictability',
-                note: `Common patterns: ${predictabilityAnalysis.trigramRatio} trigram matches`,
-                indicator: 'ai'
+                note: `Text follows expected patterns too closely`,
+                indicator: 'ai',
+                severity: pred > 0.7 ? 'high' : 'medium',
+                stats: {
+                    measured: `Predictability: ${(pred * 100).toFixed(1)}%`,
+                    bigramMatches: predictabilityAnalysis.bigramRatio,
+                    trigramMatches: predictabilityAnalysis.trigramRatio,
+                    commonPatternCount: predictabilityAnalysis.commonPatternCount || 'N/A'
+                },
+                benchmark: {
+                    humanRange: '20%–45% predictable',
+                    aiRange: '50%–80% predictable',
+                    interpretation: 'AI uses common phrases more frequently'
+                }
             });
         }
 
         // N-gram repetition
-        if (repetitionAnalysis.repetitionScore > 0.4) {
-            const topRepeated = repetitionAnalysis.ngramAnalysis['3-gram'].topRepeated[0];
+        const repScore = repetitionAnalysis.repetitionScore;
+        if (repScore > 0.4) {
+            const topRepeated = repetitionAnalysis.ngramAnalysis?.['3-gram']?.topRepeated?.[0];
+            const top5 = repetitionAnalysis.ngramAnalysis?.['3-gram']?.topRepeated?.slice(0, 5) || [];
             findings.push({
                 label: 'N-gram Repetition',
                 value: 'Higher than normal phrase repetition',
-                note: topRepeated ? `"${topRepeated[0]}" appears ${topRepeated[1]} times` : '',
-                indicator: 'ai'
+                note: `Repeated phrases are a strong AI indicator`,
+                indicator: 'ai',
+                severity: repScore > 0.6 ? 'high' : 'medium',
+                stats: {
+                    measured: `Repetition Score: ${(repScore * 100).toFixed(1)}%`,
+                    bigramRepRate: `${((repetitionAnalysis.ngramAnalysis?.['2-gram']?.repetitionRate || 0) * 100).toFixed(1)}%`,
+                    trigramRepRate: `${((repetitionAnalysis.ngramAnalysis?.['3-gram']?.repetitionRate || 0) * 100).toFixed(1)}%`,
+                    topRepeatedPhrase: topRepeated ? `"${topRepeated[0]}" (${topRepeated[1]}×)` : 'none',
+                    repeatedPhrases: top5.map(p => `"${p[0]}" (${p[1]}×)`).join(', ') || 'none'
+                },
+                benchmark: {
+                    humanRange: 'Trigram repetition: 5%–15%',
+                    aiRange: 'Trigram repetition: 20%–40%',
+                    note: 'Humans rarely repeat exact 3+ word phrases'
+                }
             });
         }
 
         // Entropy
-        if (entropyAnalysis.normalizedEntropy < 0.4) {
+        const ent = entropyAnalysis.normalizedEntropy;
+        if (ent < 0.4) {
             findings.push({
                 label: 'Information Entropy',
                 value: 'Lower than expected word entropy',
-                note: 'Limited vocabulary distribution',
-                indicator: 'ai'
+                note: 'Low entropy indicates repetitive word choices',
+                indicator: 'ai',
+                severity: ent < 0.25 ? 'high' : 'medium',
+                stats: {
+                    measured: `Normalized Entropy: ${(ent * 100).toFixed(1)}%`,
+                    rawEntropy: `${entropyAnalysis.rawEntropy?.toFixed(2) || 'N/A'} bits`,
+                    maxPossible: `${entropyAnalysis.maxEntropy?.toFixed(2) || 'N/A'} bits`,
+                    vocabularySize: entropyAnalysis.vocabularySize || 'N/A'
+                },
+                benchmark: {
+                    humanRange: 'Normalized: 60%–90%',
+                    aiRange: 'Normalized: 30%–55%',
+                    interpretation: 'Higher entropy = more varied word distribution'
+                }
+            });
+        } else if (ent > 0.7) {
+            findings.push({
+                label: 'Information Entropy',
+                value: 'High word distribution entropy',
+                note: 'Rich vocabulary distribution suggests human writing',
+                indicator: 'human',
+                severity: 'low',
+                stats: {
+                    measured: `Normalized Entropy: ${(ent * 100).toFixed(1)}%`,
+                    rawEntropy: `${entropyAnalysis.rawEntropy?.toFixed(2) || 'N/A'} bits`
+                },
+                benchmark: {
+                    humanRange: 'Normalized: 60%–90%',
+                    aiRange: 'Normalized: 30%–55%'
+                }
             });
         }
 
         // Sentence start variety
-        if (predictabilityAnalysis.repeatedStarts.length > 2) {
+        if (predictabilityAnalysis.repeatedStarts && predictabilityAnalysis.repeatedStarts.length > 2) {
+            const topStarters = predictabilityAnalysis.repeatedStarts.slice(0, 5);
             findings.push({
                 label: 'Sentence Beginnings',
                 value: 'Repeated sentence start patterns',
-                note: `"${predictabilityAnalysis.repeatedStarts[0]?.[0]}" used ${predictabilityAnalysis.repeatedStarts[0]?.[1]} times`,
-                indicator: 'ai'
+                note: `AI often begins sentences with similar words`,
+                indicator: 'ai',
+                severity: predictabilityAnalysis.repeatedStarts.length > 4 ? 'high' : 'medium',
+                stats: {
+                    measured: `${predictabilityAnalysis.repeatedStarts.length} repeated starters`,
+                    examples: topStarters.map(s => `"${s[0]}..." (${s[1]}×)`).join(', '),
+                    uniqueStarterRatio: predictabilityAnalysis.uniqueStarterRatio ? 
+                        `${(predictabilityAnalysis.uniqueStarterRatio * 100).toFixed(1)}% unique` : 'N/A'
+                },
+                benchmark: {
+                    humanRange: '70%–95% unique starters',
+                    aiRange: '40%–65% unique starters'
+                }
             });
         }
 
