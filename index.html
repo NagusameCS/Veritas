@@ -462,7 +462,11 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 $$CV = \frac{\sigma}{\mu} = \frac{\sqrt{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2}}{\bar{x}}$$
                             </div>
                             
-                            <p><strong>Interpretation:</strong> Human sentence lengths typically show $CV \in [0.4, 0.8]$. AI-generated text tends toward $CV \in [0.2, 0.4]$ due to its optimization for consistent fluency.</p>
+                            <p><strong>Interpretation:</strong> Human sentence lengths typically show $CV \in [0.4, 0.8]$. Both extremes are suspicious:</p>
+                            <ul>
+                                <li><strong>Too low ($CV < 0.25$):</strong> AI-generated text optimized for consistent fluency</li>
+                                <li><strong>Too high ($CV > 0.9$):</strong> Potential humanizer artifacts introducing artificial randomness</li>
+                            </ul>
 
                             <h3>2.4 Burstiness Score</h3>
                             <p>Burstiness measures whether events (e.g., word occurrences) are clustered or evenly distributed:</p>
@@ -477,7 +481,11 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 <li>$B = 0$: Poisson random (neutral)</li>
                                 <li>$B = +1$: Maximally bursty (human-like)</li>
                             </ul>
-                            <p>Human text typically shows $B \in [0.1, 0.4]$, reflecting natural clustering of ideas and vocabulary. AI text often shows $B \in [-0.2, 0.1]$.</p>
+                            <p>Human text typically shows $B \in [0.1, 0.4]$. Both extremes warrant attention:</p>
+                            <ul>
+                                <li><strong>Too low ($B < -0.1$):</strong> Periodic, mechanical patterns from AI generation</li>
+                                <li><strong>Too high ($B > 0.5$):</strong> Artificially chaotic patterns, possible humanizer manipulation</li>
+                            </ul>
 
                             <h3>2.5 Shannon Entropy</h3>
                             <p>Information entropy measures unpredictability of word choices:</p>
@@ -521,7 +529,14 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 $$H_{ratio} = \frac{V_1}{N}$$
                             </div>
                             
-                            <p>where $V_1$ is the count of words appearing only once. Human text typically shows $H_{ratio} \approx 0.48$; AI text often shows reduced hapax ratios due to vocabulary recycling.</p>
+                            <p>where $V_1$ is the count of words appearing only once. Human text typically shows $H_{ratio} \approx 0.48$.</p>
+                            
+                            <p><strong>Bidirectional Detection:</strong> Both extremes are suspicious:</p>
+                            <ul>
+                                <li><strong>Too low ($H_{ratio} < 0.30$):</strong> AI-generated text with limited vocabulary diversity and word recycling</li>
+                                <li><strong>Too high ($H_{ratio} > 0.65$):</strong> Possible humanizer/thesaurus manipulation artificially inflating uniqueness through synonym substitution</li>
+                            </ul>
+                            <p>This bidirectional approach applies to most metrics—natural human writing occupies a "reasonable middle" while both mechanical uniformity and artificial chaos are flagged.</p>
 
                             <h3>3.3 Yule's K Characteristic</h3>
                             <p>A length-independent vocabulary measure:</p>

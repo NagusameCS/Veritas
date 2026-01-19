@@ -1,0 +1,50 @@
+{
+  "name": "veritas-ai-detector",
+  "version": "2.0.0",
+  "description": "AI text detection engine using variance-based linguistic analysis. Detects AI-generated text and humanizer tool usage.",
+  "main": "cli/analyzer.js",
+  "bin": {
+    "veritas": "./cli/index.js"
+  },
+  "scripts": {
+    "start": "node cli/index.js",
+    "test": "node cli/index.js --help",
+    "analyze": "node cli/index.js"
+  },
+  "keywords": [
+    "ai",
+    "ai-detection",
+    "gpt",
+    "chatgpt",
+    "text-analysis",
+    "nlp",
+    "natural-language-processing",
+    "plagiarism",
+    "content-detection",
+    "machine-learning",
+    "linguistic-analysis",
+    "variance-detection",
+    "humanizer-detection",
+    "zipf",
+    "burstiness"
+  ],
+  "author": "Veritas Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NagusameCS/Veritas.git"
+  },
+  "homepage": "https://github.com/NagusameCS/Veritas#readme",
+  "bugs": {
+    "url": "https://github.com/NagusameCS/Veritas/issues"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "cli/",
+    "README.md",
+    "LICENSE"
+  ],
+  "preferGlobal": true
+}
