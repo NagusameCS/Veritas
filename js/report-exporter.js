@@ -5,22 +5,22 @@
 
 const ReportExporter = {
     // Sunrise Model v3.0 - ML-derived category weights (98.08% accuracy)
-    // These weights are used for display purposes to show how each category contributes
+    // Aggregated from 37 individual feature weights to 14 analyzer categories
     categoryWeightInfo: {
-        1: { name: 'Grammar & Error Patterns', weight: 0.06, description: 'Analyzes grammatical consistency and error distribution. AI text typically has near-perfect grammar, while humans make natural errors.' },
-        2: { name: 'Sentence Structure & Syntax', weight: 0.22, description: 'ML-derived highest weight. Measures variance in sentence length and structure. AI tends toward uniform lengths; humans show "burstiness".' },
-        3: { name: 'Lexical Choice & Vocabulary', weight: 0.18, description: 'High ML importance. Evaluates vocabulary diversity, TTR, and hapax ratio. AI often shows predictable word choice patterns.' },
-        4: { name: 'Dialect & Regional Consistency', weight: 0.03, description: 'Checks for consistent regional spelling and terminology. AI may mix American/British conventions.' },
-        5: { name: 'Archaic / Historical Grammar', weight: 0.02, description: 'Detects anachronistic language use. AI may misuse historical terms or mix time periods.' },
-        6: { name: 'Discourse & Coherence', weight: 0.05, description: 'Analyzes logical flow and paragraph transitions. AI often uses formulaic transition patterns.' },
-        7: { name: 'Semantic & Pragmatic Features', weight: 0.06, description: 'Examines meaning depth and contextual appropriateness. AI may lack nuanced understanding.' },
-        8: { name: 'Statistical Language Model Indicators', weight: 0.12, description: 'ML-derived Zipf analysis. Measures word frequency distribution and statistical patterns.' },
-        9: { name: 'Authorship Consistency', weight: 0.08, description: 'Tracks stylistic drift throughout the document. AI maintains unnaturally consistent style.' },
-        10: { name: 'Meta-Patterns Unique to AI', weight: 0.04, description: 'Detects AI-specific patterns like hedging phrases, balanced arguments, and safety disclaimers.' },
-        11: { name: 'Metadata & Formatting', weight: 0.05, description: 'Identifies Unicode anomalies, decorative dividers (⸻), and hidden characters.' },
-        12: { name: 'Repetition Patterns', weight: 0.15, description: 'High ML importance. Analyzes phrase repetition distribution and n-gram patterns.' },
-        13: { name: 'Tone Stability', weight: 0.08, description: 'Measures emotional and stylistic consistency. AI maintains flat, stable tone throughout.' },
-        14: { name: 'Part of Speech Patterns', weight: 0.06, description: 'Examines verb/adverb patterns. AI overuses hedging verbs and front-loads adverbs.' }
+        1: { name: 'Grammar & Error Patterns', weight: 0.01, description: 'Low ML weight. Analyzes grammatical consistency (complexity_cv: 0.61%). Human errors are inconsistent; AI has near-perfect grammar.' },
+        2: { name: 'Sentence Structure & Syntax', weight: 0.21, description: 'High ML weight (21%). Measures sentence_length_std, range, cv, burstiness. AI tends toward uniform lengths; humans show natural variance.' },
+        3: { name: 'Lexical Choice & Vocabulary', weight: 0.22, description: 'Highest ML weight (22%). Evaluates hapax_count (11.75%), unique_word_count (10.21%), type_token_ratio. AI shows predictable vocabulary.' },
+        4: { name: 'Dialect & Regional Consistency', weight: 0.01, description: 'Low ML weight. Checks for consistent regional spelling and terminology patterns.' },
+        5: { name: 'Archaic / Historical Grammar', weight: 0.01, description: 'Low ML weight. Detects anachronistic language use and historical term misuse.' },
+        6: { name: 'Discourse & Coherence', weight: 0.02, description: 'Low ML weight. Analyzes logical flow via sentence_similarity_avg (0.83%).' },
+        7: { name: 'Semantic & Pragmatic Features', weight: 0.02, description: 'Low ML weight. Examines meaning depth and contextual appropriateness.' },
+        8: { name: 'Statistical Language Model Indicators', weight: 0.02, description: 'Low ML weight. Zipf analysis (zipf_slope: 0.65%, zipf_r_squared: 0.25%).' },
+        9: { name: 'Authorship Consistency', weight: 0.05, description: 'Moderate ML weight. Tracks stylistic drift via overall_uniformity (0.63%).' },
+        10: { name: 'Meta-Patterns Unique to AI', weight: 0.02, description: 'Low ML weight. Detects AI-specific hedging phrases and balanced arguments.' },
+        11: { name: 'Metadata & Formatting', weight: 0.40, description: 'HIGHEST ML weight (40%). avg_paragraph_length (16.85%), paragraph_count (14.66%), paragraph_length_cv (7.36%). Primary AI detection signal.' },
+        12: { name: 'Repetition Patterns', weight: 0.02, description: 'Low ML weight. bigram_repetition_rate (0.58%), trigram_repetition_rate (0.67%).' },
+        13: { name: 'Tone Stability', weight: 0.02, description: 'Low ML weight. burstiness_sentence (1.19%), burstiness_word_length (0.18%).' },
+        14: { name: 'Part of Speech Patterns', weight: 0.01, description: 'Low ML weight. Examines verb/adverb patterns derived from other features.' }
     },
 
     /**

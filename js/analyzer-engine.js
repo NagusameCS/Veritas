@@ -14,16 +14,17 @@ const AnalyzerEngine = {
         return typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
     },
     
-    // Category weights based on detection importance
+    // Category weights derived from Sunrise Model v3.0 feature importance
+    // These are aggregated from individual feature weights to category level
     categoryWeights: {
-        syntaxVariance: 0.15,          // Syntax variance
-        lexicalDiversity: 0.12,        // Lexical diversity  
-        repetitionUniformity: 0.12,    // Repetition uniformity
-        toneStability: 0.12,           // Tone stability
-        grammarEntropy: 0.08,          // Grammar entropy
-        perplexity: 0.08,              // Statistical perplexity
-        authorshipDrift: 0.10,         // Authorship drift
-        metadataFormatting: 0.25       // Metadata & formatting (strong signal for AI markers)
+        syntaxVariance: 0.21,          // sentence_length_*, avg_sentence_length (21%)
+        lexicalDiversity: 0.22,        // hapax_*, unique_word_count, type_token_ratio (22%)
+        repetitionUniformity: 0.02,    // bigram/trigram_repetition, sentence_similarity (2%)
+        toneStability: 0.02,           // burstiness_*, overall_uniformity (2%)
+        grammarEntropy: 0.01,          // complexity_cv (1%)
+        perplexity: 0.02,              // zipf_*, entropy features (2%)
+        authorshipDrift: 0.10,         // stylistic consistency (10%)
+        metadataFormatting: 0.40       // paragraph_*, formatting patterns (40% - highest importance)
     },
 
     // Getter for analyzers - allows graceful handling of missing modules
