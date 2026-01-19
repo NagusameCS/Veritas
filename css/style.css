@@ -1522,7 +1522,7 @@ body {
 }
 
 .philosophy-box {
-    background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+    background: var(--bg-tertiary);
     border: 1px solid var(--border-medium);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
@@ -1687,6 +1687,32 @@ body {
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* Indicator dots for interpretation cards */
+.ai-indicator,
+.human-indicator,
+.mixed-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ai-indicator {
+    background: var(--ai-color);
+}
+
+.human-indicator {
+    background: var(--human-color);
+}
+
+.mixed-indicator {
+    background: var(--mixed-color);
 }
 
 .interp-card.ai h4 {
@@ -1769,7 +1795,7 @@ body {
 }
 
 .stats-section.highlight-section {
-    background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+    background: var(--bg-tertiary);
     border-color: var(--border-medium);
 }
 
@@ -1780,6 +1806,15 @@ body {
     margin-bottom: var(--space-md);
     padding-bottom: var(--space-sm);
     border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.stats-section h4 .section-icon,
+.stats-section h4 .material-icons {
+    font-size: 1.125rem;
+    color: var(--text-tertiary);
 }
 
 .stats-table {

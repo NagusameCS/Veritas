@@ -156,7 +156,7 @@ const ReportExporter = {
         .bar-row { display: flex; align-items: center; margin: 5px 0; }
         .bar-label { width: 180px; font-size: 9pt; text-align: right; padding-right: 10px; }
         .bar-track { flex: 1; height: 18px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
-        .bar-fill-ai { background: linear-gradient(90deg, #10b981, #f59e0b, #ef4444); }
+        .bar-fill-ai { background: #737373; }
         .bar-value { width: 50px; text-align: right; font-size: 10pt; font-weight: bold; padding-left: 8px; }
         .disclaimer { background: #fff8e6; border: 1px solid #ffd666; border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 10pt; }
         .methodology { background: #f0f7ff; border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 10pt; }
@@ -295,7 +295,7 @@ const ReportExporter = {
     </div>
 
     <div class="disclaimer">
-        <h3>⚠️ ${report.disclaimer.title}</h3>
+        <h3>${report.disclaimer.title}</h3>
         <p>${report.disclaimer.content.replace(/\n/g, '<br>')}</p>
     </div>
 
@@ -815,7 +815,7 @@ const ReportExporter = {
                 for (const finding of cat.findings.slice(0, 5)) {
                     const findingText = finding.text || finding.value || finding.label || 'Unknown finding';
                     const indicator = finding.indicator || 'neutral';
-                    const icon = indicator === 'ai' ? '🔴' : (indicator === 'human' ? '🟢' : '🟡');
+                    const icon = indicator === 'ai' ? '[AI]' : (indicator === 'human' ? '[Human]' : '[Mixed]');
                     children.push(new Paragraph({ text: `${icon} ${findingText}` }));
                 }
             }
@@ -1099,7 +1099,7 @@ ${escaped}
             if (cat.findings.length > 0) {
                 md += `**Findings:**\n`;
                 for (const f of cat.findings.slice(0, 5)) {
-                    const icon = f.indicator === 'ai' ? '🔴' : (f.indicator === 'human' ? '🟢' : '🟡');
+                    const icon = f.indicator === 'ai' ? '[AI]' : (f.indicator === 'human' ? '[Human]' : '[Mixed]');
                     const findingText = f.text || f.value || f.label || 'Unknown finding';
                     md += `- ${icon} ${findingText}\n`;
                 }

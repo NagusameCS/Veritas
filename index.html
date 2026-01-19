@@ -68,22 +68,22 @@
                                     </button>
                                     <div class="upload-menu" id="uploadMenu">
                                         <label class="upload-option" data-type="txt">
-                                            <span class="upload-icon">📄</span> Text File (.txt, .md)
+                                            <span class="material-icons upload-icon">description</span> Text File (.txt, .md)
                                             <input type="file" accept=".txt,.md" hidden>
                                         </label>
                                         <label class="upload-option" data-type="docx">
-                                            <span class="upload-icon">📝</span> Word Document (.docx)
+                                            <span class="material-icons upload-icon">article</span> Word Document (.docx)
                                             <input type="file" accept=".docx" hidden>
                                         </label>
                                         <label class="upload-option" data-type="pdf">
-                                            <span class="upload-icon">📕</span> PDF Document (.pdf)
+                                            <span class="material-icons upload-icon">picture_as_pdf</span> PDF Document (.pdf)
                                             <input type="file" accept=".pdf" hidden>
                                         </label>
                                         <button class="upload-option" id="pasteClipboardBtn" data-type="clipboard">
-                                            <span class="upload-icon">📋</span> Paste from Clipboard
+                                            <span class="material-icons upload-icon">content_paste</span> Paste from Clipboard
                                         </button>
                                         <button class="upload-option" id="googleDocsBtn" data-type="gdocs">
-                                            <span class="upload-icon">📊</span> Google Docs URL
+                                            <span class="material-icons upload-icon">article</span> Google Docs URL
                                         </button>
                                     </div>
                                 </div>
@@ -217,16 +217,16 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                     </button>
                                     <div class="export-menu" id="exportMenu">
                                         <button class="export-option" data-format="pdf">
-                                            <span class="export-icon">📕</span> PDF Report (.pdf)
+                                            <span class="material-icons export-icon">picture_as_pdf</span> PDF Report (.pdf)
                                         </button>
                                         <button class="export-option" data-format="docx">
-                                            <span class="export-icon">📝</span> Word Document (.docx)
+                                            <span class="material-icons export-icon">description</span> Word Document (.docx)
                                         </button>
                                         <button class="export-option" data-format="markdown">
-                                            <span class="export-icon">📄</span> Markdown (.md)
+                                            <span class="material-icons export-icon">code</span> Markdown (.md)
                                         </button>
                                         <button class="export-option" data-format="json">
-                                            <span class="export-icon">📊</span> JSON Data (.json)
+                                            <span class="material-icons export-icon">data_object</span> JSON Data (.json)
                                         </button>
                                     </div>
                                 </div>
@@ -397,17 +397,17 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             <div class="principle-diagram">
                                 <div class="curve-region left">
                                     <span class="label">Too Perfect</span>
-                                    <span class="indicator">🔴 AI-like</span>
+                                    <span class="indicator ai-indicator">AI-like</span>
                                     <span class="desc">Uniform, predictable, mechanical</span>
                                 </div>
                                 <div class="curve-region center">
                                     <span class="label">Natural Range</span>
-                                    <span class="indicator">🟢 Human</span>
+                                    <span class="indicator human-indicator">Human</span>
                                     <span class="desc">Expected variance, burstiness</span>
                                 </div>
                                 <div class="curve-region right">
                                     <span class="label">Too Chaotic</span>
-                                    <span class="indicator">🟡 Unusual</span>
+                                    <span class="indicator mixed-indicator">Unusual</span>
                                     <span class="desc">Incoherent, or poor-quality AI</span>
                                 </div>
                             </div>
@@ -791,7 +791,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             
                             <div class="interpretation-grid">
                                 <div class="interp-card ai">
-                                    <h4>🔴 AI Indicators</h4>
+                                    <h4>AI Indicators</h4>
                                     <ul>
                                         <li>Sentence length CV &lt; 0.3</li>
                                         <li>Uniformity score &gt; 0.7</li>
@@ -804,7 +804,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                     </ul>
                                 </div>
                                 <div class="interp-card human">
-                                    <h4>🟢 Human Indicators</h4>
+                                    <h4><span class="human-indicator"></span> Human Indicators</h4>
                                     <ul>
                                         <li>Sentence length CV &gt; 0.5</li>
                                         <li>Positive burstiness (&gt; 0.2)</li>
@@ -817,7 +817,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                     </ul>
                                 </div>
                                 <div class="interp-card humanized">
-                                    <h4>🟡 Humanized AI Indicators</h4>
+                                    <h4><span class="mixed-indicator"></span> Humanized AI Indicators</h4>
                                     <ul>
                                         <li>High variance but stable variance-of-variance</li>
                                         <li>Weak feature correlations</li>
@@ -849,7 +849,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             
                             <div class="interpretation-grid">
                                 <div class="interp-card ai">
-                                    <h4>🔴 AI Indicators</h4>
+                                    <h4><span class="ai-indicator"></span> AI Indicators</h4>
                                     <ul>
                                         <li>Low sentence length CV (&lt;0.3)</li>
                                         <li>High uniformity score (&gt;0.7)</li>
@@ -862,7 +862,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                     </ul>
                                 </div>
                                 <div class="interp-card human">
-                                    <h4>🟢 Human Indicators</h4>
+                                    <h4><span class="human-indicator"></span> Human Indicators</h4>
                                     <ul>
                                         <li>High sentence length CV (&gt;0.5)</li>
                                         <li>Positive burstiness (&gt;0.2)</li>

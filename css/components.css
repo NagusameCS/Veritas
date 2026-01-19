@@ -684,19 +684,22 @@
 }
 
 .metadata-source::before {
-    content: "📄";
+    font-family: 'Material Icons';
+    content: "description";
+    font-size: 1rem;
+    vertical-align: middle;
 }
 
 .metadata-source.docx::before {
-    content: "📝";
+    content: "article";
 }
 
 .metadata-source.pdf::before {
-    content: "📕";
+    content: "picture_as_pdf";
 }
 
 .metadata-source.clipboard::before {
-    content: "📋";
+    content: "content_paste";
 }
 
 .metadata-warnings {

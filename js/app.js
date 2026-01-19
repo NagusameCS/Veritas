@@ -650,7 +650,7 @@ const App = {
             <div class="stats-grid">
                 <!-- Basic Document Stats -->
                 <div class="stats-section">
-                    <h4>📊 Document Overview</h4>
+                    <h4><span class="material-icons section-icon">description</span> Document Overview</h4>
                     <div class="stats-table">
                         <div class="stat-row"><span class="stat-label">Characters</span><span class="stat-value">${basicStats.characters?.toLocaleString() || 0}</span></div>
                         <div class="stat-row"><span class="stat-label">Words</span><span class="stat-value">${basicStats.words?.toLocaleString() || 0}</span></div>
@@ -662,7 +662,7 @@ const App = {
 
                 <!-- Vocabulary Richness -->
                 <div class="stats-section">
-                    <h4>📚 Vocabulary Richness</h4>
+                    <h4><span class="material-icons section-icon">menu_book</span> Vocabulary Richness</h4>
                     <div class="stats-table">
                         <div class="stat-row">
                             <span class="stat-label">Unique Words</span>
@@ -713,7 +713,7 @@ const App = {
 
                 <!-- Sentence Statistics -->
                 <div class="stats-section">
-                    <h4>📝 Sentence Analysis</h4>
+                    <h4><span class="material-icons section-icon">notes</span> Sentence Analysis</h4>
                     <div class="stats-table">
                         <div class="stat-row">
                             <span class="stat-label">Mean Length</span>
@@ -752,7 +752,7 @@ const App = {
 
                 <!-- Zipf's Law -->
                 <div class="stats-section">
-                    <h4>📈 Zipf's Law Analysis</h4>
+                    <h4><span class="material-icons section-icon">trending_up</span> Zipf's Law Analysis</h4>
                     <div class="stats-table">
                         <div class="stat-row indicator-${getIndicator(advStats.zipf?.compliance, [0.7, 0.85], true)}">
                             <span class="stat-label">Zipf Compliance</span>
@@ -775,7 +775,7 @@ const App = {
 
                 <!-- Readability -->
                 <div class="stats-section">
-                    <h4>📖 Readability Metrics</h4>
+                    <h4><span class="material-icons section-icon">chrome_reader_mode</span> Readability Metrics</h4>
                     <div class="stats-table">
                         <div class="stat-row">
                             <span class="stat-label">Avg Syllables/Word</span>
@@ -818,7 +818,7 @@ const App = {
 
                 <!-- Burstiness -->
                 <div class="stats-section">
-                    <h4>⚡ Burstiness & Uniformity</h4>
+                    <h4><span class="material-icons section-icon">flash_on</span> Burstiness & Uniformity</h4>
                     <div class="stats-table">
                         <div class="stat-row indicator-${getIndicator(advStats.burstiness?.sentenceLength, [0.1, 0.25], true)}">
                             <span class="stat-label">Sentence Length Burstiness</span>
@@ -837,7 +837,7 @@ const App = {
 
                 <!-- N-gram Analysis -->
                 <div class="stats-section ${advStats.ngrams?.repeatedPhraseScore > 0.3 ? 'humanizer-warning' : ''}">
-                    <h4>🔗 N-gram & Phrase Analysis</h4>
+                    <h4><span class="material-icons section-icon">link</span> N-gram & Phrase Analysis</h4>
                     <p class="section-note">Research shows repeated higher-order n-grams are strong AI indicators.</p>
                     <div class="stats-table">
                         <div class="stat-row">
@@ -887,7 +887,7 @@ const App = {
 
                 <!-- Function Words -->
                 <div class="stats-section">
-                    <h4>🔤 Word Analysis</h4>
+                    <h4><span class="material-icons section-icon">text_fields</span> Word Analysis</h4>
                     <div class="stats-table">
                         <div class="stat-row">
                             <span class="stat-label">Avg Word Length</span>
@@ -910,7 +910,7 @@ const App = {
 
                 <!-- Word Pattern Analysis -->
                 <div class="stats-section">
-                    <h4>🏷️ Word Pattern Analysis</h4>
+                    <h4><span class="material-icons section-icon">label</span> Word Pattern Analysis</h4>
                     <p class="section-note">POS-like analysis without external tools. Research shows AI has different word class distributions.</p>
                     <div class="stats-table">
                         <div class="stat-row indicator-${advStats.wordPatterns?.firstPersonRatio < 0.01 ? 'ai' : (advStats.wordPatterns?.firstPersonRatio > 0.03 ? 'human' : 'neutral')}">
@@ -954,7 +954,7 @@ const App = {
 
                 <!-- Advanced Statistical Tests -->
                 <div class="stats-section highlight-section">
-                    <h4>🔬 Advanced Statistical Tests</h4>
+                    <h4><span class="material-icons section-icon">science</span> Advanced Statistical Tests</h4>
                     <div class="stats-table">
                         <div class="stat-row indicator-${getIndicator(advStats.autocorrelation?.periodicityScore, [0.6, 0.3])}">
                             <span class="stat-label">Periodicity Score</span>
@@ -993,7 +993,7 @@ const App = {
 
                 <!-- Human Likelihood (Bell Curve Analysis) -->
                 <div class="stats-section highlight-section">
-                    <h4>📊 Human Likelihood (Bell Curve)</h4>
+                    <h4><span class="material-icons section-icon">analytics</span> Human Likelihood (Bell Curve)</h4>
                     <p class="section-note">Measures how close features are to typical human writing. Values near 1.0 = normal human range.</p>
                     <div class="stats-table">
                         <div class="stat-row indicator-${getIndicator(advStats.overallHumanLikelihood, [0.4, 0.6], true)}">
@@ -1033,7 +1033,7 @@ const App = {
 
                 <!-- AI Signature Metrics -->
                 <div class="stats-section highlight-section">
-                    <h4>🤖 AI Signature Metrics</h4>
+                    <h4><span class="material-icons section-icon">smart_toy</span> AI Signature Metrics</h4>
                     <div class="stats-table">
                         <div class="stat-row indicator-${getIndicator(advStats.aiSignatures?.hedgingDensity, [0.02, 0.01])}">
                             <span class="stat-label">Hedging Density</span>
@@ -1068,7 +1068,7 @@ const App = {
 
                 <!-- Humanizer Detection -->
                 <div class="stats-section highlight-section ${advStats.humanizerSignals?.isLikelyHumanized ? 'humanizer-warning' : ''}">
-                    <h4>🔄 Humanizer Detection</h4>
+                    <h4><span class="material-icons section-icon">sync_alt</span> Humanizer Detection</h4>
                     <p class="section-note">Detects AI text that has been post-processed to evade detection.</p>
                     <div class="stats-table">
                         <div class="stat-row indicator-${advStats.humanizerSignals?.isLikelyHumanized ? 'ai' : 'neutral'}">
@@ -1077,23 +1077,23 @@ const App = {
                         </div>
                         <div class="stat-row indicator-${advStats.humanizerSignals?.stableVarianceFlag ? 'ai' : 'neutral'}">
                             <span class="stat-label">Variance Stability (2nd order)</span>
-                            <span class="stat-value">${advStats.humanizerSignals?.stableVarianceFlag ? '⚠️ Suspicious' : '✓ Normal'}</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.stableVarianceFlag ? 'Suspicious' : 'Normal'}</span>
                         </div>
                         <div class="stat-row indicator-${advStats.humanizerSignals?.flatAutocorrelationFlag ? 'ai' : 'neutral'}">
                             <span class="stat-label">Autocorrelation Pattern</span>
-                            <span class="stat-value">${advStats.humanizerSignals?.flatAutocorrelationFlag ? '⚠️ Random noise' : '✓ Natural'}</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.flatAutocorrelationFlag ? 'Random noise' : 'Natural'}</span>
                         </div>
                         <div class="stat-row indicator-${advStats.humanizerSignals?.brokenCorrelationFlag ? 'ai' : 'neutral'}">
                             <span class="stat-label">Feature Correlations</span>
-                            <span class="stat-value">${advStats.humanizerSignals?.brokenCorrelationFlag ? '⚠️ Broken' : '✓ Intact'}</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.brokenCorrelationFlag ? 'Broken' : 'Intact'}</span>
                         </div>
                         <div class="stat-row indicator-${advStats.humanizerSignals?.synonymSubstitutionFlag ? 'ai' : 'neutral'}">
                             <span class="stat-label">Sophistication Consistency</span>
-                            <span class="stat-value">${advStats.humanizerSignals?.synonymSubstitutionFlag ? '⚠️ Word-level chaos' : '✓ Consistent'}</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.synonymSubstitutionFlag ? 'Word-level chaos' : 'Consistent'}</span>
                         </div>
                         <div class="stat-row indicator-${advStats.humanizerSignals?.artificialContractionFlag ? 'ai' : 'neutral'}">
                             <span class="stat-label">Contraction Pattern</span>
-                            <span class="stat-value">${advStats.humanizerSignals?.artificialContractionFlag ? '⚠️ Artificial' : '✓ Natural'}</span>
+                            <span class="stat-value">${advStats.humanizerSignals?.artificialContractionFlag ? 'Artificial' : 'Natural'}</span>
                         </div>
                         <div class="stat-row">
                             <span class="stat-label">Warning Flags</span>
@@ -1158,7 +1158,7 @@ const App = {
         const warningHtml = `
             <div class="false-positive-warning">
                 <div class="false-positive-warning-title">
-                    ⚠️ Detection Caveats
+                    <span class="material-icons">warning</span> Detection Caveats
                 </div>
                 <ul class="false-positive-warning-list">
                     ${risks.map(r => `<li>${r.message}</li>`).join('')}
@@ -1181,7 +1181,7 @@ const App = {
         
         const noteHtml = `
             <div class="domain-awareness-note">
-                <div class="note-title">ℹ️ Domain Notice</div>
+                <div class="note-title"><span class="material-icons">info</span> Domain Notice</div>
                 <p>Detection accuracy varies by text type. Academic, creative, and technical writing 
                 may produce different results. No detector is 100% reliable—use as one data point, 
                 not as definitive proof.</p>
@@ -1686,7 +1686,7 @@ These findings have important implications for urban planning and public health 
             if (section.findings.length > 0) {
                 markdown += `**Findings:**\n`;
                 for (const finding of section.findings) {
-                    const indicator = finding.indicator === 'ai' ? '🤖' : finding.indicator === 'human' ? '👤' : '⚖️';
+                    const indicator = finding.indicator === 'ai' ? '[AI]' : finding.indicator === 'human' ? '[Human]' : '[Mixed]';
                     markdown += `- ${indicator} ${finding.text}\n`;
                 }
             }

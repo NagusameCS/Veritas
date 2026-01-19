@@ -94,8 +94,8 @@ const AdvancedVisualizations = {
         // Add description
         const uniformity = VarianceUtils.uniformityScore(lengths);
         const description = uniformity > 0.7 
-            ? '<p class="chart-insight ai-signal">⚠️ Low variance in sentence length suggests AI-like uniformity</p>'
-            : '<p class="chart-insight human-signal">✓ Natural variation in sentence length typical of human writing</p>';
+            ? '<p class="chart-insight ai-signal">Low variance in sentence length suggests AI-like uniformity</p>'
+            : '<p class="chart-insight human-signal">Natural variation in sentence length typical of human writing</p>';
 
         container.innerHTML = svg + description;
     },
@@ -272,8 +272,8 @@ const AdvancedVisualizations = {
         // Insight
         const stability = toneData.stability?.overall || 0.5;
         const insight = stability > 0.75
-            ? '<p class="chart-insight ai-signal">⚠️ Tone remains unusually stable throughout - AI characteristic</p>'
-            : '<p class="chart-insight human-signal">✓ Natural tone variation observed - human characteristic</p>';
+            ? '<p class="chart-insight ai-signal">Tone remains unusually stable throughout - AI characteristic</p>'
+            : '<p class="chart-insight human-signal">Natural tone variation observed - human characteristic</p>';
 
         container.innerHTML = svg + insight;
     },
