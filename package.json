@@ -4,7 +4,7 @@
   "description": "AI text detection engine powered by Sunrise ML model. Uses variance-based linguistic analysis with 98.08% accuracy to detect AI-generated text and humanizer tool usage.",
   "main": "cli/analyzer.js",
   "bin": {
-    "veritas": "./cli/index.js"
+    "veritas": "cli/index.js"
   },
   "scripts": {
     "start": "node cli/index.js",
@@ -35,7 +35,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/NagusameCS/Veritas.git"
+    "url": "git+https://github.com/NagusameCS/Veritas.git"
   },
   "homepage": "https://nagusame.github.io/Veritas",
   "bugs": {
