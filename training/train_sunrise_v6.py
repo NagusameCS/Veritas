@@ -225,10 +225,13 @@ def generate_humanized_samples(ai_texts: list, target_count: int):
             receipts.append(receipt)
     
     print(f"      ✓ Generated {len(humanized):,} humanized samples")
-    print(f"        Intensity distribution:")
-    for intensity in intensities:
-        count = sum(1 for r in receipts if r.get("intensity") == intensity)
-        print(f"          {intensity}: {count:,} ({100*count/len(receipts):.1f}%)")
+    if receipts:
+        print(f"        Intensity distribution:")
+        for intensity in intensities:
+            count = sum(1 for r in receipts if r.get("intensity") == intensity)
+            print(f"          {intensity}: {count:,} ({100*count/len(receipts):.1f}%)")
+    else:
+        print(f"        ⚠ No humanized samples generated (no AI texts available)")
     
     return humanized, receipts
 
