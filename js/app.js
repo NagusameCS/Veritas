@@ -852,7 +852,7 @@ const App = {
         // Advanced statistics tab
         const statsContainer = document.getElementById('advancedStatistics');
         if (statsContainer && result.advancedStats) {
-            this.renderAdvancedStatistics(statsContainer, result.advancedStats, result.stats);
+            this.renderAdvancedStatistics(statsContainer, result.advancedStats, result.stats, result);
         }
 
         // Probability graphs tab
@@ -891,7 +891,7 @@ const App = {
     /**
      * Render advanced statistics panel
      */
-    renderAdvancedStatistics(container, advStats, basicStats) {
+    renderAdvancedStatistics(container, advStats, basicStats, fullResult = null) {
         const formatNum = (n, decimals = 2) => {
             if (typeof n !== 'number' || isNaN(n)) return '—';
             return n.toFixed(decimals);
@@ -1501,6 +1501,9 @@ const App = {
                 </div>
             </div>
 
+            <!-- Detection Transparency: Show the math behind the prediction -->
+            ${this.renderDetectionTransparency(fullResult, formatNum, formatPct)}
+
             <div class="stats-legend">
                 <h5>Indicator Key</h5>
                 <div class="legend-items">
@@ -1512,6 +1515,166 @@ const App = {
         `;
 
         container.innerHTML = html;
+    },
+
+    /**
+     * Render Detection Transparency section
+     * Shows the actual math and feature values leading to the prediction
+     */
+    renderDetectionTransparency(result, formatNum, formatPct) {
+        if (!result) return '';
+        
+        const featureContributions = result.featureContributions || [];
+        const signalCounts = result.varianceProfile?.signalCounts || 
+                            (result.aiProbability !== undefined ? { strongAi: 0, strongHuman: 0 } : null);
+        
+        // Get the config for explanations
+        const config = typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
+        const featureExplanations = config?.featureExplanations || {};
+        const expectedRanges = config?.expectedRanges || {};
+        const humanizationIndicators = config?.humanizationIndicators || {};
+        
+        // Calculate totals for transparency
+        const totalWeight = featureContributions.reduce((sum, f) => sum + (f.weight || 0), 0);
+        const totalContribution = featureContributions.reduce((sum, f) => sum + (f.contribution || 0), 0);
+        const baseWeightedAvg = totalWeight > 0 ? totalContribution / totalWeight : 0.5;
+        
+        // Build feature contribution rows
+        const topContributors = featureContributions.slice(0, 10); // Top 10 contributors
+        const contributorRows = topContributors.map(f => {
+            const indicator = f.aiProbability > 0.6 ? 'ai' : (f.aiProbability < 0.4 ? 'human' : 'neutral');
+            const explanation = featureExplanations[f.name.toLowerCase().replace(/\s+/g, '_')] || '';
+            const percentOfTotal = totalContribution > 0 ? (f.contribution / totalContribution * 100).toFixed(1) : 0;
+            
+            return `
+                <div class="stat-row indicator-${indicator}">
+                    <span class="stat-label" title="${explanation}">${f.name}</span>
+                    <span class="stat-value">
+                        <span class="feature-prob">${formatNum(f.aiProbability, 2)}</span>
+                        <span class="feature-weight">× ${formatNum(f.weight, 3)}</span>
+                        <span class="feature-contribution">= ${formatNum(f.contribution, 3)}</span>
+                        <span class="feature-percent">(${percentOfTotal}%)</span>
+                    </span>
+                </div>
+            `;
+        }).join('');
+        
+        // Build humanization indicator rows if available
+        let humanizationRows = '';
+        if (result.humanizerSignals) {
+            const signals = result.humanizerSignals;
+            const indicators = [
+                { name: 'Artificial Variance', flag: signals.stableVarianceFlag, desc: 'AI has unnaturally consistent sentence lengths' },
+                { name: 'Flat Autocorrelation', flag: signals.flatAutocorrelationFlag, desc: 'Sentence patterns lack natural flow' },
+                { name: 'Broken Correlations', flag: signals.brokenCorrelationFlag, desc: 'Features that should correlate don\'t' },
+                { name: 'Synonym Substitution', flag: signals.synonymSubstitutionFlag, desc: 'Word-level edits break consistency' },
+                { name: 'Artificial Contractions', flag: signals.artificialContractionFlag, desc: 'Contractions added post-hoc' }
+            ];
+            
+            const flagged = indicators.filter(i => i.flag);
+            if (flagged.length > 0) {
+                humanizationRows = `
+                    <div class="stats-section highlight-section warning-section">
+                        <h4><span class="material-icons section-icon">warning</span> Humanization Flags Detected</h4>
+                        <p class="section-note">These patterns suggest AI text may have been modified by humanizer tools. This is an <strong>advisory indicator</strong>, not a definitive classification.</p>
+                        <div class="stats-table">
+                            ${flagged.map(i => `
+                                <div class="stat-row indicator-ai">
+                                    <span class="stat-label" title="${i.desc}">${i.name}</span>
+                                    <span class="stat-value flagged">⚠ Flagged</span>
+                                </div>
+                            `).join('')}
+                            <div class="stat-row">
+                                <span class="stat-label"><strong>Total Flags</strong></span>
+                                <span class="stat-value"><strong>${signals.flagCount || 0} / 5</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Flagged characteristics from category results
+        let flaggedCharacteristics = '';
+        if (result.categoryResults) {
+            const aiFindings = result.categoryResults
+                .flatMap(c => (c.findings || []))
+                .filter(f => f.indicator === 'ai')
+                .slice(0, 8);
+            
+            const humanFindings = result.categoryResults
+                .flatMap(c => (c.findings || []))
+                .filter(f => f.indicator === 'human')
+                .slice(0, 5);
+            
+            if (aiFindings.length > 0 || humanFindings.length > 0) {
+                flaggedCharacteristics = `
+                    <div class="stats-section highlight-section">
+                        <h4><span class="material-icons section-icon">flag</span> Flagged Characteristics</h4>
+                        <p class="section-note">Specific patterns detected that influenced the classification.</p>
+                        <div class="flagged-findings">
+                            ${aiFindings.length > 0 ? `
+                                <div class="findings-group ai-findings">
+                                    <h5 class="findings-title indicator-ai">AI Indicators</h5>
+                                    <ul class="findings-list">
+                                        ${aiFindings.map(f => `<li>${f.text}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                            ${humanFindings.length > 0 ? `
+                                <div class="findings-group human-findings">
+                                    <h5 class="findings-title indicator-human">Human Indicators</h5>
+                                    <ul class="findings-list">
+                                        ${humanFindings.map(f => `<li>${f.text}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        return `
+            <div class="stats-section highlight-section transparency-section">
+                <h4><span class="material-icons section-icon">calculate</span> Detection Transparency</h4>
+                <p class="section-note">The actual math behind the prediction. Each analyzer contributes a probability (0-1) multiplied by its weight. The final score combines these using Bayesian methods.</p>
+                
+                <!-- Final Calculation Summary -->
+                <div class="calculation-summary">
+                    <div class="calc-row">
+                        <span class="calc-label">Weighted Average (Σ prob × weight / Σ weight)</span>
+                        <span class="calc-value">${formatNum(baseWeightedAvg, 3)}</span>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Strong AI Signals</span>
+                        <span class="calc-value">${signalCounts?.strongAi || 0} analyzers</span>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Strong Human Signals</span>
+                        <span class="calc-value">${signalCounts?.strongHuman || 0} analyzers</span>
+                    </div>
+                    <div class="calc-row final-score">
+                        <span class="calc-label"><strong>Final AI Probability</strong></span>
+                        <span class="calc-value"><strong>${formatPct(result.aiProbability)}</strong></span>
+                    </div>
+                </div>
+                
+                <!-- Feature Contributions Table -->
+                <h5 class="sub-section-title">Top Feature Contributions</h5>
+                <p class="section-note">Each row: Analyzer → AI Probability × Weight = Contribution (% of total)</p>
+                <div class="stats-table feature-table">
+                    ${contributorRows}
+                    <div class="stat-row total-row">
+                        <span class="stat-label"><strong>Total</strong></span>
+                        <span class="stat-value"><strong>Σ = ${formatNum(totalContribution, 3)}</strong> (÷ ${formatNum(totalWeight, 3)} = ${formatPct(baseWeightedAvg)})</span>
+                    </div>
+                </div>
+            </div>
+            
+            ${humanizationRows}
+            ${flaggedCharacteristics}
+        `;
     },
 
     /**

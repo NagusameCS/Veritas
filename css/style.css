@@ -2193,6 +2193,160 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   Detection Transparency Section
+   ───────────────────────────────────────────────────────────────────────────── */
+.transparency-section {
+    background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.03), rgba(var(--accent-rgb), 0.08));
+    border-left: 3px solid var(--accent);
+}
+
+.transparency-section .calculation-summary {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.transparency-section .calc-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-xs) 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.transparency-section .calc-row:last-child {
+    border-bottom: none;
+}
+
+.transparency-section .calc-row.final-score {
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 2px solid var(--accent);
+    background: rgba(var(--accent-rgb), 0.1);
+    padding: var(--space-sm);
+    margin: var(--space-sm) calc(-1 * var(--space-md));
+    margin-bottom: calc(-1 * var(--space-md));
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+.transparency-section .calc-label {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+.transparency-section .calc-value {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-family: var(--font-mono);
+}
+
+.transparency-section .sub-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-xs);
+}
+
+.transparency-section .feature-table .stat-value {
+    display: flex;
+    gap: var(--space-xs);
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+
+.transparency-section .feature-prob {
+    min-width: 3em;
+    color: var(--text-primary);
+}
+
+.transparency-section .feature-weight {
+    color: var(--text-tertiary);
+    font-size: 0.7rem;
+}
+
+.transparency-section .feature-contribution {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+.transparency-section .feature-percent {
+    color: var(--text-tertiary);
+    font-size: 0.7rem;
+}
+
+.transparency-section .total-row {
+    background: var(--bg-tertiary);
+    margin-top: var(--space-xs);
+}
+
+/* Warning Section for Humanization Flags */
+.warning-section {
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.05), rgba(255, 152, 0, 0.1));
+    border-left: 3px solid #ff9800;
+}
+
+.warning-section h4 {
+    color: #ff9800;
+}
+
+.warning-section .flagged {
+    color: #ff9800;
+    font-weight: 600;
+}
+
+/* Flagged Characteristics */
+.flagged-findings {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.findings-group {
+    padding: var(--space-sm);
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+}
+
+.findings-title {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.findings-title.indicator-ai {
+    color: var(--ai-color);
+}
+
+.findings-title.indicator-human {
+    color: var(--human-color);
+}
+
+.findings-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.findings-list li {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    padding: var(--space-xs) 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.findings-list li:last-child {
+    border-bottom: none;
+}
+
+.findings-list li::before {
+    content: '→ ';
+    color: var(--text-tertiary);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    Footer
    ───────────────────────────────────────────────────────────────────────────── */
 .footer {
