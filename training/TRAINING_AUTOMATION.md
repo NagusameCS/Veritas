@@ -10,6 +10,22 @@ The training automation provides a simple interface to:
 - **Check** training status and completion
 - **Stop** training if necessary
 
+## Prerequisites
+
+Before running training, ensure you have:
+1. Python 3.8 or higher
+2. pip3 installed
+
+## Installation
+
+Run the setup script to install all dependencies:
+```bash
+cd training
+./setup.sh
+```
+
+This will install all required Python packages from `requirements.txt`.
+
 ## Quick Start
 
 ### 1. Start Training
