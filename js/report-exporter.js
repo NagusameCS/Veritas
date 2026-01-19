@@ -142,11 +142,6 @@ const ReportExporter = {
         
         // Build verbose evidence summaries for each category
         const verboseEvidence = this.buildVerboseEvidence(report, analysisResult);
-        console.log('[VERITAS Report] Building evidence from advStats:', !!analysisResult.advancedStats);
-        console.log('[VERITAS Report] AI Signals:', verboseEvidence.aiSignals.length, 'Human Signals:', verboseEvidence.humanSignals.length);
-        if (verboseEvidence.aiSignals.length > 0) {
-            console.log('[VERITAS Report] Sample AI Signal:', verboseEvidence.aiSignals[0]);
-        }
         
         let html = `<!DOCTYPE html>
 <html>
@@ -154,104 +149,146 @@ const ReportExporter = {
     <meta charset="UTF-8">
     <title>VERITAS AI Detection Report</title>
     <style>
+        /* === BASE STYLES === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
             font-size: 10pt; 
             line-height: 1.5; 
             color: #1a1a1a;
-            padding: 12px 15px;
-            max-width: 100%;
-            margin: 0;
+            padding: 15mm 15mm 20mm 15mm;
+            max-width: 210mm;
+            margin: 0 auto;
             background: #ffffff;
         }
-        h1 { font-size: 18pt; margin-bottom: 3px; color: #111; }
-        h2 { font-size: 13pt; margin: 10px 0 5px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 3px; page-break-after: avoid; }
-        h3 { font-size: 11pt; margin: 6px 0 3px; color: #444; }
-        h4 { font-size: 10pt; margin: 5px 0 2px; color: #555; }
-        p { margin-bottom: 5px; }
-        .header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px; }
-        .meta { color: #666; font-size: 9pt; }
-        .summary-box { background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 1px solid #e5e5e5; border-radius: 8px; padding: 15px; margin: 12px 0; page-break-inside: avoid; }
-        .verdict-container { display: flex; align-items: center; gap: 15px; margin: 10px 0; }
-        .verdict-gauge { width: 80px; height: 80px; position: relative; flex-shrink: 0; }
-        .verdict-gauge-circle { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(${barColor} calc(${probability} * 3.6deg), #e5e5e5 0deg); display: flex; align-items: center; justify-content: center; }
-        .verdict-gauge-inner { width: 60px; height: 60px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .verdict-gauge-value { font-size: 16pt; font-weight: bold; color: ${barColor}; line-height: 1; }
-        .verdict-gauge-label { font-size: 6pt; color: #666; text-transform: uppercase; }
+        
+        /* === TYPOGRAPHY === */
+        h1 { font-size: 20pt; margin-bottom: 4px; color: #111; font-weight: 700; letter-spacing: -0.5px; }
+        h2 { font-size: 12pt; margin: 18px 0 8px; color: #222; border-bottom: 2px solid #333; padding-bottom: 4px; page-break-after: avoid; font-weight: 600; }
+        h3 { font-size: 10pt; margin: 12px 0 6px; color: #333; font-weight: 600; }
+        h4 { font-size: 9pt; margin: 6px 0 3px; color: #444; font-weight: 600; }
+        p { margin-bottom: 6px; }
+        
+        /* === HEADER === */
+        .header { text-align: center; margin-bottom: 15px; border-bottom: 3px solid #111; padding-bottom: 10px; }
+        .meta { color: #555; font-size: 8pt; margin: 2px 0; }
+        
+        /* === SUMMARY BOX === */
+        .summary-box { 
+            background: #f8f9fa; 
+            border: 2px solid #333; 
+            border-radius: 0; 
+            padding: 15px; 
+            margin: 15px 0; 
+            page-break-inside: avoid; 
+        }
+        
+        /* === VERDICT DISPLAY === */
+        .verdict-container { display: flex; align-items: flex-start; gap: 15px; margin: 10px 0; }
+        .verdict-gauge { width: 70px; height: 70px; position: relative; flex-shrink: 0; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .verdict-gauge-circle { display: none; }
+        .verdict-gauge-inner { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .verdict-gauge-value { font-size: 18pt; font-weight: bold; color: ${barColor}; line-height: 1; }
+        .verdict-gauge-label { font-size: 6pt; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
         .verdict-info { flex: 1; }
-        .verdict-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 10pt; margin-bottom: 6px; }
-        .verdict-badge.high { background: #fee2e2; color: #b91c1c; }
-        .verdict-badge.moderate { background: #fef3c7; color: #b45309; }
-        .verdict-badge.low { background: #d1fae5; color: #047857; }
-        .verdict-badge.humanized { background: #f3e8ff; color: #7c3aed; }
-        .confidence-range { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 8pt; color: #666; }
-        .confidence-bar { flex: 1; height: 6px; background: #e5e5e5; border-radius: 3px; position: relative; max-width: 200px; }
-        .confidence-range-fill { position: absolute; height: 100%; background: linear-gradient(90deg, #d1d5db, ${barColor}); border-radius: 3px; }
-        .confidence-marker { position: absolute; width: 2px; height: 10px; background: #333; top: -2px; transform: translateX(-50%); }
-        .verdict { font-size: 11pt; font-weight: bold; margin: 5px 0; }
-        .verdict.high { color: #ef4444; }
-        .verdict.moderate { color: #f59e0b; }
-        .verdict.low { color: #10b981; }
-        .verdict.humanized { color: #9333ea; }
-        .humanized-warning { background: #faf5ff; border: 1px solid #d8b4fe; border-radius: 4px; padding: 8px; margin: 8px 0; font-size: 9pt; }
-        .humanized-warning h4 { color: #7c3aed; margin-bottom: 4px; }
-        .probability-bar { height: 14px; background: #e5e5e5; border-radius: 7px; overflow: hidden; margin: 5px 0; }
-        .probability-fill { height: 100%; background: ${barColor}; min-width: 1px; }
-        .stat-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-        .stat-item { background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); padding: 10px 12px; border-radius: 6px; flex: 1; min-width: 100px; border: 1px solid #e5e5e5; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .stat-label { font-size: 7pt; color: #888; text-transform: uppercase; display: block; letter-spacing: 0.5px; margin-bottom: 2px; }
-        .stat-value { font-size: 12pt; font-weight: bold; color: #333; }
-        .category-card { border: 1px solid #e5e5e5; border-radius: 4px; padding: 8px; margin: 6px 0; page-break-inside: avoid; break-inside: avoid; }
+        .verdict-badge { display: inline-block; padding: 4px 12px; border: 2px solid; font-weight: bold; font-size: 9pt; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .verdict-badge.high { border-color: #b91c1c; color: #b91c1c; background: #fff; }
+        .verdict-badge.moderate { border-color: #b45309; color: #b45309; background: #fff; }
+        .verdict-badge.low { border-color: #047857; color: #047857; background: #fff; }
+        .verdict-badge.humanized { border-color: #7c3aed; color: #7c3aed; background: #fff; }
+        
+        /* === CONFIDENCE RANGE === */
+        .confidence-range { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 8pt; color: #555; }
+        .confidence-bar { flex: 1; height: 8px; background: #ddd; position: relative; max-width: 180px; border: 1px solid #999; }
+        .confidence-range-fill { position: absolute; height: 100%; background: #666; }
+        .confidence-marker { position: absolute; width: 3px; height: 14px; background: #000; top: -3px; transform: translateX(-50%); }
+        
+        /* === STATISTICS GRID === */
+        .stat-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+        .stat-item { background: #fff; padding: 10px; flex: 1; min-width: 90px; border: 1px solid #333; text-align: center; }
+        .stat-label { font-size: 7pt; color: #666; text-transform: uppercase; display: block; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .stat-value { font-size: 13pt; font-weight: bold; color: #111; }
+        
+        /* === INDICATOR BADGES === */
+        .ind-ai { display: inline-block; background: #b91c1c; color: #fff; font-weight: bold; font-size: 7pt; padding: 1px 5px; border-radius: 2px; }
+        .ind-mixed { display: inline-block; background: #b45309; color: #fff; font-weight: bold; font-size: 7pt; padding: 1px 5px; border-radius: 2px; }
+        .ind-human { display: inline-block; background: #047857; color: #fff; font-weight: bold; font-size: 7pt; padding: 1px 5px; border-radius: 2px; }
+        
+        /* === TABLES === */
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 8pt; page-break-inside: avoid; }
+        th, td { border: 1px solid #999; padding: 5px 6px; text-align: left; }
+        th { background: #f0f0f0; font-weight: 600; font-size: 8pt; }
+        td { font-size: 8pt; background: #fff; }
+        
+        /* === CATEGORY CARDS === */
+        .category-card { border: 1px solid #999; padding: 10px; margin: 8px 0; page-break-inside: avoid; break-inside: avoid; background: #fff; }
         .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .category-name { font-weight: bold; font-size: 9pt; }
-        .category-score { font-weight: bold; padding: 2px 6px; border-radius: 10px; font-size: 8pt; }
-        .score-high { background: #fee2e2; color: #b91c1c; }
-        .score-moderate { background: #fef3c7; color: #b45309; }
-        .score-low { background: #d1fae5; color: #047857; }
-        .category-bar { height: 5px; background: #e5e5e5; border-radius: 2px; overflow: hidden; margin: 3px 0; }
-        .category-fill { height: 100%; border-radius: 2px; min-width: 1px; }
-        .weight-info { font-size: 7pt; color: #888; margin-top: 4px; padding-top: 4px; border-top: 1px solid #eee; }
-        .finding { padding: 2px 0 2px 10px; border-left: 2px solid #ddd; margin: 2px 0; font-size: 8pt; }
-        .finding.ai { border-left-color: #ef4444; background: #fff5f5; }
-        .finding.human { border-left-color: #10b981; background: #f0fdf4; }
-        .finding.mixed { border-left-color: #f59e0b; background: #fffbeb; }
-        .evidence-stats { font-size: 7pt; color: #666; margin-top: 3px; padding: 3px 6px; background: #f9fafb; border-radius: 2px; }
-        .evidence-stats strong { color: #333; }
-        .chart { margin: 8px 0; }
+        .category-score { font-weight: bold; padding: 2px 8px; font-size: 8pt; border: 1px solid; }
+        .score-high { border-color: #b91c1c; color: #b91c1c; }
+        .score-moderate { border-color: #b45309; color: #b45309; }
+        .score-low { border-color: #047857; color: #047857; }
+        .category-bar { height: 6px; background: #ddd; margin: 4px 0; border: 1px solid #999; }
+        .category-fill { height: 100%; }
+        .weight-info { font-size: 7pt; color: #666; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #ccc; }
+        
+        /* === FINDINGS === */
+        .finding { padding: 3px 0 3px 10px; border-left: 3px solid #999; margin: 3px 0; font-size: 8pt; background: #fafafa; }
+        .finding.ai { border-left-color: #b91c1c; }
+        .finding.human { border-left-color: #047857; }
+        .finding.mixed { border-left-color: #b45309; }
+        
+        /* === BAR CHARTS === */
+        .chart { margin: 10px 0; }
         .bar-chart { width: 100%; }
-        .bar-row { display: flex; align-items: center; margin: 3px 0; }
-        .bar-label { width: 160px; font-size: 8pt; text-align: right; padding-right: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .bar-track { flex: 1; height: 14px; background: #e5e5e5; border-radius: 3px; overflow: hidden; }
-        .bar-fill-ai { height: 100%; background: linear-gradient(90deg, #6b7280, #374151); border-radius: 3px; min-width: 2px; }
-        .bar-value { width: 45px; text-align: right; font-size: 9pt; font-weight: bold; padding-left: 6px; }
-        .disclaimer { background: #fff8e6; border: 1px solid #ffd666; border-radius: 4px; padding: 8px; margin: 10px 0; font-size: 8pt; page-break-inside: avoid; }
-        .methodology { background: #f0f7ff; border-radius: 4px; padding: 8px; margin: 10px 0; font-size: 8pt; page-break-inside: avoid; }
-        .signal-summary { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 4px; padding: 8px; margin: 8px 0; page-break-inside: avoid; }
-        .signal-summary h3 { margin-top: 0; font-size: 10pt; }
-        .signal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-        .signal-grid > div { flex: 1; min-width: 45%; }
-        .signal-item { padding: 4px; border-radius: 3px; margin-bottom: 3px; }
-        .signal-item.ai-signal { background: #fee2e2; border-left: 2px solid #ef4444; }
-        .signal-item.human-signal { background: #d1fae5; border-left: 2px solid #10b981; }
-        .signal-item .signal-label { font-size: 7pt; color: #666; }
-        .signal-item .signal-value { font-size: 9pt; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt; page-break-inside: avoid; }
-        th, td { border: 1px solid #ddd; padding: 5px 6px; text-align: left; }
-        th { background: #f5f5f5; font-weight: 600; font-size: 8pt; }
-        td { font-size: 8pt; }
-        .page-break { page-break-before: always; }
+        .bar-row { display: flex; align-items: center; margin: 4px 0; }
+        .bar-label { width: 150px; font-size: 8pt; text-align: right; padding-right: 8px; }
+        .bar-track { flex: 1; height: 12px; background: #ddd; border: 1px solid #999; }
+        .bar-fill-ai { height: 100%; background: #555; }
+        .bar-value { width: 45px; text-align: right; font-size: 8pt; font-weight: bold; padding-left: 6px; }
+        
+        /* === SIGNAL SUMMARY === */
+        .signal-summary { background: #f8f8f8; border: 1px solid #999; padding: 10px; margin: 10px 0; page-break-inside: avoid; }
+        .signal-summary h3 { margin-top: 0; font-size: 10pt; border-bottom: 1px solid #999; padding-bottom: 4px; margin-bottom: 8px; }
+        .signal-grid { display: flex; gap: 10px; }
+        .signal-grid > div { flex: 1; }
+        .signal-item { padding: 4px 6px; margin-bottom: 4px; border: 1px solid #ccc; background: #fff; }
+        .signal-item.ai-signal { border-left: 3px solid #b91c1c; }
+        .signal-item.human-signal { border-left: 3px solid #047857; }
+        .signal-item .signal-label { font-size: 7pt; color: #555; }
+        .signal-item .signal-value { font-size: 8pt; font-weight: bold; color: #111; }
+        
+        /* === METHODOLOGY & DISCLAIMER === */
+        .disclaimer { background: #fff8e6; border: 1px solid #d4a000; padding: 10px; margin: 12px 0; font-size: 8pt; page-break-inside: avoid; }
+        .methodology { background: #f0f4f8; border: 1px solid #666; padding: 10px; margin: 12px 0; font-size: 8pt; page-break-inside: avoid; }
+        
+        /* === PAGE BREAKS === */
+        .page-break { page-break-before: always; margin-top: 0; }
         .no-break { page-break-inside: avoid; break-inside: avoid; }
+        
+        /* === PRINT STYLES === */
         @media print { 
-            body { padding: 0; }
+            body { 
+                padding: 0; 
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
             .page-break { page-break-before: always; }
             .category-card, .summary-box, table, .signal-summary { page-break-inside: avoid; }
+            h2 { page-break-after: avoid; }
+            h3 { page-break-after: avoid; }
+            table { page-break-inside: avoid; }
+        }
+        
+        @page {
+            size: A4;
+            margin: 15mm;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>◈ VERITAS</h1>
+        <h1>VERITAS</h1>
         <p class="meta">AI Text Detection Analysis Report</p>
         <p class="meta">Powered by ${report.modelInfo.name} Model v${report.modelInfo.version} | ${(report.modelInfo.accuracy * 100).toFixed(1)}% Accuracy | ${report.modelInfo.trainingSamples.toLocaleString()} Training Samples</p>
         <p class="meta">Generated: ${new Date(report.generatedAt).toLocaleString()}</p>
@@ -270,7 +307,7 @@ const ReportExporter = {
                 </div>
             </div>
             <div class="verdict-info">
-                <span class="verdict-badge ${isLikelyHumanized ? 'humanized' : (probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low'))}">${isLikelyHumanized ? '🔄 Possibly Humanized AI' : report.verdict.label}</span>
+                <span class="verdict-badge ${isLikelyHumanized ? 'humanized' : (probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low'))}">${isLikelyHumanized ? 'POSSIBLY HUMANIZED AI' : report.verdict.label}</span>
                 <p style="margin:4px 0;font-size:9pt;color:#555;">${isLikelyHumanized ? 'This text shows AI origin with humanization attempts — likely AI-generated then modified by tools or manual editing to appear more human-like.' : report.verdict.description}</p>
                 <div class="confidence-range">
                     <span>Confidence: ${report.summary.confidence}%</span>
@@ -283,7 +320,7 @@ const ReportExporter = {
             </div>
         </div>
         
-        ${isLikelyHumanized ? `<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:6px;padding:8px 12px;margin:10px 0;"><p style="font-size:9pt;color:#7c3aed;margin:0;"><strong>⚠️ Humanization Detected:</strong> High disagreement between detection categories suggests post-processing or editing of AI output. Manual review recommended.</p></div>` : ''}
+        ${isLikelyHumanized ? `<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:6px;padding:8px 12px;margin:10px 0;"><p style="font-size:9pt;color:#7c3aed;margin:0;"><strong>HUMANIZATION DETECTED:</strong> High disagreement between detection categories suggests post-processing or editing of AI output. Manual review recommended.</p></div>` : ''}
         
         <p style="font-size:9pt;color:#444;line-height:1.5;margin-top:10px;">${report.summary.text}</p>
     </div>
@@ -299,7 +336,7 @@ const ReportExporter = {
         if (falsePositiveRisk.hasRisks && falsePositiveRisk.risks?.length > 0) {
             html += `
     <div class="disclaimer" style="background: ${isLikelyHumanized ? '#faf5ff' : '#fff8e6'}; border-color: ${isLikelyHumanized ? '#d8b4fe' : '#ffd666'};">
-        <h4 style="margin: 0 0 5px 0; color: ${isLikelyHumanized ? '#7c3aed' : '#b45309'};">⚠️ Detection Caveats</h4>`;
+        <h4 style="margin: 0 0 5px 0; color: ${isLikelyHumanized ? '#7c3aed' : '#b45309'};">Detection Caveats</h4>`;
             for (const risk of falsePositiveRisk.risks) {
                 const riskColor = risk.severity === 'high' ? '#b91c1c' : (risk.severity === 'medium' ? '#b45309' : '#666');
                 html += `
@@ -317,21 +354,21 @@ const ReportExporter = {
         const formatNum = (n, decimals = 2) => n != null ? Number(n).toFixed(decimals) : 'N/A';
         const formatPct = (n) => n != null ? `${(n * 100).toFixed(1)}%` : 'N/A';
         const getIndicator = (val, thresholds, higherIsBetter = false) => {
-            if (val == null) return '⚪';
+            if (val == null) return '—';
             const [warn, good] = thresholds;
             if (higherIsBetter) {
-                return val >= good ? '🟢' : (val >= warn ? '🟡' : '🔴');
+                return val >= good ? '<span class="ind-human">H</span>' : (val >= warn ? '<span class="ind-mixed">M</span>' : '<span class="ind-ai">A</span>');
             }
-            return val <= good ? '🟢' : (val <= warn ? '🟡' : '🔴');
+            return val <= good ? '<span class="ind-human">H</span>' : (val <= warn ? '<span class="ind-mixed">M</span>' : '<span class="ind-ai">A</span>');
         };
         
         if (Object.keys(advStats).length > 0) {
             html += `
     <h2>Complete Statistical Analysis</h2>
-    <p style="font-size:8pt;color:#666;margin-bottom:10px;">🔴 = AI-like | 🟡 = Uncertain | 🟢 = Human-like</p>
+    <p style="font-size:8pt;color:#666;margin-bottom:10px;"><span class="ind-ai">A</span> = AI-like | <span class="ind-mixed">M</span> = Mixed/Uncertain | <span class="ind-human">H</span> = Human-like</p>
     
     <!-- Vocabulary Richness -->
-    <h3>📚 Vocabulary Richness</h3>
+    <h3>1. Vocabulary Richness</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
         <tr><td>Unique Words</td><td>${advStats.vocabulary?.uniqueWords?.toLocaleString() || 0}</td><td>—</td></tr>
@@ -346,7 +383,7 @@ const ReportExporter = {
     </table>
     
     <!-- Sentence Analysis -->
-    <h3>📝 Sentence Analysis</h3>
+    <h3>2. Sentence Analysis</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
         <tr><td>Mean Length</td><td>${formatNum(advStats.sentences?.mean, 1)} words</td><td>—</td></tr>
@@ -360,7 +397,7 @@ const ReportExporter = {
     </table>
     
     <!-- Zipf's Law -->
-    <h3>📈 Zipf's Law Analysis</h3>
+    <h3>3. Zipf's Law Analysis</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
         <tr><td>Zipf Compliance</td><td>${formatPct(advStats.zipf?.compliance)}</td><td>${getIndicator(advStats.zipf?.compliance, [0.7, 0.85], true)}</td></tr>
@@ -370,7 +407,7 @@ const ReportExporter = {
     </table>
     
     <!-- Readability -->
-    <h3>📖 Readability Metrics</h3>
+    <h3>4. Readability Metrics</h3>
     <table>
         <tr><th>Metric</th><th>Value</th></tr>
         <tr><td>Avg Syllables/Word</td><td>${formatNum(advStats.readability?.avgSyllablesPerWord, 2)}</td></tr>
@@ -384,7 +421,7 @@ const ReportExporter = {
     </table>
     
     <!-- Burstiness & Uniformity -->
-    <h3>⚡ Burstiness & Uniformity</h3>
+    <h3>5. Burstiness and Uniformity</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
         <tr><td>Sentence Length Burstiness</td><td>${formatNum(advStats.burstiness?.sentenceLength, 3)}</td><td>${getIndicator(advStats.burstiness?.sentenceLength, [0.1, 0.25], true)}</td></tr>
@@ -393,7 +430,7 @@ const ReportExporter = {
     </table>
     
     <!-- N-gram Analysis -->
-    <h3>🔗 N-gram & Phrase Analysis</h3>
+    <h3>6. N-gram and Phrase Analysis</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
         <tr><td>Unique Bigrams</td><td>${advStats.ngrams?.uniqueBigrams?.toLocaleString() || 0}</td><td>—</td></tr>
@@ -402,7 +439,7 @@ const ReportExporter = {
         <tr><td>Trigram Repetition Rate</td><td>${formatPct(advStats.ngrams?.trigramRepetitionRate)}</td><td>${getIndicator(advStats.ngrams?.trigramRepetitionRate, [0.2, 0.1])}</td></tr>
         <tr><td>Quadgram Repetition Rate</td><td>${formatPct(advStats.ngrams?.quadgramRepetitionRate)}</td><td>${getIndicator(advStats.ngrams?.quadgramRepetitionRate, [0.1, 0.05])}</td></tr>
         <tr><td><strong>Repeated Phrase Score</strong></td><td><strong>${formatPct(advStats.ngrams?.repeatedPhraseScore)}</strong></td><td>${getIndicator(advStats.ngrams?.repeatedPhraseScore, [0.3, 0.1])}</td></tr>
-        <tr><td>Repeated Phrases (4+ words)</td><td>${advStats.ngrams?.repeatedPhraseCount || 0} found</td><td>${advStats.ngrams?.repeatedPhraseCount > 2 ? '🔴' : '⚪'}</td></tr>
+        <tr><td>Repeated Phrases (4+ words)</td><td>${advStats.ngrams?.repeatedPhraseCount || 0} found</td><td>${advStats.ngrams?.repeatedPhraseCount > 2 ? '<span class="ind-ai">A</span>' : '—'}</td></tr>
     </table>
     ${advStats.ngrams?.repeatedPhrases?.length > 0 ? `
     <p style="font-size:8pt;margin-top:5px;"><strong>Top repeated phrases:</strong></p>
@@ -411,7 +448,7 @@ const ReportExporter = {
     </ul>` : ''}
     
     <!-- Word Analysis -->
-    <h3>🔤 Word Analysis</h3>
+    <h3>7. Word Analysis</h3>
     <table>
         <tr><th>Metric</th><th>Value</th></tr>
         <tr><td>Avg Word Length</td><td>${formatNum(advStats.words?.avgLength, 2)} chars</td></tr>
@@ -421,13 +458,13 @@ const ReportExporter = {
     </table>
     
     <!-- Word Pattern Analysis -->
-    <h3>🏷️ Word Pattern Analysis</h3>
+    <h3>8. Word Pattern Analysis</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
-        <tr><td>First-Person Pronoun Ratio</td><td>${formatPct(advStats.wordPatterns?.firstPersonRatio)}</td><td>${advStats.wordPatterns?.firstPersonRatio < 0.01 ? '🔴' : (advStats.wordPatterns?.firstPersonRatio > 0.03 ? '🟢' : '🟡')}</td></tr>
-        <tr><td>Hedging Word Ratio</td><td>${formatPct(advStats.wordPatterns?.hedgingRatio)}</td><td>${advStats.wordPatterns?.hedgingRatio > 0.02 ? '🔴' : '⚪'}</td></tr>
-        <tr><td>Sentence Starter Diversity</td><td>${formatPct(advStats.wordPatterns?.starterDiversity)}</td><td>${advStats.wordPatterns?.starterDiversity < 0.4 ? '🔴' : (advStats.wordPatterns?.starterDiversity > 0.7 ? '🟢' : '🟡')}</td></tr>
-        <tr><td>Common AI Starters Ratio</td><td>${formatPct(advStats.wordPatterns?.aiStarterRatio)}</td><td>${advStats.wordPatterns?.aiStarterRatio > 0.5 ? '🔴' : '⚪'}</td></tr>
+        <tr><td>First-Person Pronoun Ratio</td><td>${formatPct(advStats.wordPatterns?.firstPersonRatio)}</td><td>${advStats.wordPatterns?.firstPersonRatio < 0.01 ? '<span class="ind-ai">A</span>' : (advStats.wordPatterns?.firstPersonRatio > 0.03 ? '<span class="ind-human">H</span>' : '<span class="ind-mixed">M</span>')}</td></tr>
+        <tr><td>Hedging Word Ratio</td><td>${formatPct(advStats.wordPatterns?.hedgingRatio)}</td><td>${advStats.wordPatterns?.hedgingRatio > 0.02 ? '<span class="ind-ai">A</span>' : '—'}</td></tr>
+        <tr><td>Sentence Starter Diversity</td><td>${formatPct(advStats.wordPatterns?.starterDiversity)}</td><td>${advStats.wordPatterns?.starterDiversity < 0.4 ? '<span class="ind-ai">A</span>' : (advStats.wordPatterns?.starterDiversity > 0.7 ? '<span class="ind-human">H</span>' : '<span class="ind-mixed">M</span>')}</td></tr>
+        <tr><td>Common AI Starters Ratio</td><td>${formatPct(advStats.wordPatterns?.aiStarterRatio)}</td><td>${advStats.wordPatterns?.aiStarterRatio > 0.5 ? '<span class="ind-ai">A</span>' : '—'}</td></tr>
         <tr><td>Verb-like Words</td><td>${formatPct(advStats.wordPatterns?.verbRatio)}</td><td>—</td></tr>
         <tr><td>Adjective-like Words</td><td>${formatPct(advStats.wordPatterns?.adjectiveRatio)}</td><td>—</td></tr>
         <tr><td>Adverb-like Words</td><td>${formatPct(advStats.wordPatterns?.adverbRatio)}</td><td>—</td></tr>
@@ -435,7 +472,7 @@ const ReportExporter = {
     </table>
     
     <!-- Advanced Statistical Tests -->
-    <h3>🔬 Advanced Statistical Tests</h3>
+    <h3>9. Advanced Statistical Tests</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
         <tr><td>Periodicity Score</td><td>${formatPct(advStats.autocorrelation?.periodicityScore)}</td><td>${getIndicator(advStats.autocorrelation?.periodicityScore, [0.6, 0.3])}</td></tr>
@@ -448,7 +485,7 @@ const ReportExporter = {
     </table>
     
     <!-- Human Likelihood -->
-    <h3>📊 Human Likelihood (Bell Curve Analysis)</h3>
+    <h3>10. Human Likelihood (Bell Curve Analysis)</h3>
     <p style="font-size:8pt;color:#666;margin-bottom:5px;">Measures how close features are to typical human writing. Values near 1.0 = normal human range.</p>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
@@ -463,7 +500,7 @@ const ReportExporter = {
     </table>
     
     <!-- AI Signature Metrics -->
-    <h3>🤖 AI Signature Metrics</h3>
+    <h3>11. AI Signature Metrics</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
         <tr><td>Hedging Density</td><td>${formatPct(advStats.aiSignatures?.hedgingDensity)}</td><td>${getIndicator(advStats.aiSignatures?.hedgingDensity, [0.02, 0.01])}</td></tr>
@@ -476,16 +513,16 @@ const ReportExporter = {
     </table>
     
     <!-- Humanizer Detection -->
-    <h3 style="${advStats.humanizerSignals?.isLikelyHumanized ? 'color:#7c3aed;' : ''}">🔄 Humanizer Detection</h3>
+    <h3 style="${advStats.humanizerSignals?.isLikelyHumanized ? 'color:#7c3aed;' : ''}">12. Humanizer Detection</h3>
     <p style="font-size:8pt;color:#666;margin-bottom:5px;">Detects AI text that has been post-processed to evade detection.</p>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Status</th></tr>
-        <tr style="${advStats.humanizerSignals?.isLikelyHumanized ? 'background:#faf5ff;' : ''}"><td><strong>Humanizer Probability</strong></td><td><strong>${formatPct(advStats.humanizerSignals?.humanizerProbability)}</strong></td><td>${advStats.humanizerSignals?.isLikelyHumanized ? '🔴' : '⚪'}</td></tr>
-        <tr><td>Variance Stability (2nd order)</td><td>${advStats.humanizerSignals?.stableVarianceFlag ? 'Suspicious' : 'Normal'}</td><td>${advStats.humanizerSignals?.stableVarianceFlag ? '🔴' : '⚪'}</td></tr>
-        <tr><td>Autocorrelation Pattern</td><td>${advStats.humanizerSignals?.flatAutocorrelationFlag ? 'Random noise' : 'Natural'}</td><td>${advStats.humanizerSignals?.flatAutocorrelationFlag ? '🔴' : '⚪'}</td></tr>
-        <tr><td>Feature Correlations</td><td>${advStats.humanizerSignals?.brokenCorrelationFlag ? 'Broken' : 'Intact'}</td><td>${advStats.humanizerSignals?.brokenCorrelationFlag ? '🔴' : '⚪'}</td></tr>
-        <tr><td>Sophistication Consistency</td><td>${advStats.humanizerSignals?.synonymSubstitutionFlag ? 'Word-level chaos' : 'Consistent'}</td><td>${advStats.humanizerSignals?.synonymSubstitutionFlag ? '🔴' : '⚪'}</td></tr>
-        <tr><td>Contraction Pattern</td><td>${advStats.humanizerSignals?.artificialContractionFlag ? 'Artificial' : 'Natural'}</td><td>${advStats.humanizerSignals?.artificialContractionFlag ? '🔴' : '⚪'}</td></tr>
+        <tr style="${advStats.humanizerSignals?.isLikelyHumanized ? 'background:#faf5ff;' : ''}"><td><strong>Humanizer Probability</strong></td><td><strong>${formatPct(advStats.humanizerSignals?.humanizerProbability)}</strong></td><td>${advStats.humanizerSignals?.isLikelyHumanized ? '<span class="ind-ai">DETECTED</span>' : '—'}</td></tr>
+        <tr><td>Variance Stability (2nd order)</td><td>${advStats.humanizerSignals?.stableVarianceFlag ? 'Suspicious' : 'Normal'}</td><td>${advStats.humanizerSignals?.stableVarianceFlag ? '<span class="ind-ai">!</span>' : '—'}</td></tr>
+        <tr><td>Autocorrelation Pattern</td><td>${advStats.humanizerSignals?.flatAutocorrelationFlag ? 'Random noise' : 'Natural'}</td><td>${advStats.humanizerSignals?.flatAutocorrelationFlag ? '<span class="ind-ai">!</span>' : '—'}</td></tr>
+        <tr><td>Feature Correlations</td><td>${advStats.humanizerSignals?.brokenCorrelationFlag ? 'Broken' : 'Intact'}</td><td>${advStats.humanizerSignals?.brokenCorrelationFlag ? '<span class="ind-ai">!</span>' : '—'}</td></tr>
+        <tr><td>Sophistication Consistency</td><td>${advStats.humanizerSignals?.synonymSubstitutionFlag ? 'Word-level chaos' : 'Consistent'}</td><td>${advStats.humanizerSignals?.synonymSubstitutionFlag ? '<span class="ind-ai">!</span>' : '—'}</td></tr>
+        <tr><td>Contraction Pattern</td><td>${advStats.humanizerSignals?.artificialContractionFlag ? 'Artificial' : 'Natural'}</td><td>${advStats.humanizerSignals?.artificialContractionFlag ? '<span class="ind-ai">!</span>' : '—'}</td></tr>
         <tr><td>Warning Flags</td><td>${advStats.humanizerSignals?.flagCount || 0} / 5</td><td>—</td></tr>
     </table>`;
         }
@@ -558,16 +595,16 @@ const ReportExporter = {
 
         // Add the original analyzed text
         html += `
-    <h2 class="page-break">📄 Analyzed Text</h2>
+    <h2 class="page-break">Analyzed Text</h2>
     <div style="background:#fafafa;border:1px solid #e5e5e5;border-radius:6px;padding:12px;margin:10px 0;max-height:none;">
         <p style="font-size:8pt;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Original Text (${report.statistics.wordCount.toLocaleString()} words)</p>
         <div style="font-size:9pt;line-height:1.6;color:#333;white-space:pre-wrap;word-wrap:break-word;font-family:'Georgia',serif;">${this.escapeHtml(report.analyzedText || '')}</div>
     </div>`;
 
         html += `
-    <div class="methodology">
-        <h3>${report.methodology.title}</h3>
-        <p>${report.methodology.content.replace(/\n/g, '<br>')}</p>
+    <div class="methodology page-break">
+        <h2 style="border-bottom: 2px solid #333; margin-bottom: 10px;">${report.methodology.title}</h2>
+        <div style="font-size: 9pt; line-height: 1.7;">${report.methodology.content.replace(/\n\n/g, '</p><p style="margin-top:10px;">').replace(/\n/g, '<br>')}</div>
     </div>
 
     <div class="disclaimer">
@@ -594,13 +631,13 @@ const ReportExporter = {
         html += `
     </table>
 
-    <div style="margin-top: 40px; padding: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius: 8px; border: 1px solid #e5e5e5; text-align: center;">
-        <div style="font-size: 14pt; font-weight: bold; color: #333; margin-bottom: 8px;">◈ VERITAS</div>
-        <p style="color: #666; font-size: 9pt; margin: 4px 0;">AI Text Detection Analysis System</p>
-        <p style="color: #888; font-size: 8pt; margin: 4px 0;">Powered by Sunrise Model v3.0 | 98.08% Accuracy | 29,976 Training Samples</p>
-        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd;">
-            <p style="font-size: 7pt; color: #aaa; line-height: 1.6;">
-                ⚠️ <strong>Important:</strong> No single metric is definitive • Context and domain matter significantly • Confidence varies with text length and complexity • AI detection methods continuously evolve • This report is for informational purposes only and should not be the sole basis for any decision.
+    <div style="margin-top: 30px; padding: 15px; background: #f5f5f5; border: 2px solid #333; text-align: center;">
+        <div style="font-size: 14pt; font-weight: bold; color: #111; margin-bottom: 6px;">VERITAS</div>
+        <p style="color: #555; font-size: 8pt; margin: 3px 0;">AI Text Detection Analysis System</p>
+        <p style="color: #666; font-size: 8pt; margin: 3px 0;">Powered by Sunrise Model v3.0 | 98.08% Accuracy | 29,976 Training Samples</p>
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ccc;">
+            <p style="font-size: 7pt; color: #888; line-height: 1.5;">
+                <strong>Important:</strong> No single metric is definitive • Context and domain matter significantly • Confidence varies with text length and complexity • AI detection methods continuously evolve • This report is for informational purposes only and should not be the sole basis for any decision.
             </p>
         </div>
     </div>
@@ -612,6 +649,7 @@ const ReportExporter = {
 
     /**
      * Build verbose evidence from analysis results with specific statistics
+     * Uses exact same thresholds as app.js getIndicator() function for consistency
      */
     buildVerboseEvidence(report, analysisResult) {
         const evidence = {
@@ -623,256 +661,141 @@ const ReportExporter = {
         const advStats = analysisResult.advancedStats || {};
         const stats = analysisResult.stats || {};
 
-        // Sentence structure evidence
-        if (advStats.sentences) {
-            const cv = advStats.sentences.coefficientOfVariation;
-            evidence.statistics.sentenceCV = cv;
-            if (cv < 0.35) {
-                evidence.aiSignals.push({
-                    label: 'Low Sentence Variance',
-                    value: `CV: ${(cv * 100).toFixed(1)}% (human avg: 45-60%)`,
-                    severity: cv < 0.25 ? 'high' : 'medium'
-                });
-            } else if (cv > 0.5) {
-                evidence.humanSignals.push({
-                    label: 'Natural Sentence Variance',
-                    value: `CV: ${(cv * 100).toFixed(1)}%`
-                });
-            }
-        }
-
-        // Burstiness evidence
-        if (advStats.burstiness) {
-            const burst = advStats.burstiness.sentenceLength;
-            evidence.statistics.burstiness = burst;
-            if (burst < 0.15) {
-                evidence.aiSignals.push({
-                    label: 'Low Burstiness',
-                    value: `${(burst * 100).toFixed(1)}% (human avg: 25-40%)`,
-                    severity: burst < 0.1 ? 'high' : 'medium'
-                });
-            } else if (burst > 0.25) {
-                evidence.humanSignals.push({
-                    label: 'Natural Burstiness',
-                    value: `${(burst * 100).toFixed(1)}%`
-                });
-            }
-        }
-
-        // Vocabulary diversity
-        if (advStats.vocabulary) {
-            const hapax = advStats.vocabulary.hapaxLegomenaRatio;
-            evidence.statistics.hapaxRatio = hapax;
-            if (hapax < 0.35) {
-                evidence.aiSignals.push({
-                    label: 'Low Hapax Ratio',
-                    value: `${(hapax * 100).toFixed(1)}% unique words (human avg: 40-55%)`,
-                    severity: hapax < 0.3 ? 'high' : 'medium'
-                });
-            }
-        }
-
-        // Personal pronouns
-        if (advStats.wordPatterns) {
-            const fp = advStats.wordPatterns.firstPersonRatio;
-            evidence.statistics.firstPersonRatio = fp;
-            if (fp < 0.005) {
-                evidence.aiSignals.push({
-                    label: 'No Personal Pronouns',
-                    value: `${(fp * 100).toFixed(2)}% first-person usage`,
-                    severity: 'medium'
-                });
-            } else if (fp > 0.02) {
-                evidence.humanSignals.push({
-                    label: 'Personal Experience Markers',
-                    value: `${(fp * 100).toFixed(2)}% first-person pronouns`
-                });
-            }
-
-            const hedging = advStats.wordPatterns.hedgingRatio;
-            if (hedging > 0.02) {
-                evidence.aiSignals.push({
-                    label: 'Excessive Hedging',
-                    value: `${(hedging * 100).toFixed(2)}% hedging words (AI typically >2%)`,
-                    severity: hedging > 0.03 ? 'high' : 'medium'
-                });
-            }
-        }
-
-        // Uniformity metrics
-        if (advStats.burstiness?.overallUniformity) {
-            const uniformity = advStats.burstiness.overallUniformity;
-            evidence.statistics.overallUniformity = uniformity;
-            if (uniformity > 0.7) {
-                evidence.aiSignals.push({
-                    label: 'High Uniformity Score',
-                    value: `${(uniformity * 100).toFixed(1)}% (human avg: 40-60%)`,
-                    severity: uniformity > 0.8 ? 'high' : 'medium'
-                });
-            } else if (uniformity < 0.5) {
-                evidence.humanSignals.push({
-                    label: 'Natural Uniformity',
-                    value: `${(uniformity * 100).toFixed(1)}%`
-                });
-            }
-        }
-
-        // Vocabulary richness
-        if (advStats.vocabulary?.typeTokenRatio) {
-            const ttr = advStats.vocabulary.typeTokenRatio;
-            if (ttr < 0.3) {
-                evidence.aiSignals.push({
-                    label: 'Low Vocabulary Diversity',
-                    value: `TTR: ${(ttr * 100).toFixed(1)}% (human avg: 45-60%)`,
-                    severity: ttr < 0.2 ? 'high' : 'medium'
-                });
-            } else if (ttr > 0.5) {
-                evidence.humanSignals.push({
-                    label: 'Rich Vocabulary',
-                    value: `TTR: ${(ttr * 100).toFixed(1)}%`
-                });
-            }
-        }
-
-        // N-gram repetition
-        if (advStats.ngrams?.trigramRepetitionRate) {
-            const trigram = advStats.ngrams.trigramRepetitionRate;
-            if (trigram > 0.2) {
-                evidence.aiSignals.push({
-                    label: 'High N-gram Repetition',
-                    value: `${(trigram * 100).toFixed(1)}% repeated trigrams`,
-                    severity: trigram > 0.3 ? 'high' : 'medium'
-                });
-            } else if (trigram < 0.1) {
-                evidence.humanSignals.push({
-                    label: 'Natural Phrase Variety',
-                    value: `${(trigram * 100).toFixed(1)}% repeated trigrams`
-                });
-            }
-        }
-
-        // Sentence length Gini
-        if (advStats.sentences?.gini) {
-            const gini = advStats.sentences.gini;
-            if (gini < 0.15) {
-                evidence.aiSignals.push({
-                    label: 'Uniform Sentence Lengths',
-                    value: `Gini: ${(gini * 100).toFixed(1)}% (human avg: 20-35%)`,
-                    severity: gini < 0.1 ? 'high' : 'medium'
-                });
-            } else if (gini > 0.25) {
-                evidence.humanSignals.push({
-                    label: 'Varied Sentence Lengths',
-                    value: `Gini: ${(gini * 100).toFixed(1)}%`
-                });
-            }
-        }
-
-        // Zipf's law compliance
-        if (advStats.zipf?.compliance) {
-            const zipf = advStats.zipf.compliance;
-            if (zipf < 0.7) {
-                evidence.aiSignals.push({
-                    label: 'Unnatural Word Distribution',
-                    value: `Zipf compliance: ${(zipf * 100).toFixed(1)}%`,
-                    severity: zipf < 0.5 ? 'high' : 'medium'
-                });
-            } else if (zipf > 0.85) {
-                evidence.humanSignals.push({
-                    label: 'Natural Word Distribution',
-                    value: `Zipf compliance: ${(zipf * 100).toFixed(1)}%`
-                });
-            }
-        }
-
-        // Human likelihood score
-        if (advStats.overallHumanLikelihood) {
-            const hl = advStats.overallHumanLikelihood;
-            if (hl < 0.4) {
-                evidence.aiSignals.push({
-                    label: 'Low Human Likelihood',
-                    value: `${(hl * 100).toFixed(1)}% (bell curve distance)`,
-                    severity: hl < 0.25 ? 'high' : 'medium'
-                });
-            } else if (hl > 0.6) {
-                evidence.humanSignals.push({
-                    label: 'High Human Likelihood',
-                    value: `${(hl * 100).toFixed(1)}% (within normal range)`
-                });
-            }
-        }
-
-        // Predictability
-        if (advStats.perplexity?.predictability) {
-            const pred = advStats.perplexity.predictability;
-            if (pred > 0.6) {
-                evidence.aiSignals.push({
-                    label: 'High Predictability',
-                    value: `${(pred * 100).toFixed(1)}% (AI text is often predictable)`,
-                    severity: pred > 0.75 ? 'high' : 'medium'
-                });
-            } else if (pred < 0.4) {
-                evidence.humanSignals.push({
-                    label: 'Natural Unpredictability',
-                    value: `${(pred * 100).toFixed(1)}%`
-                });
-            }
-        }
-
-        // AI signatures
-        if (advStats.aiSignatures) {
-            if (advStats.aiSignatures.contractionRate < 0.05) {
-                evidence.aiSignals.push({
-                    label: 'No Contractions',
-                    value: `${advStats.aiSignatures.contractionRate.toFixed(2)} per sentence (human avg: 0.2-0.5)`,
-                    severity: 'low'
-                });
-            } else if (advStats.aiSignatures.contractionRate > 0.3) {
-                evidence.humanSignals.push({
-                    label: 'Natural Contractions',
-                    value: `${advStats.aiSignatures.contractionRate.toFixed(2)} per sentence`
-                });
-            }
+        // Helper to add signal based on threshold (matches app.js getIndicator logic)
+        const addSignal = (value, aiThresh, humanThresh, invert, label, formatFn, severity = 'medium') => {
+            if (typeof value !== 'number' || isNaN(value)) return;
+            const formattedValue = formatFn ? formatFn(value) : `${(value * 100).toFixed(1)}%`;
             
-            if (advStats.aiSignatures.sentenceStarterVariety < 0.4) {
-                evidence.aiSignals.push({
-                    label: 'Repetitive Sentence Starters',
-                    value: `${(advStats.aiSignatures.sentenceStarterVariety * 100).toFixed(1)}% variety`,
-                    severity: 'medium'
-                });
-            } else if (advStats.aiSignatures.sentenceStarterVariety > 0.6) {
-                evidence.humanSignals.push({
-                    label: 'Varied Sentence Starters',
-                    value: `${(advStats.aiSignatures.sentenceStarterVariety * 100).toFixed(1)}% variety`
-                });
+            if (invert) {
+                if (value < aiThresh) {
+                    evidence.aiSignals.push({ label, value: formattedValue, severity });
+                } else if (value > humanThresh) {
+                    evidence.humanSignals.push({ label, value: formattedValue });
+                }
+            } else {
+                if (value > aiThresh) {
+                    evidence.aiSignals.push({ label, value: formattedValue, severity });
+                } else if (value < humanThresh) {
+                    evidence.humanSignals.push({ label, value: formattedValue });
+                }
             }
+        };
 
-            if (advStats.aiSignatures.hedgingDensity > 0.02) {
-                evidence.aiSignals.push({
-                    label: 'Excessive Hedging',
-                    value: `${(advStats.aiSignatures.hedgingDensity * 100).toFixed(2)}% hedging words`,
-                    severity: advStats.aiSignatures.hedgingDensity > 0.03 ? 'high' : 'medium'
-                });
-            }
+        // === VOCABULARY RICHNESS (matches app.js lines 726-750) ===
+        addSignal(advStats.vocabulary?.typeTokenRatio, 0.3, 0.5, true,
+            'Type-Token Ratio', v => `${(v * 100).toFixed(1)}% vocabulary diversity`);
+        
+        addSignal(advStats.vocabulary?.hapaxLegomenaRatio, 0.35, 0.5, true,
+            'Hapax Legomena Ratio', v => `${(v * 100).toFixed(1)}% unique words`);
+        
+        addSignal(advStats.vocabulary?.yulesK, 150, 100, false,
+            'Vocabulary Concentration', v => `Yule's K = ${v.toFixed(1)}`);
+        
+        addSignal(advStats.vocabulary?.simpsonsD, 0.02, 0.01, false,
+            'Word Repetition Pattern', v => `Simpson's D = ${v.toFixed(4)}`);
+
+        // === SENTENCE STRUCTURE (matches app.js lines 789-801) ===
+        addSignal(advStats.sentences?.coefficientOfVariation, 0.35, 0.5, true,
+            'Sentence Length Variance', v => `CV = ${(v * 100).toFixed(1)}%`, 'high');
+        
+        addSignal(advStats.sentences?.gini, 0.15, 0.25, true,
+            'Sentence Length Distribution', v => `Gini = ${(v * 100).toFixed(1)}%`);
+
+        // === ZIPF'S LAW (matches app.js lines 812-816) ===
+        addSignal(advStats.zipf?.compliance, 0.7, 0.85, true,
+            'Zipf Law Compliance', v => `${(v * 100).toFixed(1)}% natural distribution`);
+        
+        if (advStats.zipf?.slope != null) {
+            const slopeDev = Math.abs((advStats.zipf.slope || 0) + 1);
+            addSignal(slopeDev, 0.3, 0.15, false,
+                'Word Frequency Slope', v => `Deviation from ideal: ${v.toFixed(3)}`);
         }
 
-        // Humanizer detection signals
+        // === BURSTINESS (matches app.js lines 878-886) ===
+        addSignal(advStats.burstiness?.sentenceLength, 0.1, 0.25, true,
+            'Sentence Burstiness', v => `${(v * 100).toFixed(1)}% variation`, 'high');
+        
+        addSignal(advStats.burstiness?.overallUniformity, 0.7, 0.5, false,
+            'Overall Uniformity', v => `${(v * 100).toFixed(1)}% uniform`, 'high');
+
+        // === N-GRAM ANALYSIS (matches app.js lines 910-922) ===
+        addSignal(advStats.ngrams?.bigramRepetitionRate, 0.4, 0.25, false,
+            'Bigram Repetition', v => `${(v * 100).toFixed(1)}% repeated`);
+        
+        addSignal(advStats.ngrams?.trigramRepetitionRate, 0.2, 0.1, false,
+            'Trigram Repetition', v => `${(v * 100).toFixed(1)}% repeated`, 'high');
+        
+        addSignal(advStats.ngrams?.quadgramRepetitionRate, 0.1, 0.05, false,
+            'Quadgram Repetition', v => `${(v * 100).toFixed(1)}% repeated`);
+        
+        addSignal(advStats.ngrams?.repeatedPhraseScore, 0.3, 0.1, false,
+            'Repeated Phrase Score', v => `${(v * 100).toFixed(1)}%`, 'high');
+
+        // === ADVANCED STATISTICAL TESTS (matches app.js lines 1014-1038) ===
+        addSignal(advStats.autocorrelation?.periodicityScore, 0.6, 0.3, false,
+            'Periodicity Score', v => `${(v * 100).toFixed(1)}% periodic`);
+        
+        addSignal(advStats.perplexity?.predictability, 0.6, 0.4, false,
+            'N-gram Predictability', v => `${(v * 100).toFixed(1)}% predictable`, 'high');
+        
+        addSignal(advStats.runsTest?.randomnessScore, 0.4, 0.6, true,
+            'Randomness Score', v => `${(v * 100).toFixed(1)}%`);
+        
+        addSignal(advStats.chiSquared?.uniformityScore, 0.7, 0.4, false,
+            'Chi-Squared Uniformity', v => `${(v * 100).toFixed(1)}%`);
+        
+        addSignal(advStats.varianceStability, 0.7, 0.5, false,
+            'Variance Stability', v => `${(v * 100).toFixed(1)}% stable`);
+        
+        addSignal(advStats.mahalanobisDistance, 2.0, 1.0, false,
+            'Mahalanobis Distance', v => `${v.toFixed(2)} sigma from mean`);
+
+        // === HUMAN LIKELIHOOD (matches app.js lines 1054-1095) ===
+        addSignal(advStats.overallHumanLikelihood, 0.4, 0.6, true,
+            'Overall Human Likelihood', v => `${(v * 100).toFixed(1)}%`, 'high');
+        
+        addSignal(advStats.humanLikelihood?.sentenceLengthCV, 0.4, 0.7, true,
+            'Sentence Variance Naturalness', v => `${(v * 100).toFixed(1)}%`);
+        
+        addSignal(advStats.humanLikelihood?.burstiness, 0.4, 0.7, true,
+            'Burstiness Naturalness', v => `${(v * 100).toFixed(1)}%`);
+        
+        addSignal(advStats.varianceNaturalness, 0.4, 0.7, true,
+            'Variance Naturalness', v => `${(v * 100).toFixed(1)}%`);
+        
+        addSignal(advStats.extremeVarianceIndicator, 0.6, 0.4, false,
+            'Extreme Variance Warning', v => `${(v * 100).toFixed(1)}%`, 'high');
+
+        // === AI SIGNATURES (matches app.js lines 1097-1130) ===
+        addSignal(advStats.aiSignatures?.hedgingDensity, 0.02, 0.01, false,
+            'Hedging Density', v => `${(v * 100).toFixed(2)}% hedging words`);
+        
+        addSignal(advStats.aiSignatures?.discourseMarkerDensity, 0.4, 0.2, false,
+            'Discourse Marker Density', v => `${v.toFixed(2)} per sentence`);
+        
+        addSignal(advStats.aiSignatures?.contractionRate, 0.3, 0.5, true,
+            'Contraction Rate', v => `${v.toFixed(2)} per sentence`);
+        
+        addSignal(advStats.aiSignatures?.sentenceStarterVariety, 0.4, 0.6, true,
+            'Sentence Starter Variety', v => `${(v * 100).toFixed(1)}%`);
+
+        // === HUMANIZER DETECTION ===
         if (advStats.humanizerSignals?.isLikelyHumanized) {
             evidence.aiSignals.push({
-                label: '⚠️ Humanizer Detected',
-                value: `${(advStats.humanizerSignals.humanizerProbability * 100).toFixed(0)}% probability of AI + humanizer`,
+                label: 'Humanizer Detected',
+                value: `${(advStats.humanizerSignals.humanizerProbability * 100).toFixed(0)}% probability`,
                 severity: 'high'
             });
         }
 
-        // Category-specific evidence
+        // === CATEGORY-SPECIFIC EVIDENCE ===
         for (const cat of (analysisResult.categoryResults || [])) {
             if (cat.aiProbability > 0.65 && cat.confidence > 0.5) {
                 const weightInfo = this.categoryWeightInfo[cat.category];
-                if (weightInfo && weightInfo.weight > 0.08) {
+                if (weightInfo && weightInfo.weight > 0.05) {
                     evidence.aiSignals.push({
                         label: cat.name,
-                        value: `${Math.round(cat.aiProbability * 100)}% AI probability, ${Math.round(cat.confidence * 100)}% confidence`,
+                        value: `${Math.round(cat.aiProbability * 100)}% AI, ${Math.round(cat.confidence * 100)}% confidence`,
                         severity: cat.aiProbability > 0.8 ? 'high' : 'medium'
                     });
                 }
@@ -883,6 +806,10 @@ const ReportExporter = {
                 });
             }
         }
+
+        // Sort by severity (high first)
+        const severityOrder = { high: 0, medium: 1, low: 2 };
+        evidence.aiSignals.sort((a, b) => (severityOrder[a.severity] || 2) - (severityOrder[b.severity] || 2));
 
         return evidence;
     },
@@ -917,7 +844,7 @@ const ReportExporter = {
         const barWidth = Math.floor(chartWidth / sortedFreqs.length) - 2;
 
         let html = `
-    <h3>📊 Word Frequency Distribution (Zipf Chart)</h3>
+    <h3>Word Frequency Distribution (Zipf Chart)</h3>
     <p style="font-size:8pt;color:#666;margin-bottom:10px;">Shows top 30 words by frequency. Natural text follows Zipf's law (rank × frequency ≈ constant).</p>
     <div style="background:#f9fafb;border:1px solid #e5e5e5;border-radius:4px;padding:10px;margin:10px 0;">
         <svg viewBox="0 0 ${chartWidth} ${chartHeight}" style="width:100%;max-width:${chartWidth}px;height:auto;">
@@ -992,7 +919,7 @@ const ReportExporter = {
 
         // AI signals column
         html += `<div>
-            <h4 style="color:#b91c1c;font-size:10pt;margin-bottom:6px;">🔴 AI Indicators (${evidence.aiSignals.length})</h4>`;
+            <h4 style="color:#b91c1c;font-size:10pt;margin-bottom:6px;">AI Indicators (${evidence.aiSignals.length})</h4>`;
         
         for (const signal of evidence.aiSignals.slice(0, 10)) {
             const severityColor = signal.severity === 'high' ? '#991b1b' : (signal.severity === 'medium' ? '#b91c1c' : '#dc2626');
@@ -1006,7 +933,7 @@ const ReportExporter = {
 
         // Human signals column
         html += `<div>
-            <h4 style="color:#047857;font-size:10pt;margin-bottom:6px;">🟢 Human Indicators (${evidence.humanSignals.length})</h4>`;
+            <h4 style="color:#047857;font-size:10pt;margin-bottom:6px;">Human Indicators (${evidence.humanSignals.length})</h4>`;
         
         for (const signal of evidence.humanSignals.slice(0, 10)) {
             html += `
@@ -1325,25 +1252,29 @@ const ReportExporter = {
     },
 
     /**
-     * Generate methodology section
+     * Generate methodology section with mathematical foundations
      */
     generateMethodologySection() {
         return {
             title: 'Analysis Methodology',
-            content: `This analysis employs a variance-based detection approach that measures deviations from expected human writing patterns. ` +
-                `Rather than flagging specific features as "AI-like" or "human-like," the system analyzes the distribution, uniformity, ` +
-                `and predictability of linguistic features across the document.\n\n` +
-                `Key analysis dimensions include:\n` +
-                `• Grammar & Error Pattern Variance\n` +
-                `• Sentence Structure Uniformity (Burstiness)\n` +
-                `• Lexical Diversity & Vocabulary Distribution\n` +
-                `• Tone Stability & Emotional Variance\n` +
-                `• Repetition Clustering & Distribution\n` +
-                `• Statistical Language Model Indicators\n` +
-                `• Authorship Consistency Metrics\n` +
-                `• Meta-Patterns Unique to AI Generation\n\n` +
-                `Scores are normalized using z-scores relative to expected document characteristics ` +
-                `and aggregated with weighted category contributions.`
+            content: `VERITAS employs a multi-dimensional statistical analysis framework trained on the Sunrise ML model (v3.0) with 98.08% accuracy across 29,976 samples.\n\n` +
+                `CORE DETECTION PRINCIPLES\n\n` +
+                `1. Variance Analysis: AI-generated text tends toward statistical uniformity. We measure the coefficient of variation (CV = σ/μ) across sentence lengths, word frequencies, and structural patterns. Human writing typically shows CV > 0.45, while AI tends toward CV < 0.35.\n\n` +
+                `2. Burstiness Measurement: Human writing exhibits "bursty" patterns where similar elements cluster together. We calculate burstiness as B = (σ - μ) / (σ + μ), where values near 0 indicate regularity (AI-like) and values > 0.25 suggest natural variation.\n\n` +
+                `3. Zipf's Law Compliance: Natural language follows Zipf's law where word frequency × rank ≈ constant. We fit a log-log regression and measure compliance via R² and slope deviation from -1.0.\n\n` +
+                `4. Vocabulary Diversity Metrics:\n` +
+                `   • Type-Token Ratio (TTR) = unique words / total words\n` +
+                `   • Hapax Legomena Ratio = words appearing once / total words\n` +
+                `   • Yule's K = 10⁴ × (Σ(fᵢ² × Vᵢ) - N) / N²\n\n` +
+                `5. Human Likelihood (Bell Curve): Each feature is compared against known human writing distributions. We calculate the probability density at the observed value using Gaussian distributions derived from training data.\n\n` +
+                `WEIGHTED AGGREGATION\n\n` +
+                `Category weights are ML-derived from feature importance analysis:\n` +
+                `• Metadata & Formatting: 40% (paragraph structure is highly discriminative)\n` +
+                `• Lexical Choice: 22% (vocabulary patterns reveal generation method)\n` +
+                `• Syntax: 21% (sentence structure uniformity)\n` +
+                `• Authorship: 5-10% (style consistency across document)\n` +
+                `• Other categories: 1-2% each\n\n` +
+                `Final probability = Σ(categoryᵢ × weightᵢ) with confidence intervals based on inter-category agreement.`
         };
     },
 
