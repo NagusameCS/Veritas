@@ -520,7 +520,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .score-header h3 {
@@ -541,7 +541,8 @@ body {
 
 .score-display {
     display: flex;
-    gap: var(--space-xl);
+    flex-direction: column;
+    gap: var(--space-sm);
     align-items: center;
 }
 
@@ -2318,9 +2319,10 @@ body {
 
 /* Score Ring SVG */
 .score-ring-container {
-    width: 180px;
-    height: 180px;
-    margin: 0 auto var(--space-md);
+    width: 160px;
+    height: 160px;
+    margin: 0 auto var(--space-sm);
+    flex-shrink: 0;
 }
 
 .score-ring-svg {
@@ -2329,45 +2331,62 @@ body {
 }
 
 .score-ring-percent {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
     fill: var(--text-primary);
+    font-family: var(--font-mono);
 }
 
 .score-ring-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     fill: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .score-ring-progress {
     transition: stroke-dashoffset 1s ease-out;
 }
 
+/* Overall Score Display */
+.overall-score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding: var(--space-sm) 0;
+}
+
 /* Verdict Styles */
 .verdict {
     text-align: center;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
+    padding: 0 var(--space-md);
+    max-width: 400px;
 }
 
 .verdict-label {
     display: block;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: var(--space-xs);
+    letter-spacing: -0.02em;
 }
 
 .verdict-label.human { color: var(--human-color); }
-.verdict-label.probably-human { color: var(--human-color); opacity: 0.8; }
-.verdict-label.leaning-human { color: var(--human-color); opacity: 0.7; }
+.verdict-label.probably-human { color: var(--human-color); opacity: 0.85; }
+.verdict-label.leaning-human { color: var(--human-color); opacity: 0.75; }
 .verdict-label.mixed { color: var(--mixed-color); }
-.verdict-label.leaning-ai { color: var(--ai-color); opacity: 0.7; }
-.verdict-label.probably-ai { color: var(--ai-color); opacity: 0.8; }
+.verdict-label.leaning-ai { color: var(--ai-color); opacity: 0.75; }
+.verdict-label.probably-ai { color: var(--ai-color); opacity: 0.85; }
 .verdict-label.ai { color: var(--ai-color); }
 .verdict-label.humanized { color: var(--humanized-color); font-weight: 700; }
 
 .verdict-description {
     display: block;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
     color: var(--text-secondary);
 }
 
@@ -2375,11 +2394,23 @@ body {
     text-align: center;
     font-size: 0.875rem;
     color: var(--text-tertiary);
+    width: 100%;
+    max-width: 320px;
+}
+
+.confidence-label {
+    margin-right: var(--space-xs);
 }
 
 .confidence-value {
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.confidence-range {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-left: var(--space-xs);
 }
 
 .text-stats {

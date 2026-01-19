@@ -1734,14 +1734,20 @@ These findings have important implications for urban planning and public health 
                     reportWindow.document.write(htmlContent);
                     reportWindow.document.close();
                     
-                    // Add print/save instructions
+                    // Add print/save instructions with print-hide class
                     const infoBar = reportWindow.document.createElement('div');
+                    infoBar.className = 'print-info-bar';
                     infoBar.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#3b82f6;color:white;padding:10px 20px;font-family:system-ui,sans-serif;font-size:14px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 2px 10px rgba(0,0,0,0.2);';
                     infoBar.innerHTML = `
                         <span>📄 VERITAS Analysis Report — Use <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">Ctrl+P</kbd> / <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">⌘P</kbd> to save as PDF or print</span>
                         <button onclick="this.parentElement.remove()" style="background:#2563eb;border:none;color:white;padding:5px 15px;border-radius:4px;cursor:pointer;font-size:12px;">Dismiss</button>
                     `;
                     reportWindow.document.body.insertBefore(infoBar, reportWindow.document.body.firstChild);
+                    
+                    // Add print styles to hide the info bar when printing
+                    const printStyle = reportWindow.document.createElement('style');
+                    printStyle.textContent = '@media print { .print-info-bar { display: none !important; } body { padding-top: 0 !important; } }';
+                    reportWindow.document.head.appendChild(printStyle);
                     
                     // Add padding to body to account for fixed header
                     reportWindow.document.body.style.paddingTop = '50px';

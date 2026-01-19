@@ -248,15 +248,15 @@ const ReportExporter = {
         .bar-value { width: 45px; text-align: right; font-size: 8pt; font-weight: bold; padding-left: 6px; }
         
         /* === SIGNAL SUMMARY === */
-        .signal-summary { background: #f8f8f8; border: 1px solid #999; padding: 10px; margin: 10px 0; page-break-inside: avoid; }
-        .signal-summary h3 { margin-top: 0; font-size: 10pt; border-bottom: 1px solid #999; padding-bottom: 4px; margin-bottom: 8px; }
-        .signal-grid { display: flex; gap: 10px; }
-        .signal-grid > div { flex: 1; }
-        .signal-item { padding: 4px 6px; margin-bottom: 4px; border: 1px solid #ccc; background: #fff; }
-        .signal-item.ai-signal { border-left: 3px solid #b91c1c; }
-        .signal-item.human-signal { border-left: 3px solid #047857; }
-        .signal-item .signal-label { font-size: 7pt; color: #555; }
-        .signal-item .signal-value { font-size: 8pt; font-weight: bold; color: #111; }
+        .signal-summary { background: #f8f8f8; border: 1px solid #999; padding: 12px 15px; margin: 12px 0; page-break-inside: avoid; border-radius: 4px; }
+        .signal-summary h3 { margin-top: 0; font-size: 11pt; font-weight: 600; border-bottom: 2px solid #333; padding-bottom: 6px; margin-bottom: 10px; color: #111; }
+        .signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .signal-grid > div { min-width: 0; }
+        .signal-item { padding: 6px 10px; margin-bottom: 6px; border: 1px solid #ddd; background: #fff; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .signal-item.ai-signal { border-left: 4px solid #b91c1c; background: #fef2f2; }
+        .signal-item.human-signal { border-left: 4px solid #047857; background: #f0fdf4; }
+        .signal-item .signal-label { font-size: 8pt; color: #444; font-weight: 500; flex: 1; }
+        .signal-item .signal-value { font-size: 8pt; font-weight: 600; text-align: right; white-space: nowrap; }
         
         /* === METHODOLOGY & DISCLAIMER === */
         .disclaimer { background: #fff8e6; border: 1px solid #d4a000; padding: 10px; margin: 12px 0; font-size: 8pt; page-break-inside: avoid; }
@@ -839,20 +839,25 @@ const ReportExporter = {
         }
 
         const maxFreq = sortedFreqs[0][1];
-        const chartWidth = 400;
+        // Calculate proper chart dimensions to fit all bars
+        const leftMargin = 35;
+        const rightMargin = 15;
+        const barWidth = 10;
+        const barGap = 2;
+        const numBars = sortedFreqs.length;
+        const chartWidth = leftMargin + (numBars * (barWidth + barGap)) + rightMargin;
         const chartHeight = 180;
-        const barWidth = Math.floor(chartWidth / sortedFreqs.length) - 2;
 
         let html = `
     <h3>Word Frequency Distribution (Zipf Chart)</h3>
-    <p style="font-size:8pt;color:#666;margin-bottom:10px;">Shows top 30 words by frequency. Natural text follows Zipf's law (rank × frequency ≈ constant).</p>
-    <div style="background:#f9fafb;border:1px solid #e5e5e5;border-radius:4px;padding:10px;margin:10px 0;">
-        <svg viewBox="0 0 ${chartWidth} ${chartHeight}" style="width:100%;max-width:${chartWidth}px;height:auto;">
+    <p style="font-size:8pt;color:#666;margin-bottom:10px;">Shows top ${numBars} words by frequency. Natural text follows Zipf's law (rank × frequency ≈ constant).</p>
+    <div style="background:#f9fafb;border:1px solid #e5e5e5;border-radius:4px;padding:10px;margin:10px 0;overflow-x:auto;">
+        <svg viewBox="0 0 ${chartWidth} ${chartHeight}" style="width:100%;max-width:${Math.max(chartWidth, 400)}px;min-width:${Math.min(chartWidth, 350)}px;height:auto;display:block;">
             <!-- Title -->
-            <text x="${chartWidth/2}" y="15" text-anchor="middle" style="font-size:10px;fill:#333;">Word Frequency (Top 30)</text>
+            <text x="${chartWidth/2}" y="15" text-anchor="middle" style="font-size:10px;fill:#333;">Word Frequency (Top ${numBars})</text>
             
             <!-- Y-axis label -->
-            <text x="5" y="${chartHeight/2}" text-anchor="middle" transform="rotate(-90, 12, ${chartHeight/2})" style="font-size:8px;fill:#666;">Frequency</text>
+            <text x="8" y="${chartHeight/2}" text-anchor="middle" transform="rotate(-90, 12, ${chartHeight/2})" style="font-size:8px;fill:#666;">Frequency</text>
             
             <!-- X-axis label -->
             <text x="${chartWidth/2}" y="${chartHeight - 5}" text-anchor="middle" style="font-size:8px;fill:#666;">Word Rank</text>
@@ -865,7 +870,7 @@ const ReportExporter = {
         const logMax = Math.log(maxFreq + 1);
 
         sortedFreqs.forEach(([word, count], i) => {
-            const x = 30 + i * (barWidth + 2);
+            const x = leftMargin + i * (barWidth + barGap);
             const barHeight = (Math.log(count + 1) / logMax) * plotHeight;
             const y = plotBottom - barHeight;
             
@@ -883,20 +888,22 @@ const ReportExporter = {
         let pathData = '';
         sortedFreqs.forEach(([word, count], i) => {
             const expectedFreq = maxFreq / (i + 1);
-            const x = 30 + i * (barWidth + 2) + barWidth / 2;
+            const x = leftMargin + i * (barWidth + barGap) + barWidth / 2;
             const y = plotBottom - (Math.log(expectedFreq + 1) / logMax) * plotHeight;
             pathData += `${i === 0 ? 'M' : 'L'} ${x},${y}`;
         });
         
+        // Position legend in top-right with proper offset from edge
+        const legendX = chartWidth - 90;
         html += `
             <!-- Expected Zipf curve -->
             <path d="${pathData}" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
             
             <!-- Legend -->
-            <rect x="${chartWidth - 100}" y="20" width="10" height="10" fill="hsl(220, 60%, 50%)" rx="1"/>
-            <text x="${chartWidth - 85}" y="28" style="font-size:7px;fill:#666;">Actual</text>
-            <line x1="${chartWidth - 100}" y1="38" x2="${chartWidth - 90}" y2="38" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
-            <text x="${chartWidth - 85}" y="41" style="font-size:7px;fill:#666;">Expected (Zipf)</text>
+            <rect x="${legendX}" y="20" width="10" height="10" fill="hsl(220, 60%, 50%)" rx="1"/>
+            <text x="${legendX + 15}" y="28" style="font-size:7px;fill:#666;">Actual</text>
+            <line x1="${legendX}" y1="38" x2="${legendX + 10}" y2="38" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+            <text x="${legendX + 15}" y="41" style="font-size:7px;fill:#666;">Expected (Zipf)</text>
         </svg>
     </div>`;
 
