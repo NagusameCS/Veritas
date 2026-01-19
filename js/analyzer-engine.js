@@ -78,6 +78,9 @@ const AnalyzerEngine = {
             avgWordsPerSentence: sentences.length > 0 ? (tokens.length / sentences.length).toFixed(1) : 0
         };
 
+        // Advanced statistics
+        const advancedStats = this.computeAdvancedStatistics(text, tokens, sentences);
+
         // Filter to only available analyzers
         const availableAnalyzers = this.analyzers.filter(a => this.safeGetAnalyzer(a));
 
@@ -156,9 +159,180 @@ const AnalyzerEngine = {
             
             // Statistics
             stats,
+            advancedStats,
             metadata: metadata || null,
             analysisTime: (endTime - startTime).toFixed(0) + 'ms'
         };
+    },
+
+    /**
+     * Compute advanced statistics for comprehensive analysis
+     */
+    computeAdvancedStatistics(text, tokens, sentences) {
+        const stats = {};
+
+        // === Vocabulary Richness Metrics ===
+        stats.vocabulary = {
+            uniqueWords: new Set(tokens).size,
+            typeTokenRatio: Utils.typeTokenRatio(tokens),
+            rootTTR: Utils.rootTTR(tokens),
+            logTTR: Utils.logTTR(tokens),
+            msttr: Utils.msttr(tokens, 50),
+            hapaxLegomenaRatio: Utils.hapaxLegomenaRatio(tokens),
+            disLegomenaRatio: Utils.disLegomenaRatio(tokens),
+            yulesK: Utils.yulesK(tokens),
+            simpsonsD: Utils.simpsonsD(tokens),
+            honoresR: Utils.honoresR(tokens),
+            brunetsW: Utils.brunetsW(tokens),
+            sichelsS: Utils.sichelsS(tokens)
+        };
+
+        // === Word Statistics ===
+        stats.words = {
+            avgLength: Utils.avgWordLength(tokens),
+            lengthDistribution: Utils.wordLengthDistribution(tokens),
+            entropy: Utils.entropy(Utils.frequencyDistribution(tokens))
+        };
+
+        // === Sentence Statistics ===
+        const sentLengths = sentences.map(s => Utils.tokenize(s).length);
+        stats.sentences = {
+            mean: Utils.mean(sentLengths),
+            median: Utils.median(sentLengths),
+            stdDev: Utils.standardDeviation(sentLengths),
+            variance: Utils.variance(sentLengths),
+            min: Math.min(...sentLengths),
+            max: Math.max(...sentLengths),
+            range: Math.max(...sentLengths) - Math.min(...sentLengths),
+            coefficientOfVariation: Utils.coefficientOfVariation(sentLengths),
+            skewness: Utils.skewness(sentLengths),
+            kurtosis: Utils.kurtosis(sentLengths),
+            gini: Utils.giniCoefficient(sentLengths)
+        };
+
+        // === Zipf's Law Analysis ===
+        stats.zipf = Utils.zipfAnalysis(tokens);
+
+        // === N-gram Analysis ===
+        const bigrams = Utils.ngrams(tokens, 2);
+        const trigrams = Utils.ngrams(tokens, 3);
+        stats.ngrams = {
+            uniqueBigrams: new Set(bigrams).size,
+            uniqueTrigrams: new Set(trigrams).size,
+            bigramRepetitionRate: bigrams.length > 0 ? 1 - (new Set(bigrams).size / bigrams.length) : 0,
+            trigramRepetitionRate: trigrams.length > 0 ? 1 - (new Set(trigrams).size / trigrams.length) : 0
+        };
+
+        // === Readability Approximations ===
+        const syllableCount = this.estimateSyllables(tokens);
+        const avgSyllablesPerWord = tokens.length > 0 ? syllableCount / tokens.length : 0;
+        
+        // Flesch Reading Ease approximation
+        const fleschRE = 206.835 - 1.015 * (stats.sentences.mean || 15) - 84.6 * avgSyllablesPerWord;
+        
+        // Flesch-Kincaid Grade Level approximation
+        const fleschKG = 0.39 * (stats.sentences.mean || 15) + 11.8 * avgSyllablesPerWord - 15.59;
+        
+        // Gunning Fog Index approximation
+        const complexWords = tokens.filter(t => this.syllableCount(t) >= 3).length;
+        const complexWordPct = tokens.length > 0 ? (complexWords / tokens.length) * 100 : 0;
+        const gunningFog = 0.4 * ((stats.sentences.mean || 15) + complexWordPct);
+
+        stats.readability = {
+            avgSyllablesPerWord,
+            fleschReadingEase: Math.max(0, Math.min(100, fleschRE)),
+            fleschKincaidGrade: Math.max(0, fleschKG),
+            gunningFogIndex: gunningFog,
+            complexWordPercentage: complexWordPct
+        };
+
+        // === Burstiness Metrics ===
+        stats.burstiness = {
+            sentenceLength: VarianceUtils.burstiness(sentLengths),
+            wordLength: VarianceUtils.burstiness(tokens.map(t => t.length)),
+            overallUniformity: VarianceUtils.uniformityScore(sentLengths)
+        };
+
+        // === Function Word Analysis ===
+        const functionWordCount = tokens.filter(t => Utils.functionWords.has(t.toLowerCase())).length;
+        const contentWordCount = tokens.length - functionWordCount;
+        stats.functionWords = {
+            count: functionWordCount,
+            ratio: tokens.length > 0 ? functionWordCount / tokens.length : 0,
+            contentWordRatio: tokens.length > 0 ? contentWordCount / tokens.length : 0
+        };
+
+        // === AI Signature Metrics ===
+        stats.aiSignatures = this.computeAISignatureMetrics(text, tokens, sentences);
+
+        return stats;
+    },
+
+    /**
+     * Compute AI-specific signature metrics
+     */
+    computeAISignatureMetrics(text, tokens, sentences) {
+        const metrics = {};
+
+        // Hedging word density
+        const hedgingCount = Utils.hedgingWords.reduce((count, word) => {
+            return count + (text.toLowerCase().match(new RegExp(`\\b${word}\\b`, 'gi')) || []).length;
+        }, 0);
+        metrics.hedgingDensity = tokens.length > 0 ? hedgingCount / tokens.length : 0;
+
+        // Discourse marker density
+        const discourseCount = Utils.discourseMarkers.reduce((count, marker) => {
+            return count + (text.toLowerCase().includes(marker.toLowerCase()) ? 1 : 0);
+        }, 0);
+        metrics.discourseMarkerDensity = sentences.length > 0 ? discourseCount / sentences.length : 0;
+
+        // Unicode anomalies (strong AI indicator)
+        const unicodeAnomalies = (text.match(/[\u2014\u2013\u2018\u2019\u201C\u201D\u2026\u2E3A\u2E3B]/g) || []).length;
+        metrics.unicodeAnomalyDensity = text.length > 0 ? unicodeAnomalies / text.length * 1000 : 0;
+
+        // Decorative dividers (very strong AI indicator)
+        const decorativeDividers = (text.match(/[⸻═━─]{3,}|[•●◦◆◇■□▪▫]{3,}/g) || []).length;
+        metrics.decorativeDividerCount = decorativeDividers;
+
+        // Perfect grammar indicators (lack of contractions)
+        const contractionCount = (text.match(/\b(don't|won't|can't|wouldn't|couldn't|shouldn't|isn't|aren't|wasn't|weren't|haven't|hasn't|hadn't|I'm|you're|we're|they're|he's|she's|it's|that's|there's|here's|what's|who's|let's)\b/gi) || []).length;
+        metrics.contractionRate = sentences.length > 0 ? contractionCount / sentences.length : 0;
+
+        // Sentence starter variety
+        const starters = sentences.map(s => Utils.tokenize(s)[0]?.toLowerCase()).filter(Boolean);
+        const uniqueStarters = new Set(starters).size;
+        metrics.sentenceStarterVariety = starters.length > 0 ? uniqueStarters / starters.length : 0;
+
+        // Passive voice indicators
+        const passiveIndicators = (text.match(/\b(is|are|was|were|been|being)\s+(being\s+)?\w+ed\b/gi) || []).length;
+        metrics.passiveVoiceRate = sentences.length > 0 ? passiveIndicators / sentences.length : 0;
+
+        return metrics;
+    },
+
+    /**
+     * Estimate total syllables in tokens
+     */
+    estimateSyllables(tokens) {
+        return tokens.reduce((total, token) => total + this.syllableCount(token), 0);
+    },
+
+    /**
+     * Estimate syllable count for a word
+     */
+    syllableCount(word) {
+        word = word.toLowerCase().replace(/[^a-z]/g, '');
+        if (word.length <= 3) return 1;
+        
+        // Count vowel groups
+        const vowels = word.match(/[aeiouy]+/g);
+        let count = vowels ? vowels.length : 1;
+        
+        // Subtract silent e
+        if (word.endsWith('e') && !word.endsWith('le')) count--;
+        
+        // Ensure at least 1 syllable
+        return Math.max(1, count);
     },
 
     /**

@@ -579,6 +579,12 @@ const App = {
             Visualizations.createCategoryBars(featuresContainer, result.categoryResults);
         }
 
+        // Advanced statistics tab
+        const statsContainer = document.getElementById('advancedStatistics');
+        if (statsContainer && result.advancedStats) {
+            this.renderAdvancedStatistics(statsContainer, result.advancedStats, result.stats);
+        }
+
         // Probability graphs tab
         const graphsContainer = document.getElementById('probabilityGraphs');
         if (graphsContainer) {
@@ -610,6 +616,302 @@ const App = {
             const report = AnalyzerEngine.generateReport(result);
             Visualizations.renderDetailedReport(reportContainer, report);
         }
+    },
+
+    /**
+     * Render advanced statistics panel
+     */
+    renderAdvancedStatistics(container, advStats, basicStats) {
+        const formatNum = (n, decimals = 2) => {
+            if (typeof n !== 'number' || isNaN(n)) return '—';
+            return n.toFixed(decimals);
+        };
+
+        const formatPct = (n) => {
+            if (typeof n !== 'number' || isNaN(n)) return '—';
+            return (n * 100).toFixed(1) + '%';
+        };
+
+        const getIndicator = (value, thresholds, invert = false) => {
+            // Returns 'ai', 'human', or 'neutral' based on value
+            if (typeof value !== 'number' || isNaN(value)) return 'neutral';
+            const [aiThresh, humanThresh] = thresholds;
+            if (invert) {
+                if (value < aiThresh) return 'ai';
+                if (value > humanThresh) return 'human';
+            } else {
+                if (value > aiThresh) return 'ai';
+                if (value < humanThresh) return 'human';
+            }
+            return 'neutral';
+        };
+
+        let html = `
+            <div class="stats-grid">
+                <!-- Basic Document Stats -->
+                <div class="stats-section">
+                    <h4>📊 Document Overview</h4>
+                    <div class="stats-table">
+                        <div class="stat-row"><span class="stat-label">Characters</span><span class="stat-value">${basicStats.characters?.toLocaleString() || 0}</span></div>
+                        <div class="stat-row"><span class="stat-label">Words</span><span class="stat-value">${basicStats.words?.toLocaleString() || 0}</span></div>
+                        <div class="stat-row"><span class="stat-label">Sentences</span><span class="stat-value">${basicStats.sentences?.toLocaleString() || 0}</span></div>
+                        <div class="stat-row"><span class="stat-label">Paragraphs</span><span class="stat-value">${basicStats.paragraphs?.toLocaleString() || 0}</span></div>
+                        <div class="stat-row"><span class="stat-label">Avg Words/Sentence</span><span class="stat-value">${basicStats.avgWordsPerSentence || 0}</span></div>
+                    </div>
+                </div>
+
+                <!-- Vocabulary Richness -->
+                <div class="stats-section">
+                    <h4>📚 Vocabulary Richness</h4>
+                    <div class="stats-table">
+                        <div class="stat-row">
+                            <span class="stat-label">Unique Words</span>
+                            <span class="stat-value">${advStats.vocabulary?.uniqueWords?.toLocaleString() || 0}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.vocabulary?.typeTokenRatio, [0.3, 0.5], true)}">
+                            <span class="stat-label">Type-Token Ratio (TTR)</span>
+                            <span class="stat-value">${formatPct(advStats.vocabulary?.typeTokenRatio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Root TTR (Guiraud's R)</span>
+                            <span class="stat-value">${formatNum(advStats.vocabulary?.rootTTR)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Log TTR (Herdan's C)</span>
+                            <span class="stat-value">${formatNum(advStats.vocabulary?.logTTR, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.vocabulary?.hapaxLegomenaRatio, [0.35, 0.5], true)}">
+                            <span class="stat-label">Hapax Legomena Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.vocabulary?.hapaxLegomenaRatio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Dis Legomena Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.vocabulary?.disLegomenaRatio)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.vocabulary?.yulesK, [150, 100])}">
+                            <span class="stat-label">Yule's K</span>
+                            <span class="stat-value">${formatNum(advStats.vocabulary?.yulesK, 1)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.vocabulary?.simpsonsD, [0.02, 0.01])}">
+                            <span class="stat-label">Simpson's D</span>
+                            <span class="stat-value">${formatNum(advStats.vocabulary?.simpsonsD, 4)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Honore's R</span>
+                            <span class="stat-value">${formatNum(advStats.vocabulary?.honoresR, 0)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Brunet's W</span>
+                            <span class="stat-value">${formatNum(advStats.vocabulary?.brunetsW, 1)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Sichel's S</span>
+                            <span class="stat-value">${formatNum(advStats.vocabulary?.sichelsS, 3)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sentence Statistics -->
+                <div class="stats-section">
+                    <h4>📝 Sentence Analysis</h4>
+                    <div class="stats-table">
+                        <div class="stat-row">
+                            <span class="stat-label">Mean Length</span>
+                            <span class="stat-value">${formatNum(advStats.sentences?.mean, 1)} words</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Median Length</span>
+                            <span class="stat-value">${formatNum(advStats.sentences?.median, 1)} words</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Std Deviation</span>
+                            <span class="stat-value">${formatNum(advStats.sentences?.stdDev, 2)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Min / Max</span>
+                            <span class="stat-value">${advStats.sentences?.min || 0} / ${advStats.sentences?.max || 0}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.sentences?.coefficientOfVariation, [0.35, 0.5], true)}">
+                            <span class="stat-label">Coeff. of Variation</span>
+                            <span class="stat-value">${formatNum(advStats.sentences?.coefficientOfVariation, 3)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Skewness</span>
+                            <span class="stat-value">${formatNum(advStats.sentences?.skewness, 3)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Kurtosis</span>
+                            <span class="stat-value">${formatNum(advStats.sentences?.kurtosis, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.sentences?.gini, [0.15, 0.25], true)}">
+                            <span class="stat-label">Gini Coefficient</span>
+                            <span class="stat-value">${formatNum(advStats.sentences?.gini, 3)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zipf's Law -->
+                <div class="stats-section">
+                    <h4>📈 Zipf's Law Analysis</h4>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${getIndicator(advStats.zipf?.compliance, [0.7, 0.85], true)}">
+                            <span class="stat-label">Zipf Compliance</span>
+                            <span class="stat-value">${formatPct(advStats.zipf?.compliance)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(Math.abs((advStats.zipf?.slope || 0) + 1), [0.3, 0.15])}">
+                            <span class="stat-label">Log-Log Slope</span>
+                            <span class="stat-value">${formatNum(advStats.zipf?.slope, 3)} (ideal: -1)</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">R² (Fit Quality)</span>
+                            <span class="stat-value">${formatNum(advStats.zipf?.rSquared, 3)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Deviation from Ideal</span>
+                            <span class="stat-value">${formatNum(advStats.zipf?.deviation, 3)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Readability -->
+                <div class="stats-section">
+                    <h4>📖 Readability Metrics</h4>
+                    <div class="stats-table">
+                        <div class="stat-row">
+                            <span class="stat-label">Avg Syllables/Word</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.avgSyllablesPerWord, 2)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Flesch Reading Ease</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.fleschReadingEase, 1)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Flesch-Kincaid Grade</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.fleschKincaidGrade, 1)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Gunning Fog Index</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.gunningFogIndex, 1)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Complex Word %</span>
+                            <span class="stat-value">${formatNum(advStats.readability?.complexWordPercentage, 1)}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Burstiness -->
+                <div class="stats-section">
+                    <h4>⚡ Burstiness & Uniformity</h4>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${getIndicator(advStats.burstiness?.sentenceLength, [0.1, 0.25], true)}">
+                            <span class="stat-label">Sentence Length Burstiness</span>
+                            <span class="stat-value">${formatNum(advStats.burstiness?.sentenceLength, 3)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Word Length Burstiness</span>
+                            <span class="stat-value">${formatNum(advStats.burstiness?.wordLength, 3)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.burstiness?.overallUniformity, [0.7, 0.5])}">
+                            <span class="stat-label">Overall Uniformity</span>
+                            <span class="stat-value">${formatPct(advStats.burstiness?.overallUniformity)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- N-gram Analysis -->
+                <div class="stats-section">
+                    <h4>🔗 N-gram Analysis</h4>
+                    <div class="stats-table">
+                        <div class="stat-row">
+                            <span class="stat-label">Unique Bigrams</span>
+                            <span class="stat-value">${advStats.ngrams?.uniqueBigrams?.toLocaleString() || 0}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Unique Trigrams</span>
+                            <span class="stat-value">${advStats.ngrams?.uniqueTrigrams?.toLocaleString() || 0}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.ngrams?.bigramRepetitionRate, [0.4, 0.25])}">
+                            <span class="stat-label">Bigram Repetition Rate</span>
+                            <span class="stat-value">${formatPct(advStats.ngrams?.bigramRepetitionRate)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.ngrams?.trigramRepetitionRate, [0.2, 0.1])}">
+                            <span class="stat-label">Trigram Repetition Rate</span>
+                            <span class="stat-value">${formatPct(advStats.ngrams?.trigramRepetitionRate)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Function Words -->
+                <div class="stats-section">
+                    <h4>🔤 Word Analysis</h4>
+                    <div class="stats-table">
+                        <div class="stat-row">
+                            <span class="stat-label">Avg Word Length</span>
+                            <span class="stat-value">${formatNum(advStats.words?.avgLength, 2)} chars</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Word Entropy</span>
+                            <span class="stat-value">${formatNum(advStats.words?.entropy, 2)} bits</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Function Word Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.functionWords?.ratio)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Content Word Ratio</span>
+                            <span class="stat-value">${formatPct(advStats.functionWords?.contentWordRatio)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Signature Metrics -->
+                <div class="stats-section highlight-section">
+                    <h4>🤖 AI Signature Metrics</h4>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${getIndicator(advStats.aiSignatures?.hedgingDensity, [0.02, 0.01])}">
+                            <span class="stat-label">Hedging Density</span>
+                            <span class="stat-value">${formatPct(advStats.aiSignatures?.hedgingDensity)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.aiSignatures?.discourseMarkerDensity, [0.4, 0.2])}">
+                            <span class="stat-label">Discourse Marker Density</span>
+                            <span class="stat-value">${formatNum(advStats.aiSignatures?.discourseMarkerDensity, 2)}/sentence</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.aiSignatures?.unicodeAnomalyDensity, [1, 0.3])}">
+                            <span class="stat-label">Unicode Anomaly Density</span>
+                            <span class="stat-value">${formatNum(advStats.aiSignatures?.unicodeAnomalyDensity, 2)}/1000 chars</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.aiSignatures?.decorativeDividerCount, [1, 0])}">
+                            <span class="stat-label">Decorative Dividers</span>
+                            <span class="stat-value">${advStats.aiSignatures?.decorativeDividerCount || 0}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.aiSignatures?.contractionRate, [0.3, 0.5], true)}">
+                            <span class="stat-label">Contraction Rate</span>
+                            <span class="stat-value">${formatNum(advStats.aiSignatures?.contractionRate, 2)}/sentence</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.aiSignatures?.sentenceStarterVariety, [0.4, 0.6], true)}">
+                            <span class="stat-label">Sentence Starter Variety</span>
+                            <span class="stat-value">${formatPct(advStats.aiSignatures?.sentenceStarterVariety)}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Passive Voice Rate</span>
+                            <span class="stat-value">${formatNum(advStats.aiSignatures?.passiveVoiceRate, 2)}/sentence</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-legend">
+                <h5>Legend</h5>
+                <div class="legend-items">
+                    <span class="legend-item indicator-ai">🔴 Suggests AI</span>
+                    <span class="legend-item indicator-human">🟢 Suggests Human</span>
+                    <span class="legend-item indicator-neutral">⚪ Neutral</span>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = html;
     },
 
     /**

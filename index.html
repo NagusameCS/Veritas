@@ -22,6 +22,7 @@
             <nav class="nav">
                 <a href="#" class="nav-link active" data-view="analyze">Analyze</a>
                 <a href="#" class="nav-link" data-view="history">History</a>
+                <a href="#" class="nav-link" data-view="methodology">Methodology</a>
                 <a href="#" class="nav-link" data-view="about">About</a>
             </nav>
             <div class="header-actions">
@@ -153,6 +154,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 <div class="tabs" role="tablist">
                                     <button class="tab-btn active" data-tab="tab-highlighted" role="tab" aria-selected="true">Highlighted Text</button>
                                     <button class="tab-btn" data-tab="tab-features" role="tab" aria-selected="false">Feature Analysis</button>
+                                    <button class="tab-btn" data-tab="tab-statistics" role="tab" aria-selected="false">Statistics</button>
                                     <button class="tab-btn" data-tab="tab-graphs" role="tab" aria-selected="false">Probability Graphs</button>
                                     <button class="tab-btn" data-tab="tab-report" role="tab" aria-selected="false">Detailed Report</button>
                                 </div>
@@ -164,6 +166,10 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
 
                                 <div class="tab-panel" id="tab-features" role="tabpanel" hidden>
                                     <div id="featureAnalysis" class="features-container"></div>
+                                </div>
+
+                                <div class="tab-panel" id="tab-statistics" role="tabpanel" hidden>
+                                    <div id="advancedStatistics" class="statistics-container"></div>
                                 </div>
 
                                 <div class="tab-panel" id="tab-graphs" role="tabpanel" hidden>
@@ -253,7 +259,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                     <div class="about-content">
                         <div class="about-section">
                             <h3>How It Works</h3>
-                            <p>Veritas analyzes text using 10 comprehensive feature categories derived from NLP literature, authorship attribution research, and AI-detection studies. Each feature is measured programmatically to provide accurate detection results.</p>
+                            <p>Veritas analyzes text using 14 comprehensive feature categories derived from NLP literature, authorship attribution research, and AI-detection studies. Each feature is measured programmatically to provide accurate detection results.</p>
                         </div>
 
                         <div class="feature-categories-grid">
@@ -294,7 +300,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             </div>
                             <div class="category-card">
                                 <span class="category-num">08</span>
-                                <h4>Statistical Language Model Indicators</h4>
+                                <h4>Statistical Language Model</h4>
                                 <p>Perplexity variance, token predictability, and n-gram repetition patterns.</p>
                             </div>
                             <div class="category-card">
@@ -307,22 +313,365 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 <h4>Meta-Patterns Unique to AI</h4>
                                 <p>Argument balance, hedging, formatting symmetry, and rhetorical arc predictability.</p>
                             </div>
+                            <div class="category-card">
+                                <span class="category-num">11</span>
+                                <h4>Metadata & Formatting</h4>
+                                <p>Unicode anomalies, decorative dividers, invisible characters, and formatting patterns.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">12</span>
+                                <h4>Repetition Patterns</h4>
+                                <p>N-gram distribution, phrase clustering, and repetition uniformity analysis.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">13</span>
+                                <h4>Tone Stability</h4>
+                                <p>Emotional variance, sentiment drift, and stylistic consistency throughout text.</p>
+                            </div>
+                            <div class="category-card">
+                                <span class="category-num">14</span>
+                                <h4>Part of Speech Patterns</h4>
+                                <p>Verb usage, adverb placement, adjective density, and POS distribution analysis.</p>
+                            </div>
                         </div>
 
                         <div class="about-section">
-                            <h3>Methodology</h3>
-                            <p>Our detection system combines multiple analytical approaches:</p>
-                            <ul class="method-list">
-                                <li><strong>Linguistic Profiling:</strong> Statistical analysis of grammar, syntax, and vocabulary patterns</li>
-                                <li><strong>Perplexity Analysis:</strong> Measuring predictability using language model baselines</li>
-                                <li><strong>Stylometric Analysis:</strong> Identifying unique authorial fingerprints and inconsistencies</li>
-                                <li><strong>Discourse Analysis:</strong> Evaluating coherence, flow, and rhetorical structures</li>
-                            </ul>
+                            <h3>Detection Philosophy</h3>
+                            <p>Our system uses <strong>variance-based detection</strong> — we don't flag individual features as "AI-like" or "human-like." Instead, we measure deviations from expected human variance patterns. AI text is characterized by unusual uniformity and predictability, while human text shows natural burstiness and variation.</p>
                         </div>
 
                         <div class="about-section disclaimer">
                             <h3>Disclaimer</h3>
                             <p>No AI detection system is 100% accurate. Results should be used as one of multiple factors in evaluation. Human judgment remains essential.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Methodology View -->
+            <section class="view" id="methodologyView" hidden>
+                <div class="methodology-container">
+                    <div class="methodology-hero">
+                        <h1>Mathematical Methodology</h1>
+                        <p class="subtitle">The Science Behind VERITAS AI Detection</p>
+                    </div>
+
+                    <div class="methodology-content">
+                        <!-- Core Philosophy -->
+                        <div class="methodology-section">
+                            <h2>Core Detection Philosophy</h2>
+                            <div class="philosophy-box">
+                                <blockquote>
+                                    "Never grade features as 'AI-like' or 'human-like' in isolation. Grade them as deviations from expected human variance."
+                                </blockquote>
+                                <p>Human writing exhibits natural <strong>burstiness</strong> — irregular patterns in sentence length, vocabulary choice, and style. AI text tends toward <strong>uniformity</strong> — suspiciously consistent patterns that deviate from natural human variance.</p>
+                            </div>
+                        </div>
+
+                        <!-- Statistical Measures -->
+                        <div class="methodology-section">
+                            <h2>Statistical Measures</h2>
+                            
+                            <div class="formula-card">
+                                <h3>Coefficient of Variation (CV)</h3>
+                                <p>Measures relative variability — lower CV indicates more uniform (AI-like) text.</p>
+                                <div class="formula">
+                                    <span class="math">CV = σ / μ</span>
+                                </div>
+                                <p class="formula-note">Where σ is standard deviation and μ is the mean. Typical human CV for sentence length: 0.4-0.8. AI text: 0.2-0.4.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Burstiness Score</h3>
+                                <p>Measures clustering patterns — humans show "bursty" behavior; AI shows even distribution.</p>
+                                <div class="formula">
+                                    <span class="math">B = (σ - μ) / (σ + μ)</span>
+                                </div>
+                                <p class="formula-note">Range: -1 (periodic) to +1 (bursty). Value of 0 indicates Poisson randomness. Human text typically: 0.1-0.4. AI text: -0.2-0.1.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Shannon Entropy</h3>
+                                <p>Measures information content and unpredictability of word choices.</p>
+                                <div class="formula">
+                                    <span class="math">H(X) = -Σ p(xᵢ) log₂ p(xᵢ)</span>
+                                </div>
+                                <p class="formula-note">Higher entropy = more diverse/unpredictable vocabulary. AI text often shows lower entropy due to repetitive phrasing.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Gini Coefficient</h3>
+                                <p>Measures inequality in distribution (used for sentence length variation).</p>
+                                <div class="formula">
+                                    <span class="math">G = (2Σᵢ i·xᵢ) / (n·Σxᵢ) - (n+1)/n</span>
+                                </div>
+                                <p class="formula-note">Range: 0 (perfect equality) to 1 (perfect inequality). Lower Gini in sentence lengths suggests AI-generated uniformity.</p>
+                            </div>
+                        </div>
+
+                        <!-- Vocabulary Richness -->
+                        <div class="methodology-section">
+                            <h2>Vocabulary Richness Metrics</h2>
+
+                            <div class="formula-card">
+                                <h3>Type-Token Ratio (TTR)</h3>
+                                <p>Basic measure of vocabulary diversity.</p>
+                                <div class="formula">
+                                    <span class="math">TTR = V / N</span>
+                                </div>
+                                <p class="formula-note">V = unique words (types), N = total words (tokens). Higher = more diverse vocabulary.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Root TTR (Guiraud's R)</h3>
+                                <p>Length-normalized vocabulary richness.</p>
+                                <div class="formula">
+                                    <span class="math">R = V / √N</span>
+                                </div>
+                                <p class="formula-note">More stable across different text lengths than simple TTR.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Yule's K Characteristic</h3>
+                                <p>Measures vocabulary consistency independent of text length.</p>
+                                <div class="formula">
+                                    <span class="math">K = 10⁴ · (M₂ - M₁) / M₁²</span>
+                                </div>
+                                <p class="formula-note">Where M₁ = N (total tokens), M₂ = Σ r²·Vᵣ (Vᵣ = words appearing r times). Lower K = richer vocabulary. Typical range: 80-200.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Hapax Legomena Ratio</h3>
+                                <p>Proportion of words appearing exactly once.</p>
+                                <div class="formula">
+                                    <span class="math">H = V₁ / N</span>
+                                </div>
+                                <p class="formula-note">V₁ = count of words appearing only once. Higher ratio suggests more natural/human vocabulary usage.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Honore's R Statistic</h3>
+                                <p>Vocabulary richness based on hapax legomena.</p>
+                                <div class="formula">
+                                    <span class="math">R = 100 · log(N) / (1 - V₁/V)</span>
+                                </div>
+                                <p class="formula-note">Higher R = richer vocabulary. Typical range: 1500-2500 for natural text.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Simpson's D (Diversity Index)</h3>
+                                <p>Probability that two randomly chosen words are the same.</p>
+                                <div class="formula">
+                                    <span class="math">D = Σ [nᵢ(nᵢ-1)] / [N(N-1)]</span>
+                                </div>
+                                <p class="formula-note">Lower D = more diverse vocabulary. AI text often shows higher D due to repetitive word choices.</p>
+                            </div>
+                        </div>
+
+                        <!-- Zipf's Law -->
+                        <div class="methodology-section">
+                            <h2>Zipf's Law Analysis</h2>
+                            
+                            <div class="formula-card">
+                                <h3>Zipf's Law</h3>
+                                <p>Natural language follows a power law distribution for word frequencies.</p>
+                                <div class="formula">
+                                    <span class="math">f(r) ∝ 1/rᵅ  where α ≈ 1</span>
+                                </div>
+                                <p class="formula-note">In log-log space: log(f) = -α·log(r) + c. Natural text has slope ≈ -1. AI text often deviates (slope &lt; -1), showing overuse of common words.</p>
+                            </div>
+
+                            <div class="zipf-explanation">
+                                <h4>How We Measure Zipf Compliance</h4>
+                                <ol>
+                                    <li>Rank all words by frequency (rank 1 = most frequent)</li>
+                                    <li>Plot log(rank) vs log(frequency)</li>
+                                    <li>Perform linear regression to find slope</li>
+                                    <li>Calculate R² to measure fit quality</li>
+                                    <li>Deviation from slope -1 indicates potential AI generation</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <!-- Readability -->
+                        <div class="methodology-section">
+                            <h2>Readability Metrics</h2>
+
+                            <div class="formula-card">
+                                <h3>Flesch Reading Ease</h3>
+                                <p>Measures text difficulty on a 0-100 scale.</p>
+                                <div class="formula">
+                                    <span class="math">FRE = 206.835 - 1.015(words/sentences) - 84.6(syllables/words)</span>
+                                </div>
+                                <p class="formula-note">Higher = easier to read. AI text often scores 50-70 (professional level) with unusual consistency.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Flesch-Kincaid Grade Level</h3>
+                                <p>Estimates U.S. school grade level needed to understand text.</p>
+                                <div class="formula">
+                                    <span class="math">FKGL = 0.39(words/sentences) + 11.8(syllables/words) - 15.59</span>
+                                </div>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Gunning Fog Index</h3>
+                                <p>Estimates years of education needed to understand text.</p>
+                                <div class="formula">
+                                    <span class="math">FOG = 0.4[(words/sentences) + 100(complex words/words)]</span>
+                                </div>
+                                <p class="formula-note">Complex words = 3+ syllables. AI text often has low variance in FOG across paragraphs.</p>
+                            </div>
+                        </div>
+
+                        <!-- Probability Aggregation -->
+                        <div class="methodology-section">
+                            <h2>Probability Aggregation</h2>
+
+                            <div class="formula-card">
+                                <h3>Weighted Category Aggregation</h3>
+                                <p>Final AI probability is computed using weighted category scores.</p>
+                                <div class="formula">
+                                    <span class="math">P(AI) = Σ(wᵢ · cᵢ · pᵢ) / Σ(wᵢ · cᵢ)</span>
+                                </div>
+                                <p class="formula-note">Where wᵢ = category weight, cᵢ = confidence, pᵢ = category AI probability.</p>
+                            </div>
+
+                            <div class="weight-table">
+                                <h4>Category Weights</h4>
+                                <table>
+                                    <thead>
+                                        <tr><th>Category</th><th>Weight</th><th>Rationale</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Metadata & Formatting</td><td>25%</td><td>Strongest signal — decorative dividers, Unicode anomalies</td></tr>
+                                        <tr><td>Sentence Structure</td><td>15%</td><td>Length uniformity is highly indicative</td></tr>
+                                        <tr><td>Lexical Diversity</td><td>12%</td><td>Vocabulary patterns are reliable indicators</td></tr>
+                                        <tr><td>Repetition Uniformity</td><td>12%</td><td>AI shows even spacing; humans cluster</td></tr>
+                                        <tr><td>Tone Stability</td><td>12%</td><td>AI maintains unnaturally consistent tone</td></tr>
+                                        <tr><td>Authorship Drift</td><td>10%</td><td>Style consistency throughout document</td></tr>
+                                        <tr><td>Grammar Entropy</td><td>8%</td><td>Error distribution patterns</td></tr>
+                                        <tr><td>Statistical Perplexity</td><td>8%</td><td>Token predictability measures</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Wilson Score Confidence Interval</h3>
+                                <p>We report 95% confidence intervals using Wilson score.</p>
+                                <div class="formula">
+                                    <span class="math">CI = (p + z²/2n ± z√(p(1-p)/n + z²/4n²)) / (1 + z²/n)</span>
+                                </div>
+                                <p class="formula-note">Where z = 1.96 for 95% CI, n = number of analyzers, p = probability estimate.</p>
+                            </div>
+                        </div>
+
+                        <!-- Variance Analysis -->
+                        <div class="methodology-section">
+                            <h2>Variance-Based Detection</h2>
+
+                            <div class="formula-card">
+                                <h3>Uniformity Score</h3>
+                                <p>Measures how uniform a sequence is (high uniformity = AI-like).</p>
+                                <div class="formula">
+                                    <span class="math">U = 1 - min(1, CV / 0.8)</span>
+                                </div>
+                                <p class="formula-note">Normalized to 0-1 where 1 = perfectly uniform. Expected human CV ≈ 0.4-0.8.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Variance Stability</h3>
+                                <p>Measures how consistent variance is across the document.</p>
+                                <div class="formula">
+                                    <span class="math">VS = Uniformity(LocalVariances)</span>
+                                </div>
+                                <p class="formula-note">Compute variance in sliding windows, then measure uniformity of those variances. AI maintains stable variance; humans vary.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Periodicity Detection</h3>
+                                <p>Detects regular patterns in feature sequences.</p>
+                                <div class="formula">
+                                    <span class="math">P = max(AutoCorr(x, lag)) for lag ∈ [2, 10]</span>
+                                </div>
+                                <p class="formula-note">High periodicity suggests AI-generated content with systematic patterns.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Style Drift Score</h3>
+                                <p>Measures how much writing style changes from beginning to end.</p>
+                                <div class="formula">
+                                    <span class="math">Drift = |μ_last - μ_first| / μ_overall</span>
+                                </div>
+                                <p class="formula-note">Humans naturally drift in style; AI maintains unnatural consistency.</p>
+                            </div>
+                        </div>
+
+                        <!-- Skewness and Kurtosis -->
+                        <div class="methodology-section">
+                            <h2>Distribution Shape Analysis</h2>
+
+                            <div class="formula-card">
+                                <h3>Skewness</h3>
+                                <p>Measures asymmetry of the distribution.</p>
+                                <div class="formula">
+                                    <span class="math">γ₁ = E[(X-μ)³] / σ³</span>
+                                </div>
+                                <p class="formula-note">0 = symmetric, positive = right-skewed, negative = left-skewed. Human sentence lengths often show positive skew.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Kurtosis</h3>
+                                <p>Measures "tailedness" of the distribution.</p>
+                                <div class="formula">
+                                    <span class="math">κ = E[(X-μ)⁴] / σ⁴ - 3</span>
+                                </div>
+                                <p class="formula-note">0 = normal distribution, positive = heavy tails, negative = light tails. AI text often shows lower kurtosis (fewer outliers).</p>
+                            </div>
+                        </div>
+
+                        <!-- Interpretation -->
+                        <div class="methodology-section">
+                            <h2>Interpretation Guidelines</h2>
+                            
+                            <div class="interpretation-grid">
+                                <div class="interp-card ai">
+                                    <h4>🔴 AI Indicators</h4>
+                                    <ul>
+                                        <li>Low sentence length CV (&lt;0.3)</li>
+                                        <li>High uniformity score (&gt;0.7)</li>
+                                        <li>Low burstiness (&lt;0)</li>
+                                        <li>Zipf slope deviation &gt;0.2</li>
+                                        <li>Low hapax ratio (&lt;0.4)</li>
+                                        <li>Decorative Unicode dividers</li>
+                                        <li>Consistent readability scores</li>
+                                        <li>High discourse marker density</li>
+                                    </ul>
+                                </div>
+                                <div class="interp-card human">
+                                    <h4>🟢 Human Indicators</h4>
+                                    <ul>
+                                        <li>High sentence length CV (&gt;0.5)</li>
+                                        <li>Positive burstiness (&gt;0.2)</li>
+                                        <li>Zipf compliance (slope ≈ -1)</li>
+                                        <li>High hapax ratio (&gt;0.5)</li>
+                                        <li>Natural contractions present</li>
+                                        <li>Variable readability</li>
+                                        <li>Personal pronouns used</li>
+                                        <li>Style drift over document</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="methodology-section disclaimer">
+                            <h3>Important Notes</h3>
+                            <ul>
+                                <li><strong>No single metric is definitive</strong> — we combine multiple signals</li>
+                                <li><strong>Context matters</strong> — academic/technical writing may appear AI-like</li>
+                                <li><strong>Confidence varies</strong> — short texts have higher uncertainty</li>
+                                <li><strong>AI evolves</strong> — detection methods must continuously adapt</li>
+                            </ul>
                         </div>
                     </div>
                 </div>

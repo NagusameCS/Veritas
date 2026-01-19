@@ -152,6 +152,298 @@ const Utils = {
         return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
     },
 
+    /**
+     * Calculate median
+     */
+    median(arr) {
+        return this.percentile(arr, 50);
+    },
+
+    /**
+     * Calculate skewness (asymmetry of distribution)
+     * Positive skew = right tail, Negative skew = left tail
+     */
+    skewness(arr) {
+        if (!arr || arr.length < 3) return 0;
+        const n = arr.length;
+        const mean = this.mean(arr);
+        const stdDev = this.standardDeviation(arr);
+        if (stdDev === 0) return 0;
+        
+        const sum = arr.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 3), 0);
+        return (n / ((n - 1) * (n - 2))) * sum;
+    },
+
+    /**
+     * Calculate kurtosis (tailedness of distribution)
+     * High kurtosis = heavy tails, Low kurtosis = light tails
+     */
+    kurtosis(arr) {
+        if (!arr || arr.length < 4) return 0;
+        const n = arr.length;
+        const mean = this.mean(arr);
+        const stdDev = this.standardDeviation(arr);
+        if (stdDev === 0) return 0;
+        
+        const sum = arr.reduce((acc, val) => acc + Math.pow((val - mean) / stdDev, 4), 0);
+        const excess = ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * sum;
+        const correction = (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+        return excess - correction;
+    },
+
+    /**
+     * Calculate Gini coefficient (inequality measure)
+     * 0 = perfect equality, 1 = perfect inequality
+     */
+    giniCoefficient(arr) {
+        if (!arr || arr.length < 2) return 0;
+        const sorted = [...arr].sort((a, b) => a - b);
+        const n = sorted.length;
+        const mean = this.mean(sorted);
+        if (mean === 0) return 0;
+        
+        let sum = 0;
+        for (let i = 0; i < n; i++) {
+            sum += (2 * (i + 1) - n - 1) * sorted[i];
+        }
+        return sum / (n * n * mean);
+    },
+
+    /**
+     * Calculate Hapax Legomena ratio (words appearing exactly once)
+     * Higher ratio suggests more natural/human text
+     */
+    hapaxLegomenaRatio(tokens) {
+        if (!tokens || tokens.length === 0) return 0;
+        const freq = this.frequencyDistribution(tokens);
+        const hapaxCount = Object.values(freq).filter(f => f === 1).length;
+        return hapaxCount / tokens.length;
+    },
+
+    /**
+     * Calculate Dis Legomena ratio (words appearing exactly twice)
+     */
+    disLegomenaRatio(tokens) {
+        if (!tokens || tokens.length === 0) return 0;
+        const freq = this.frequencyDistribution(tokens);
+        const disCount = Object.values(freq).filter(f => f === 2).length;
+        return disCount / tokens.length;
+    },
+
+    /**
+     * Calculate Yule's K characteristic (vocabulary richness)
+     * Lower K = richer vocabulary
+     */
+    yulesK(tokens) {
+        if (!tokens || tokens.length < 10) return 0;
+        const freq = this.frequencyDistribution(tokens);
+        const freqOfFreq = {};
+        
+        Object.values(freq).forEach(f => {
+            freqOfFreq[f] = (freqOfFreq[f] || 0) + 1;
+        });
+        
+        const N = tokens.length;
+        let M2 = 0;
+        
+        for (const [r, Vr] of Object.entries(freqOfFreq)) {
+            M2 += Vr * Math.pow(parseInt(r), 2);
+        }
+        
+        const M1 = N;
+        if (M1 === 0) return 0;
+        
+        return 10000 * (M2 - M1) / (M1 * M1);
+    },
+
+    /**
+     * Calculate Simpson's D (diversity index)
+     * Lower = more diverse
+     */
+    simpsonsD(tokens) {
+        if (!tokens || tokens.length < 2) return 0;
+        const freq = this.frequencyDistribution(tokens);
+        const N = tokens.length;
+        
+        let sum = 0;
+        for (const count of Object.values(freq)) {
+            sum += count * (count - 1);
+        }
+        
+        return sum / (N * (N - 1));
+    },
+
+    /**
+     * Calculate Honore's R statistic (vocabulary richness)
+     * Higher R = richer vocabulary
+     */
+    honoresR(tokens) {
+        if (!tokens || tokens.length < 10) return 0;
+        const freq = this.frequencyDistribution(tokens);
+        const V = Object.keys(freq).length; // vocabulary size
+        const V1 = Object.values(freq).filter(f => f === 1).length; // hapax legomena
+        const N = tokens.length;
+        
+        if (V1 === V) return 0; // Avoid division by zero
+        return (100 * Math.log(N)) / (1 - V1 / V);
+    },
+
+    /**
+     * Calculate Type-Token Ratio (TTR)
+     */
+    typeTokenRatio(tokens) {
+        if (!tokens || tokens.length === 0) return 0;
+        return new Set(tokens).size / tokens.length;
+    },
+
+    /**
+     * Calculate Root TTR (RTTR) - more stable than TTR
+     */
+    rootTTR(tokens) {
+        if (!tokens || tokens.length === 0) return 0;
+        return new Set(tokens).size / Math.sqrt(tokens.length);
+    },
+
+    /**
+     * Calculate Log TTR (LTTR) - Herdan's C
+     */
+    logTTR(tokens) {
+        if (!tokens || tokens.length < 2) return 0;
+        const V = new Set(tokens).size;
+        return Math.log(V) / Math.log(tokens.length);
+    },
+
+    /**
+     * Calculate MSTTR (Mean Segmental TTR) - average TTR over segments
+     */
+    msttr(tokens, segmentSize = 50) {
+        if (!tokens || tokens.length < segmentSize) return this.typeTokenRatio(tokens);
+        
+        const segments = [];
+        for (let i = 0; i <= tokens.length - segmentSize; i += segmentSize) {
+            const segment = tokens.slice(i, i + segmentSize);
+            segments.push(this.typeTokenRatio(segment));
+        }
+        
+        return this.mean(segments);
+    },
+
+    /**
+     * Analyze Zipf's Law compliance
+     * Returns how well word frequencies follow Zipf's distribution
+     */
+    zipfAnalysis(tokens) {
+        if (!tokens || tokens.length < 20) return { compliance: 0.5, slope: 0, rSquared: 0 };
+        
+        const freq = this.frequencyDistribution(tokens);
+        const sorted = Object.entries(freq)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 50); // Top 50 words
+        
+        // Calculate log-log regression
+        const points = sorted.map((entry, i) => ({
+            x: Math.log(i + 1), // log(rank)
+            y: Math.log(entry[1]) // log(frequency)
+        }));
+        
+        const n = points.length;
+        const sumX = points.reduce((s, p) => s + p.x, 0);
+        const sumY = points.reduce((s, p) => s + p.y, 0);
+        const sumXY = points.reduce((s, p) => s + p.x * p.y, 0);
+        const sumX2 = points.reduce((s, p) => s + p.x * p.x, 0);
+        const sumY2 = points.reduce((s, p) => s + p.y * p.y, 0);
+        
+        // Linear regression slope
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+        
+        // R-squared (coefficient of determination)
+        const yMean = sumY / n;
+        const ssTotal = points.reduce((s, p) => s + Math.pow(p.y - yMean, 2), 0);
+        const ssResidual = points.reduce((s, p) => {
+            const predicted = slope * p.x + intercept;
+            return s + Math.pow(p.y - predicted, 2);
+        }, 0);
+        
+        const rSquared = ssTotal > 0 ? 1 - ssResidual / ssTotal : 0;
+        
+        // Zipf's law predicts slope ≈ -1
+        // Deviation from -1 indicates AI text (often slope < -1)
+        const zipfCompliance = 1 - Math.min(1, Math.abs(slope + 1));
+        
+        return {
+            compliance: zipfCompliance,
+            slope: slope,
+            rSquared: rSquared,
+            expectedSlope: -1,
+            deviation: slope + 1
+        };
+    },
+
+    /**
+     * Calculate Brunet's W (vocabulary richness index)
+     * Typically ranges 10-20 for natural text
+     */
+    brunetsW(tokens) {
+        if (!tokens || tokens.length < 10) return 0;
+        const V = new Set(tokens).size;
+        const N = tokens.length;
+        return Math.pow(N, Math.pow(V, -0.172));
+    },
+
+    /**
+     * Calculate Sichel's S (proportion of dis legomena)
+     */
+    sichelsS(tokens) {
+        if (!tokens || tokens.length === 0) return 0;
+        const freq = this.frequencyDistribution(tokens);
+        const V = Object.keys(freq).length;
+        const V2 = Object.values(freq).filter(f => f === 2).length;
+        return V > 0 ? V2 / V : 0;
+    },
+
+    /**
+     * Calculate average word length
+     */
+    avgWordLength(tokens) {
+        if (!tokens || tokens.length === 0) return 0;
+        return tokens.reduce((sum, t) => sum + t.length, 0) / tokens.length;
+    },
+
+    /**
+     * Calculate word length distribution
+     */
+    wordLengthDistribution(tokens) {
+        if (!tokens || tokens.length === 0) return {};
+        const dist = {};
+        tokens.forEach(t => {
+            const len = t.length;
+            dist[len] = (dist[len] || 0) + 1;
+        });
+        return dist;
+    },
+
+    /**
+     * Calculate sentence length distribution statistics
+     */
+    sentenceLengthStats(sentences) {
+        if (!sentences || sentences.length === 0) {
+            return { mean: 0, median: 0, stdDev: 0, min: 0, max: 0, cv: 0 };
+        }
+        
+        const lengths = sentences.map(s => this.tokenize(s).length);
+        return {
+            mean: this.mean(lengths),
+            median: this.median(lengths),
+            stdDev: this.standardDeviation(lengths),
+            min: Math.min(...lengths),
+            max: Math.max(...lengths),
+            cv: this.coefficientOfVariation(lengths),
+            skewness: this.skewness(lengths),
+            kurtosis: this.kurtosis(lengths)
+        };
+    },
+
     // ═══════════════════════════════════════════════════════════════════════════
     // N-gram Utilities
     // ═══════════════════════════════════════════════════════════════════════════
