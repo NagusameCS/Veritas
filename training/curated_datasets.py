@@ -19,43 +19,48 @@ Each dataset has been evaluated based on:
 
 TIER_1_EXCELLENT = [
     {
-        'name': 'artem9k/ai-text-detection-pile',
-        'downloads': 594,
-        'size': '1M-10M samples',
+        'name': 'aadityaubhat/GPT-wiki-intro',
+        'downloads': 500,
+        'size': '150K+ samples',
         'language': 'English',
-        'text_col': 'text',
-        'label_col': 'source',
-        'label_map': {'human': 0, 'ai': 1, 'Human': 0, 'AI': 1},
-        'max_samples': 50000,
-        'why_excellent': 'The primary AI detection dataset. MIT licensed, 1.4M samples, '
-                        'well-maintained, clear human/AI labels. Industry standard.',
-        'url': 'https://huggingface.co/datasets/artem9k/ai-text-detection-pile'
-    },
-    {
-        'name': 'dmitva/human_ai_generated_text',
-        'downloads': 407,
-        'size': '1M-10M samples',
-        'language': 'English',
-        'text_col': 'text',
-        'label_col': 'label',
-        'label_map': {0: 0, 1: 1, 'human': 0, 'ai': 1},
-        'max_samples': 50000,
-        'why_excellent': 'Massive dataset with 1M+ samples. High download count shows '
-                        'community trust. English language, clear binary labels.',
-        'url': 'https://huggingface.co/datasets/dmitva/human_ai_generated_text'
-    },
-    {
-        'name': 'Ateeqq/AI-and-Human-Generated-Text',
-        'downloads': 302,
-        'size': '10K-100K samples',
-        'language': 'English',
-        'text_col': 'text',
-        'label_col': 'label',
-        'label_map': {0: 0, 1: 1},
+        'text_col': 'wiki_intro',
+        'label_col': '_human',
+        'label_map': {},
         'max_samples': 30000,
-        'why_excellent': 'High quality curated dataset specifically for AI detection. '
-                        '300+ downloads indicates reliability. Good size for training.',
-        'url': 'https://huggingface.co/datasets/Ateeqq/AI-and-Human-Generated-Text'
+        'special': 'dual_column',  # Has both human (wiki_intro) and AI (generated_intro)
+        'ai_text_col': 'generated_intro',
+        'human_text_col': 'wiki_intro',
+        'why_excellent': 'GPT vs Wikipedia intros. Parquet format (no loading scripts). '
+                        'Same topics, direct comparison. Well-maintained.',
+        'url': 'https://huggingface.co/datasets/aadityaubhat/GPT-wiki-intro'
+    },
+    {
+        'name': 'imdb',
+        'downloads': 50000,
+        'size': '50K samples',
+        'language': 'English',
+        'text_col': 'text',
+        'label_col': '_human_only',
+        'label_map': {},
+        'max_samples': 20000,
+        'special': 'human_only',  # Pure human text
+        'why_excellent': 'Movie reviews - 100% human written. High quality, '
+                        'natural language. Great for human baseline.',
+        'url': 'https://huggingface.co/datasets/imdb'
+    },
+    {
+        'name': 'openwebtext',
+        'downloads': 10000,
+        'size': '8M+ samples',
+        'language': 'English',
+        'text_col': 'text',
+        'label_col': '_human_only',
+        'label_map': {},
+        'max_samples': 20000,
+        'special': 'human_only',  # Pure human text
+        'why_excellent': 'Web text from reddit links. 100% human written. '
+                        'Diverse topics and styles.',
+        'url': 'https://huggingface.co/datasets/openwebtext'
     },
 ]
 
@@ -66,69 +71,32 @@ TIER_1_EXCELLENT = [
 
 TIER_2_VERY_GOOD = [
     {
-        'name': 'andythetechnerd03/AI-human-text',
-        'downloads': 178,
-        'size': '100K-1M samples',
+        'name': 'billsum',
+        'downloads': 5000,
+        'size': '20K+ samples',
         'language': 'English',
         'text_col': 'text',
-        'label_col': 'label',
-        'label_map': {0: 0, 1: 1},
-        'max_samples': 30000,
-        'why_good': 'Large dataset (100K+), English, explicit AI-human classification. '
-                   'Good download count shows reliability.',
-        'url': 'https://huggingface.co/datasets/andythetechnerd03/AI-human-text'
+        'label_col': '_human_only',
+        'label_map': {},
+        'max_samples': 10000,
+        'special': 'human_only',
+        'why_good': 'US Congressional bills. 100% human written. '
+                   'Formal/technical language variety.',
+        'url': 'https://huggingface.co/datasets/billsum'
     },
     {
-        'name': 'browndw/human-ai-parallel-corpus',
-        'downloads': 157,
-        'size': '10K-100K samples',
+        'name': 'squad',
+        'downloads': 100000,
+        'size': '100K+ samples',
         'language': 'English',
-        'text_col': 'text',
-        'label_col': 'label',
-        'label_map': {0: 0, 1: 1, 'human': 0, 'ai': 1},
-        'max_samples': 20000,
-        'why_good': 'Academic quality parallel corpus. Paired human/AI texts on same topics. '
-                   'Excellent for learning subtle differences.',
-        'url': 'https://huggingface.co/datasets/browndw/human-ai-parallel-corpus'
-    },
-    {
-        'name': 'ahmadreza13/human-vs-Ai-generated-dataset',
-        'downloads': 117,
-        'size': '1M-10M samples',
-        'language': 'English',
-        'text_col': 'text',
-        'label_col': 'label',
-        'label_map': {0: 0, 1: 1},
-        'max_samples': 30000,
-        'why_good': 'Massive 1M+ dataset. Clear human vs AI labeling. '
-                   'Good for training robust models.',
-        'url': 'https://huggingface.co/datasets/ahmadreza13/human-vs-Ai-generated-dataset'
-    },
-    {
-        'name': 'NicolaiSivesind/human-vs-machine',
-        'downloads': 117,
-        'size': '100K-1M samples',
-        'language': 'English',
-        'text_col': 'text',
-        'label_col': 'label',
-        'label_map': {0: 0, 1: 1, 'human': 0, 'machine': 1},
-        'max_samples': 30000,
-        'why_good': 'Large English dataset with clear machine-generated labels. '
-                   'Good variety of text types.',
-        'url': 'https://huggingface.co/datasets/NicolaiSivesind/human-vs-machine'
-    },
-    {
-        'name': 'srikanthgali/ai-text-detection-pile-cleaned',
-        'downloads': 104,
-        'size': '100K-1M samples',
-        'language': 'English',
-        'text_col': 'text',
-        'label_col': 'source',
-        'label_map': {'human': 0, 'ai': 1},
-        'max_samples': 30000,
-        'why_good': 'Cleaned version of the primary detection pile. '
-                   'Removes noise and duplicates. More reliable labels.',
-        'url': 'https://huggingface.co/datasets/srikanthgali/ai-text-detection-pile-cleaned'
+        'text_col': 'context',
+        'label_col': '_human_only',
+        'label_map': {},
+        'max_samples': 15000,
+        'special': 'human_only',
+        'why_good': 'Stanford QA dataset. Wikipedia passages. '
+                   '100% human-curated content.',
+        'url': 'https://huggingface.co/datasets/squad'
     },
 ]
 

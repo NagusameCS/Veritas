@@ -32,20 +32,8 @@
             </nav>
             <div class="header-actions">
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                        <circle cx="12" cy="12" r="5"/>
-                        <line x1="12" y1="1" x2="12" y2="3"/>
-                        <line x1="12" y1="21" x2="12" y2="23"/>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                        <line x1="1" y1="12" x2="3" y2="12"/>
-                        <line x1="21" y1="12" x2="23" y2="12"/>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                    </svg>
-                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-                    </svg>
+                    <span class="theme-label light-label">Light</span>
+                    <span class="theme-label dark-label">Dark</span>
                 </button>
             </div>
         </header>
@@ -891,16 +879,6 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                                 </div>
                             </div>
                         </div>
-
-                        <div class="methodology-section disclaimer">
-                            <h3>Important Notes</h3>
-                            <ul>
-                                <li><strong>No single metric is definitive</strong> — we combine multiple signals</li>
-                                <li><strong>Context matters</strong> — academic/technical writing may appear AI-like</li>
-                                <li><strong>Confidence varies</strong> — short texts have higher uncertainty</li>
-                                <li><strong>AI evolves</strong> — detection methods must continuously adapt</li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -908,7 +886,31 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Veritas AI Detection — Linguistic Analysis Engine</p>
+            <div class="footer-content">
+                <div class="footer-main">
+                    <div class="footer-brand">
+                        <span class="footer-logo">◈</span>
+                        <span class="footer-title">VERITAS</span>
+                        <span class="footer-version">Powered by Sunrise Model v3.0</span>
+                    </div>
+                    <div class="footer-model-stats">
+                        <span class="model-stat"><strong>98.08%</strong> Accuracy</span>
+                        <span class="model-stat-divider">•</span>
+                        <span class="model-stat"><strong>98.09%</strong> F1 Score</span>
+                        <span class="model-stat-divider">•</span>
+                        <span class="model-stat"><strong>29,976</strong> Training Samples</span>
+                    </div>
+                </div>
+                <div class="footer-notes">
+                    <span class="note-item">No single metric is definitive — we combine multiple signals</span>
+                    <span class="note-divider">|</span>
+                    <span class="note-item">Context matters — academic/technical writing may appear AI-like</span>
+                    <span class="note-divider">|</span>
+                    <span class="note-item">Confidence varies — short texts have higher uncertainty</span>
+                    <span class="note-divider">|</span>
+                    <span class="note-item">AI evolves — detection methods must continuously adapt</span>
+                </div>
+            </div>
         </footer>
     </div>
 
@@ -921,6 +923,7 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
     <!-- Core Utilities -->
     <script src="js/utils.js"></script>
     <script src="js/variance-utils.js"></script>
+    <script src="js/sunrise-model.js"></script>
     
     <!-- Analyzers -->
     <script src="js/analyzers/grammar.js"></script>

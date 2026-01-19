@@ -293,8 +293,35 @@ const App = {
             analyzeBtn.disabled = !hasText || this.isAnalyzing;
         }
         
+        // Update text statistics
+        this.updateTextStats();
+        
         // Auto-expand textarea
         this.autoExpandTextarea();
+    },
+
+    /**
+     * Update text statistics display (characters, words, sentences)
+     */
+    updateTextStats() {
+        const textInput = document.getElementById('textInput');
+        const charCountEl = document.getElementById('charCount');
+        const wordCountEl = document.getElementById('wordCount');
+        const sentenceCountEl = document.getElementById('sentenceCount');
+        
+        if (!textInput) return;
+        
+        const text = textInput.value;
+        
+        // Calculate stats
+        const chars = text.length;
+        const words = text.trim() ? text.trim().split(/\s+/).filter(w => w.length > 0).length : 0;
+        const sentences = text.trim() ? (text.match(/[.!?]+(?:\s|$)/g) || []).length : 0;
+        
+        // Update display
+        if (charCountEl) charCountEl.textContent = `${chars.toLocaleString()} character${chars !== 1 ? 's' : ''}`;
+        if (wordCountEl) wordCountEl.textContent = `${words.toLocaleString()} word${words !== 1 ? 's' : ''}`;
+        if (sentenceCountEl) sentenceCountEl.textContent = `${sentences.toLocaleString()} sentence${sentences !== 1 ? 's' : ''}`;
     },
 
     /**

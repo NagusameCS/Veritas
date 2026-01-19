@@ -4,9 +4,16 @@
  * 
  * Philosophy: "Never grade features as 'AI-like' or 'human-like' in isolation.
  * Grade them as deviations from expected human variance."
+ * 
+ * Powered by: Sunrise Model v3.0 (98.08% accuracy, 29,976 training samples)
  */
 
 const AnalyzerEngine = {
+    // Use Sunrise model config if available, otherwise fallback to defaults
+    get modelConfig() {
+        return typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
+    },
+    
     // Category weights based on detection importance
     categoryWeights: {
         syntaxVariance: 0.15,          // Syntax variance

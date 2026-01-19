@@ -49,19 +49,48 @@ const ReportExporter = {
         if (typeof html2pdf !== 'undefined') {
             const element = document.createElement('div');
             element.innerHTML = htmlContent;
-            element.style.width = '210mm';
+            element.style.width = '190mm';
+            element.style.position = 'absolute';
+            element.style.left = '-9999px';
+            element.style.top = '0';
+            element.style.background = '#ffffff';
             document.body.appendChild(element);
             
+            // Wait for images and fonts to load
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             const opt = {
-                margin: [10, 10, 10, 10],
+                margin: [8, 8, 8, 8],
                 filename: `veritas-report-${new Date().toISOString().slice(0, 10)}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                image: { type: 'jpeg', quality: 0.95 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    logging: false,
+                    letterRendering: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    removeContainer: true
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait',
+                    compress: true
+                },
+                pagebreak: { 
+                    mode: ['avoid-all', 'css', 'legacy'],
+                    before: '.page-break-before',
+                    after: '.page-break-after',
+                    avoid: '.category-card, .summary-box, table, .signal-summary'
+                }
             };
             
-            await html2pdf().set(opt).from(element).save();
-            document.body.removeChild(element);
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } finally {
+                document.body.removeChild(element);
+            }
         } else if (typeof jspdf !== 'undefined' || typeof jsPDF !== 'undefined') {
             // Fallback to jsPDF
             const { jsPDF } = window.jspdf || { jsPDF: window.jsPDF };
@@ -115,70 +144,75 @@ const ReportExporter = {
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
             font-size: 10pt; 
-            line-height: 1.4; 
+            line-height: 1.5; 
             color: #1a1a1a;
-            padding: 15px 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            padding: 12px 15px;
+            max-width: 100%;
+            margin: 0;
+            background: #ffffff;
         }
-        h1 { font-size: 20pt; margin-bottom: 3px; color: #111; }
-        h2 { font-size: 14pt; margin: 12px 0 6px; color: #333; border-bottom: 2px solid #e5e5e5; padding-bottom: 3px; }
-        h3 { font-size: 11pt; margin: 8px 0 4px; color: #444; }
-        h4 { font-size: 10pt; margin: 6px 0 3px; color: #555; }
-        p { margin-bottom: 6px; }
-        .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        h1 { font-size: 18pt; margin-bottom: 3px; color: #111; }
+        h2 { font-size: 13pt; margin: 10px 0 5px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 3px; page-break-after: avoid; }
+        h3 { font-size: 11pt; margin: 6px 0 3px; color: #444; }
+        h4 { font-size: 10pt; margin: 5px 0 2px; color: #555; }
+        p { margin-bottom: 5px; }
+        .header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px; }
         .meta { color: #666; font-size: 9pt; }
-        .summary-box { background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 6px; padding: 12px; margin: 10px 0; }
-        .verdict { font-size: 12pt; font-weight: bold; margin: 6px 0; }
+        .summary-box { background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 4px; padding: 10px; margin: 8px 0; page-break-inside: avoid; }
+        .verdict { font-size: 11pt; font-weight: bold; margin: 5px 0; }
         .verdict.high { color: #ef4444; }
         .verdict.moderate { color: #f59e0b; }
         .verdict.low { color: #10b981; }
-        .probability-bar { height: 16px; background: #e5e5e5; border-radius: 8px; overflow: hidden; margin: 6px 0; }
-        .probability-fill { height: 100%; background: ${barColor}; transition: width 0.3s; }
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0; }
-        .stat-item { background: #f5f5f5; padding: 6px 8px; border-radius: 4px; }
-        .stat-label { font-size: 7pt; color: #666; text-transform: uppercase; }
-        .stat-value { font-size: 11pt; font-weight: bold; color: #333; }
-        .category-card { border: 1px solid #e5e5e5; border-radius: 6px; padding: 10px; margin: 8px 0; page-break-inside: avoid; }
-        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .category-name { font-weight: bold; font-size: 10pt; }
-        .category-score { font-weight: bold; padding: 2px 8px; border-radius: 12px; font-size: 9pt; }
+        .probability-bar { height: 14px; background: #e5e5e5; border-radius: 7px; overflow: hidden; margin: 5px 0; }
+        .probability-fill { height: 100%; background: ${barColor}; min-width: 1px; }
+        .stat-grid { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+        .stat-item { background: #f5f5f5; padding: 5px 8px; border-radius: 3px; flex: 1; min-width: 80px; }
+        .stat-label { font-size: 7pt; color: #666; text-transform: uppercase; display: block; }
+        .stat-value { font-size: 10pt; font-weight: bold; color: #333; }
+        .category-card { border: 1px solid #e5e5e5; border-radius: 4px; padding: 8px; margin: 6px 0; page-break-inside: avoid; break-inside: avoid; }
+        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .category-name { font-weight: bold; font-size: 9pt; }
+        .category-score { font-weight: bold; padding: 2px 6px; border-radius: 10px; font-size: 8pt; }
         .score-high { background: #fee2e2; color: #b91c1c; }
         .score-moderate { background: #fef3c7; color: #b45309; }
         .score-low { background: #d1fae5; color: #047857; }
-        .category-bar { height: 6px; background: #e5e5e5; border-radius: 3px; overflow: hidden; margin: 4px 0; }
-        .category-fill { height: 100%; border-radius: 3px; }
-        .weight-info { font-size: 8pt; color: #888; margin-top: 6px; padding-top: 6px; border-top: 1px solid #eee; }
-        .finding { padding: 3px 0 3px 12px; border-left: 2px solid #ddd; margin: 3px 0; font-size: 9pt; }
+        .category-bar { height: 5px; background: #e5e5e5; border-radius: 2px; overflow: hidden; margin: 3px 0; }
+        .category-fill { height: 100%; border-radius: 2px; min-width: 1px; }
+        .weight-info { font-size: 7pt; color: #888; margin-top: 4px; padding-top: 4px; border-top: 1px solid #eee; }
+        .finding { padding: 2px 0 2px 10px; border-left: 2px solid #ddd; margin: 2px 0; font-size: 8pt; }
         .finding.ai { border-left-color: #ef4444; background: #fff5f5; }
         .finding.human { border-left-color: #10b981; background: #f0fdf4; }
         .finding.mixed { border-left-color: #f59e0b; background: #fffbeb; }
-        .evidence-stats { font-size: 8pt; color: #666; margin-top: 4px; padding: 4px 8px; background: #f9fafb; border-radius: 3px; }
+        .evidence-stats { font-size: 7pt; color: #666; margin-top: 3px; padding: 3px 6px; background: #f9fafb; border-radius: 2px; }
         .evidence-stats strong { color: #333; }
-        .chart { margin: 10px 0; }
+        .chart { margin: 8px 0; }
         .bar-chart { width: 100%; }
-        .bar-row { display: flex; align-items: center; margin: 3px 0; }
-        .bar-label { width: 150px; font-size: 8pt; text-align: right; padding-right: 8px; }
-        .bar-track { flex: 1; height: 14px; background: #f0f0f0; border-radius: 2px; overflow: hidden; }
-        .bar-fill-ai { background: #737373; }
-        .bar-value { width: 45px; text-align: right; font-size: 9pt; font-weight: bold; padding-left: 6px; }
-        .disclaimer { background: #fff8e6; border: 1px solid #ffd666; border-radius: 6px; padding: 10px; margin: 12px 0; font-size: 9pt; }
-        .methodology { background: #f0f7ff; border-radius: 6px; padding: 10px; margin: 12px 0; font-size: 9pt; }
-        .signal-summary { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 6px; padding: 10px; margin: 10px 0; }
-        .signal-summary h3 { margin-top: 0; }
-        .signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .signal-item { padding: 6px; border-radius: 4px; }
-        .signal-item.ai-signal { background: #fee2e2; border-left: 3px solid #ef4444; }
-        .signal-item.human-signal { background: #d1fae5; border-left: 3px solid #10b981; }
-        .signal-item .signal-label { font-size: 8pt; color: #666; }
-        .signal-item .signal-value { font-size: 10pt; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 10pt; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background: #f5f5f5; font-weight: 600; }
+        .bar-row { display: flex; align-items: center; margin: 2px 0; }
+        .bar-label { width: 130px; font-size: 7pt; text-align: right; padding-right: 6px; white-space: nowrap; overflow: hidden; }
+        .bar-track { flex: 1; height: 12px; background: #f0f0f0; border-radius: 2px; overflow: hidden; }
+        .bar-fill-ai { background: #737373; min-width: 1px; }
+        .bar-value { width: 40px; text-align: right; font-size: 8pt; font-weight: bold; padding-left: 5px; }
+        .disclaimer { background: #fff8e6; border: 1px solid #ffd666; border-radius: 4px; padding: 8px; margin: 10px 0; font-size: 8pt; page-break-inside: avoid; }
+        .methodology { background: #f0f7ff; border-radius: 4px; padding: 8px; margin: 10px 0; font-size: 8pt; page-break-inside: avoid; }
+        .signal-summary { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 4px; padding: 8px; margin: 8px 0; page-break-inside: avoid; }
+        .signal-summary h3 { margin-top: 0; font-size: 10pt; }
+        .signal-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .signal-grid > div { flex: 1; min-width: 45%; }
+        .signal-item { padding: 4px; border-radius: 3px; margin-bottom: 3px; }
+        .signal-item.ai-signal { background: #fee2e2; border-left: 2px solid #ef4444; }
+        .signal-item.human-signal { background: #d1fae5; border-left: 2px solid #10b981; }
+        .signal-item .signal-label { font-size: 7pt; color: #666; }
+        .signal-item .signal-value { font-size: 9pt; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9pt; page-break-inside: avoid; }
+        th, td { border: 1px solid #ddd; padding: 5px 6px; text-align: left; }
+        th { background: #f5f5f5; font-weight: 600; font-size: 8pt; }
+        td { font-size: 8pt; }
         .page-break { page-break-before: always; }
+        .no-break { page-break-inside: avoid; break-inside: avoid; }
         @media print { 
             body { padding: 0; }
             .page-break { page-break-before: always; }
+            .category-card, .summary-box, table, .signal-summary { page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -186,17 +220,18 @@ const ReportExporter = {
     <div class="header">
         <h1>◈ VERITAS</h1>
         <p class="meta">AI Text Detection Analysis Report</p>
+        <p class="meta">Powered by ${report.modelInfo.name} Model v${report.modelInfo.version} | ${(report.modelInfo.accuracy * 100).toFixed(1)}% Accuracy | ${report.modelInfo.trainingSamples.toLocaleString()} Training Samples</p>
         <p class="meta">Generated: ${new Date(report.generatedAt).toLocaleString()}</p>
     </div>
 
     <div class="summary-box">
-        <h2 style="margin-top:0;border:none;">Executive Summary</h2>
+        <h2 style="margin-top:0;border:none;font-size:12pt;">Executive Summary</h2>
         <div class="probability-bar">
-            <div class="probability-fill" style="width: ${probability}%"></div>
+            <div class="probability-fill" style="width: ${Math.max(1, probability)}%"></div>
         </div>
         <p><strong>AI Probability: ${probability}%</strong> (${report.summary.band}) | Confidence: ${report.summary.confidence}%</p>
         <p class="verdict ${probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low')}">${report.verdict.label}</p>
-        <p>${report.summary.text}</p>
+        <p style="font-size:9pt;">${report.summary.text}</p>
     </div>
 
     <div class="stat-grid">
@@ -333,8 +368,9 @@ const ReportExporter = {
     </table>
 
     <div style="margin-top: 40px; text-align: center; color: #888; font-size: 9pt;">
-        <p>Generated by VERITAS AI Detection System</p>
-        <p>This report is for informational purposes only.</p>
+        <p>Generated by VERITAS AI Detection System | Powered by Sunrise Model v3.0</p>
+        <p>Model Accuracy: 98.08% | F1 Score: 98.09% | Trained on 29,976 samples</p>
+        <p style="margin-top: 8px; font-size: 8pt; color: #aaa;">No single metric is definitive — Context matters — Confidence varies with text length — AI detection methods continuously adapt</p>
     </div>
 </body>
 </html>`;
@@ -540,9 +576,25 @@ const ReportExporter = {
      * Generate structured report content
      */
     generateReportContent(result, originalText) {
+        // Get model info if available
+        const modelConfig = typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
+        
         const report = {
             title: 'VERITAS AI Detection Analysis Report',
             generatedAt: new Date().toISOString(),
+            modelInfo: modelConfig ? {
+                name: modelConfig.modelName,
+                version: modelConfig.version,
+                accuracy: modelConfig.trainingStats?.testAccuracy || 0.98,
+                f1Score: modelConfig.trainingStats?.testF1 || 0.98,
+                trainingSamples: modelConfig.trainingStats?.totalSamples || 29976
+            } : {
+                name: 'Sunrise',
+                version: '3.0.0',
+                accuracy: 0.9808,
+                f1Score: 0.9809,
+                trainingSamples: 29976
+            },
             summary: this.generateExecutiveSummary(result),
             verdict: this.generateVerdictSection(result),
             statistics: this.generateStatisticsSection(result),
