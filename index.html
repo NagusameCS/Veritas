@@ -368,6 +368,57 @@ Supports: Plain text, Word documents (.docx), PDFs, and Google Docs URLs"
                             </div>
                         </div>
 
+                        <!-- Bell Curve Principle -->
+                        <div class="methodology-section">
+                            <h2>The Bell Curve Principle (v2.2)</h2>
+                            <div class="philosophy-box">
+                                <blockquote>
+                                    "There's a normal distribution of reasonable values. Humans fall somewhere in the middle — neither too perfect nor too chaotic."
+                                </blockquote>
+                                <p>For every metric, we model where human writing naturally falls using a <strong>Gaussian distribution</strong>. Values at either extreme are suspicious:</p>
+                                <ul style="margin-top: 1rem; padding-left: 2rem;">
+                                    <li><strong>Too Perfect (Low Variance):</strong> Likely AI-generated — machines produce unnaturally uniform text</li>
+                                    <li><strong>Reasonable Middle:</strong> Typical human writing — natural variation within expected bounds</li>
+                                    <li><strong>Too Chaotic (High Variance):</strong> Either unusual human writing or low-quality AI with poor coherence</li>
+                                </ul>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Gaussian Deviation Scoring</h3>
+                                <p>Measures how close a value is to the expected human mean.</p>
+                                <div class="formula">
+                                    <span class="math">Score = e^(-z²/2) where z = |x - μ| / σ</span>
+                                </div>
+                                <p class="formula-note">Returns 1.0 at the expected human mean, decaying toward 0 at extremes in either direction.</p>
+                            </div>
+
+                            <div class="formula-card">
+                                <h3>Human Likelihood Score</h3>
+                                <p>Combines Gaussian scoring with range bounds for more robust detection.</p>
+                                <div class="formula">
+                                    <span class="math">HLS = Gaussian(x) × (1 - RangePenalty × 0.5)</span>
+                                </div>
+                                <p class="formula-note">Range penalty applies when values fall outside empirically-derived human bounds [min, max].</p>
+                            </div>
+
+                            <div class="weight-table">
+                                <h4>Human Baseline Reference Values</h4>
+                                <table>
+                                    <thead>
+                                        <tr><th>Metric</th><th>Expected Mean</th><th>StdDev</th><th>Human Range</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Sentence Length CV</td><td>0.55</td><td>±0.15</td><td>0.25 – 0.85</td></tr>
+                                        <tr><td>Hapax Ratio</td><td>0.48</td><td>±0.08</td><td>0.30 – 0.65</td></tr>
+                                        <tr><td>Burstiness</td><td>0.15</td><td>±0.12</td><td>-0.10 – 0.40</td></tr>
+                                        <tr><td>Zipf Slope</td><td>-1.0</td><td>±0.15</td><td>-1.3 – -0.7</td></tr>
+                                        <tr><td>Type-Token Ratio</td><td>0.42</td><td>±0.10</td><td>0.25 – 0.60</td></tr>
+                                    </tbody>
+                                </table>
+                                <p class="formula-note">Values derived from analysis of human-written texts across multiple domains.</p>
+                            </div>
+                        </div>
+
                         <!-- Statistical Measures -->
                         <div class="methodology-section">
                             <h2>Statistical Measures</h2>

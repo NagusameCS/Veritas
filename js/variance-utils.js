@@ -16,13 +16,15 @@ const VarianceUtils = {
     // ═══════════════════════════════════════════════════════════════════════════
     
     // Expected human variance baselines (from literature)
+    // KEY PRINCIPLE: Humans fall in a "reasonable middle" - neither too perfect nor too chaotic
+    // These baselines define the center of a Gaussian; deviations in EITHER direction are suspicious
     HUMAN_BASELINES: {
-        sentenceLengthCV: { mean: 0.55, stdDev: 0.15 },      // Coefficient of variation
-        hapaxRatio: { mean: 0.48, stdDev: 0.08 },            // Hapax legomena ratio
-        burstiness: { mean: 0.15, stdDev: 0.12 },            // Burstiness score
-        zipfSlope: { mean: -1.0, stdDev: 0.15 },             // Zipf's law slope
-        ttrNormalized: { mean: 0.42, stdDev: 0.10 },         // Type-token ratio
-        sentenceEntropy: { mean: 2.8, stdDev: 0.4 }          // Sentence length entropy
+        sentenceLengthCV: { mean: 0.55, stdDev: 0.15, min: 0.25, max: 0.85 },  // Too low = AI uniform; too high = chaotic
+        hapaxRatio: { mean: 0.48, stdDev: 0.08, min: 0.30, max: 0.65 },        // Unique word ratio
+        burstiness: { mean: 0.15, stdDev: 0.12, min: -0.10, max: 0.40 },       // Pattern of word usage
+        zipfSlope: { mean: -1.0, stdDev: 0.15, min: -1.3, max: -0.7 },         // Natural language follows Zipf's law
+        ttrNormalized: { mean: 0.42, stdDev: 0.10, min: 0.25, max: 0.60 },     // Vocabulary richness
+        sentenceEntropy: { mean: 2.8, stdDev: 0.4, min: 1.8, max: 3.8 }        // Information content
     },
     
     // Minimum sample sizes for reliable statistics
@@ -38,6 +40,66 @@ const VarianceUtils = {
     zScore(value, mean, stdDev) {
         if (stdDev === 0) return 0;
         return (value - mean) / stdDev;
+    },
+
+    /**
+     * GAUSSIAN DEVIATION SCORING
+     * Core philosophy: There's a "normal curve" of reasonable values.
+     * Humans fall somewhere in the reasonable middle.
+     * Both extremes (too perfect AND too chaotic) are suspicious.
+     * 
+     * Returns 0-1 where:
+     *   1 = value is at expected human mean (most natural)
+     *   0 = value is far from expected (suspicious - either too perfect or too chaotic)
+     */
+    gaussianScore(value, mean, stdDev) {
+        if (stdDev === 0) return value === mean ? 1 : 0;
+        const z = Math.abs((value - mean) / stdDev);
+        // Gaussian: e^(-z²/2) gives 1 at mean, decays to 0 at extremes
+        return Math.exp(-z * z / 2);
+    },
+
+    /**
+     * Score how "reasonably human" a value is based on expected range.
+     * Uses soft boundaries - values outside range get low scores but not zero.
+     * 
+     * @param value - The observed value
+     * @param baseline - Object with {mean, stdDev, min, max} from HUMAN_BASELINES
+     * @returns 0-1 where 1 = typical human, 0 = highly unusual
+     */
+    humanLikelihoodScore(value, baseline) {
+        if (!baseline) return 0.5;
+        
+        const { mean, stdDev, min, max } = baseline;
+        
+        // Gaussian component: how close to expected mean?
+        const gaussianComponent = this.gaussianScore(value, mean, stdDev);
+        
+        // Range component: penalty for being outside expected bounds
+        let rangePenalty = 0;
+        if (min !== undefined && max !== undefined) {
+            if (value < min) {
+                // Too low (often too uniform/perfect = AI)
+                rangePenalty = Math.min(1, (min - value) / (stdDev * 2));
+            } else if (value > max) {
+                // Too high (too chaotic, but could also be weird AI)
+                rangePenalty = Math.min(1, (value - max) / (stdDev * 2));
+            }
+        }
+        
+        // Combined score: Gaussian weighted by range compliance
+        return gaussianComponent * (1 - rangePenalty * 0.5);
+    },
+
+    /**
+     * Compute AI probability from deviation from human baseline.
+     * Values near human mean = low AI probability.
+     * Values far from human mean (in either direction) = higher AI probability.
+     */
+    deviationToAIProbability(value, baseline) {
+        const humanScore = this.humanLikelihoodScore(value, baseline);
+        // Invert: high human score = low AI probability
+        return 1 - humanScore;
     },
 
     /**
@@ -66,6 +128,7 @@ const VarianceUtils = {
 
     /**
      * Calculate uniformity score (0 = varied, 1 = perfectly uniform)
+     * OLD simple version - kept for backwards compatibility
      */
     uniformityScore(values) {
         if (!values || values.length < 2) return 0.5;
@@ -75,6 +138,47 @@ const VarianceUtils = {
         // Normalize to 0-1 where higher = more uniform
         const normalized = 1 - Math.min(1, cv / 0.8);
         return normalized;
+    },
+
+    /**
+     * Calculate how "natural" the variance is (bell curve approach).
+     * Both too uniform (AI-like) AND too chaotic are flagged as unusual.
+     * 
+     * Returns:
+     *   1 = variance is exactly what we'd expect from human writing
+     *   0 = variance is suspiciously extreme (either direction)
+     *   
+     * This is the core of the "normal curve" philosophy.
+     */
+    varianceNaturalnessScore(values) {
+        if (!values || values.length < 2) return 0.5;
+        
+        const cv = this.coefficientOfVariation(values);
+        
+        // Use Gaussian centered on expected human CV
+        // Expected CV ~0.55, stdDev ~0.15
+        return this.gaussianScore(cv, 0.55, 0.15);
+    },
+
+    /**
+     * Combined AI indicator that flags BOTH extremes:
+     * - Too perfect (low CV) = likely AI generated
+     * - Too chaotic (high CV) = possibly AI with poor quality or unusual human
+     * 
+     * Returns 0-1 where higher = more likely AI
+     */
+    extremeVarianceScore(values) {
+        if (!values || values.length < 2) return 0.5;
+        
+        const cv = this.coefficientOfVariation(values);
+        const humanBaseline = this.HUMAN_BASELINES.sentenceLengthCV;
+        
+        // Distance from expected human mean in either direction
+        const zScore = Math.abs((cv - humanBaseline.mean) / humanBaseline.stdDev);
+        
+        // Convert to probability: further from mean = higher AI probability
+        // Using sigmoid to cap at reasonable bounds
+        return 1 / (1 + Math.exp(-zScore + 1.5));
     },
 
     /**

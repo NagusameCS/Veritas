@@ -904,6 +904,46 @@ const App = {
                     </div>
                 </div>
 
+                <!-- Human Likelihood (Bell Curve Analysis) -->
+                <div class="stats-section highlight-section">
+                    <h4>📊 Human Likelihood (Bell Curve)</h4>
+                    <p class="section-note">Measures how close features are to typical human writing. Values near 1.0 = normal human range.</p>
+                    <div class="stats-table">
+                        <div class="stat-row indicator-${getIndicator(advStats.overallHumanLikelihood, [0.4, 0.6], true)}">
+                            <span class="stat-label"><strong>Overall Human Likelihood</strong></span>
+                            <span class="stat-value"><strong>${formatPct(advStats.overallHumanLikelihood)}</strong></span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.humanLikelihood?.sentenceLengthCV, [0.4, 0.7], true)}">
+                            <span class="stat-label">Sentence Length Variance</span>
+                            <span class="stat-value">${formatPct(advStats.humanLikelihood?.sentenceLengthCV)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.humanLikelihood?.hapaxRatio, [0.4, 0.7], true)}">
+                            <span class="stat-label">Unique Word Distribution</span>
+                            <span class="stat-value">${formatPct(advStats.humanLikelihood?.hapaxRatio)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.humanLikelihood?.burstiness, [0.4, 0.7], true)}">
+                            <span class="stat-label">Word Usage Burstiness</span>
+                            <span class="stat-value">${formatPct(advStats.humanLikelihood?.burstiness)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.humanLikelihood?.zipfSlope, [0.4, 0.7], true)}">
+                            <span class="stat-label">Zipf's Law Compliance</span>
+                            <span class="stat-value">${formatPct(advStats.humanLikelihood?.zipfSlope)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.humanLikelihood?.ttr, [0.4, 0.7], true)}">
+                            <span class="stat-label">Vocabulary Richness</span>
+                            <span class="stat-value">${formatPct(advStats.humanLikelihood?.ttr)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.varianceNaturalness, [0.4, 0.7], true)}">
+                            <span class="stat-label">Variance Naturalness</span>
+                            <span class="stat-value">${formatPct(advStats.varianceNaturalness)}</span>
+                        </div>
+                        <div class="stat-row indicator-${getIndicator(advStats.extremeVarianceIndicator, [0.6, 0.4])}">
+                            <span class="stat-label">Extreme Variance Warning</span>
+                            <span class="stat-value">${formatPct(advStats.extremeVarianceIndicator)}</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- AI Signature Metrics -->
                 <div class="stats-section highlight-section">
                     <h4>🤖 AI Signature Metrics</h4>

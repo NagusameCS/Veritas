@@ -293,6 +293,43 @@ const AnalyzerEngine = {
         };
         stats.mahalanobisDistance = VarianceUtils.mahalanobisDistance(featureVector);
 
+        // === BELL CURVE / GAUSSIAN DEVIATION ANALYSIS (v2.2) ===
+        // Core philosophy: Humans fall in a "reasonable middle" - neither too perfect nor too chaotic
+        
+        // How "natural" is the variance? (1 = human-like middle, 0 = extreme)
+        stats.varianceNaturalness = VarianceUtils.varianceNaturalnessScore(sentLengths);
+        
+        // Does this text show extremes in either direction?
+        stats.extremeVarianceIndicator = VarianceUtils.extremeVarianceScore(sentLengths);
+        
+        // Per-feature human likelihood scores
+        stats.humanLikelihood = {
+            sentenceLengthCV: VarianceUtils.humanLikelihoodScore(
+                stats.sentences.coefficientOfVariation,
+                VarianceUtils.HUMAN_BASELINES.sentenceLengthCV
+            ),
+            hapaxRatio: VarianceUtils.humanLikelihoodScore(
+                stats.vocabulary.hapaxLegomenaRatio,
+                VarianceUtils.HUMAN_BASELINES.hapaxRatio
+            ),
+            burstiness: VarianceUtils.humanLikelihoodScore(
+                stats.burstiness.sentenceLength,
+                VarianceUtils.HUMAN_BASELINES.burstiness
+            ),
+            zipfSlope: VarianceUtils.humanLikelihoodScore(
+                stats.zipf.slope,
+                VarianceUtils.HUMAN_BASELINES.zipfSlope
+            ),
+            ttr: VarianceUtils.humanLikelihoodScore(
+                stats.vocabulary.typeTokenRatio,
+                VarianceUtils.HUMAN_BASELINES.ttrNormalized
+            )
+        };
+        
+        // Average human likelihood (overall "normalcy" score)
+        const hlScores = Object.values(stats.humanLikelihood);
+        stats.overallHumanLikelihood = hlScores.reduce((a, b) => a + b, 0) / hlScores.length;
+
         // === AI Signature Metrics ===
         stats.aiSignatures = this.computeAISignatureMetrics(text, tokens, sentences);
 
@@ -405,7 +442,10 @@ const AnalyzerEngine = {
      * Calculate overall AI probability using variance-based methodology
      * Key principle: High uniformity = AI, High variance = Human
      * 
-     * ENHANCED v2.1: Uses Bayesian combination and calibrated confidence
+     * ENHANCED v2.2: Uses Gaussian bell curve philosophy
+     * - Humans fall in the "reasonable middle" of a normal distribution
+     * - BOTH extremes (too perfect AND too chaotic) are suspicious
+     * - Bayesian combination with calibrated confidence
      */
     calculateVarianceBasedProbability(categoryResults) {
         const validResults = categoryResults.filter(r => 
