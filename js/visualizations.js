@@ -429,25 +429,45 @@ const Visualizations = {
             return;
         }
 
+        // Count signals across all sections
+        let totalAiFindings = 0;
+        let totalHumanFindings = 0;
+        
         const sectionsHtml = report.sections.map(section => {
+            const aiFindings = section.findings.filter(f => f.indicator === 'ai');
+            const humanFindings = section.findings.filter(f => f.indicator === 'human');
+            totalAiFindings += aiFindings.length;
+            totalHumanFindings += humanFindings.length;
+            
+            const signalSummary = aiFindings.length > 0 || humanFindings.length > 0
+                ? `<span class="section-signal-count">🔴 ${aiFindings.length} AI | 🟢 ${humanFindings.length} Human</span>`
+                : '';
+            
             const findingsHtml = section.findings.length > 0 
                 ? section.findings.map(f => {
                     const mainText = f.text || f.value || f.label || 'Unknown finding';
+                    const severityClass = f.severity ? `severity-${f.severity}` : '';
                     return `
-                        <div class="report-finding ${f.indicator || 'neutral'}">
+                        <div class="report-finding ${f.indicator || 'neutral'} ${severityClass}">
                             <span class="finding-icon">${this.getIndicatorIcon(f.indicator)}</span>
-                            <span class="finding-text">${this.escapeHtml(mainText)}</span>
+                            <div class="finding-content-wrapper">
+                                <span class="finding-text">${this.escapeHtml(mainText)}</span>
+                                ${f.note ? `<span class="finding-note">${this.escapeHtml(f.note)}</span>` : ''}
+                            </div>
                         </div>
                     `;
                 }).join('')
                 : '<p class="no-findings">No significant findings in this category</p>';
 
+            const barColor = section.aiScore >= 60 ? '#ef4444' : (section.aiScore >= 40 ? '#f59e0b' : '#10b981');
+            
             return `
-                <div class="accordion-item">
+                <div class="accordion-item ${section.aiScore >= 60 ? 'high-signal' : ''}">
                     <button class="accordion-header">
                         <span class="accordion-title">
                             <span class="category-number">${section.number}</span>
                             ${section.name}
+                            ${signalSummary}
                         </span>
                         <span class="accordion-meta">
                             <span class="accordion-score ${this.getScoreLevel(section.aiScore)}">${section.aiScore}%</span>
@@ -461,6 +481,9 @@ const Visualizations = {
                             <div class="report-meta">
                                 <span>AI Score: <strong>${section.aiScore}%</strong></span>
                                 <span>Confidence: <strong>${section.confidence}%</strong></span>
+                                <div class="score-bar-mini">
+                                    <div class="score-bar-fill" style="width:${section.aiScore}%;background:${barColor}"></div>
+                                </div>
                             </div>
                             <div class="report-findings">
                                 ${findingsHtml}
@@ -478,6 +501,10 @@ const Visualizations = {
                     <div class="report-overall">
                         <span class="report-verdict ${report.overall.verdict.level}">${report.overall.verdict.label}</span>
                         <span class="report-probability">${report.overall.aiProbability}% AI Probability</span>
+                    </div>
+                    <div class="report-signal-summary">
+                        <span class="signal-badge ai">🔴 ${totalAiFindings} AI Indicators</span>
+                        <span class="signal-badge human">🟢 ${totalHumanFindings} Human Indicators</span>
                     </div>
                 </div>
                 <div class="accordion">

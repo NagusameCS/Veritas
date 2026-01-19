@@ -347,43 +347,51 @@ const MetaPatternsAnalyzer = {
     generateFindings(balanceAnalysis, hedgingAnalysis, formattingAnalysis, rhetoricalAnalysis) {
         const findings = [];
 
-        // Over-balanced arguments
+        // Over-balanced arguments with specifics
         if (balanceAnalysis.isOverBalanced) {
+            const proConStr = `${balanceAnalysis.proConBalance.pro} pros vs ${balanceAnalysis.proConBalance.con} cons`;
             findings.push({
+                text: `Suspiciously balanced perspective: ${proConStr}. ${balanceAnalysis.templateMatches} balanced-argument templates detected. AI tends to present artificially even-handed views.`,
                 label: 'Argument Balance',
-                value: 'Suspiciously balanced perspective',
-                note: balanceAnalysis.templatesFound[0] ? `Uses: "${balanceAnalysis.templatesFound[0]}"` : 'Equal pro/con distribution',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'high'
             });
         }
 
-        // Excessive hedging
+        // Excessive hedging with metrics
         if (hedgingAnalysis.hedgingScore > 0.5) {
             findings.push({
+                text: `Excessive hedging: ${hedgingAnalysis.hedgingCount} hedging phrases (${hedgingAnalysis.hedgingPerSentence}/sentence). Examples: "${hedgingAnalysis.hedgingFound.slice(0, 3).join('", "')}". Human avg: 0.1-0.2/sentence.`,
                 label: 'Hedging Language',
-                value: `${hedgingAnalysis.hedgingCount} hedging phrase(s) detected`,
-                note: 'Avoids taking definitive positions',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'high'
             });
         }
 
         // Lack of strong stance
         if (hedgingAnalysis.strongStanceCount === 0 && hedgingAnalysis.hedgingCount > 2) {
             findings.push({
+                text: `No strong stance markers found while using ${hedgingAnalysis.hedgingCount} hedging phrases. Stance ratio: ${hedgingAnalysis.stanceRatio} (1.0 = all hedging). AI avoids definitive positions.`,
                 label: 'Position Strength',
-                value: 'No strong stance markers found',
-                note: 'Text lacks confident assertions',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'medium'
             });
         }
 
-        // Formatting symmetry
+        // Formatting symmetry with detailed metrics
         if (formattingAnalysis.symmetryScore > 0.5) {
             findings.push({
+                text: `Highly uniform paragraph structure: Length CV=${formattingAnalysis.paragraphLengthCV} (human avg: 0.4-0.6), Sentence count CV=${formattingAnalysis.sentenceCountCV}, ${formattingAnalysis.sentenceSymmetricParagraphs} paragraphs with uniform sentence lengths.`,
                 label: 'Formatting Symmetry',
-                value: 'Highly regular paragraph structure',
-                note: `Paragraph length CV: ${formattingAnalysis.paragraphLengthCV}`,
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'high'
+            });
+        } else if (parseFloat(formattingAnalysis.paragraphLengthCV) > 0.5) {
+            findings.push({
+                text: `Natural paragraph length variation: CV=${formattingAnalysis.paragraphLengthCV} indicates human-like structural variety.`,
+                label: 'Formatting Variety',
+                indicator: 'human',
+                severity: 'low'
             });
         }
 
@@ -391,20 +399,20 @@ const MetaPatternsAnalyzer = {
         if (rhetoricalAnalysis.predictabilityScore > 0.5) {
             const types = rhetoricalAnalysis.patternsFound.map(p => p.type);
             findings.push({
+                text: `Follows predictable essay template with ${rhetoricalAnalysis.patternMatches} rhetorical markers. Detected: ${[...new Set(types)].join(', ')}. Ordinal markers ("firstly", "secondly"): ${rhetoricalAnalysis.bodyPatternCount.ordinal}.`,
                 label: 'Rhetorical Structure',
-                value: 'Follows predictable essay template',
-                note: `Detected patterns: ${[...new Set(types)].join(', ')}`,
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'high'
             });
         }
 
         // Five-paragraph essay structure
         if (rhetoricalAnalysis.isFiveParaStructure) {
             findings.push({
+                text: `Classic five-paragraph essay format detected. Has intro pattern, body ordinals, and conclusion markers. This formulaic structure is common in AI-generated academic content.`,
                 label: 'Essay Structure',
-                value: 'Classic five-paragraph essay format',
-                note: 'Formulaic academic structure common in AI',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'high'
             });
         }
 

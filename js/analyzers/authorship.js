@@ -356,61 +356,68 @@ const AuthorshipAnalyzer = {
     generateFindings(styleDriftAnalysis, complexityAnalysis, toneAnalysis, vocabAnalysis) {
         const findings = [];
 
-        // Style drift
+        // Style drift with specific metrics
         if (styleDriftAnalysis.driftScore > 0.5 && parseFloat(styleDriftAnalysis.totalDrift) < 0.2) {
             findings.push({
+                text: `Unusually consistent style: sentence length drift ${styleDriftAnalysis.drifts.sentenceLength} words, word length drift ${styleDriftAnalysis.drifts.wordLength} chars (human avg: 2-5 words, 0.3-0.5 chars)`,
                 label: 'Style Consistency',
-                value: 'Unusually consistent style throughout',
-                note: 'Mechanical consistency may indicate AI',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'high'
             });
         }
 
         if (parseFloat(styleDriftAnalysis.totalDrift) > 0.5) {
             findings.push({
+                text: `Significant style shift: ${(parseFloat(styleDriftAnalysis.totalDrift) * 100).toFixed(0)}% drift between first and second half of document`,
                 label: 'Style Shift',
-                value: 'Significant style change detected',
-                note: 'First and second half have different characteristics',
-                indicator: 'mixed'
+                indicator: 'mixed',
+                severity: 'medium'
             });
         }
 
-        // Complexity spikes
+        // Complexity spikes with details
         if (complexityAnalysis.spikes.length > 0) {
             findings.push({
+                text: `${complexityAnalysis.spikes.length} sudden complexity increase(s) detected at sentences ${complexityAnalysis.spikes.map(s => s.index + 1).join(', ')} - may indicate AI assistance`,
                 label: 'Fluency Spikes',
-                value: `${complexityAnalysis.spikes.length} sudden complexity increase(s)`,
-                note: 'May indicate AI assistance in specific sections',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'medium'
             });
         }
 
         if (complexityAnalysis.drops.length > 0) {
             findings.push({
+                text: `${complexityAnalysis.drops.length} sudden simplification(s) at sentences ${complexityAnalysis.drops.map(s => s.index + 1).join(', ')} - inconsistent complexity`,
                 label: 'Complexity Drops',
-                value: `${complexityAnalysis.drops.length} sudden simplification(s)`,
-                note: 'Inconsistent complexity across text',
-                indicator: 'mixed'
+                indicator: 'mixed',
+                severity: 'low'
             });
         }
 
-        // Tone shifts
+        // Tone shifts with specifics
         if (toneAnalysis.toneShifts > 2) {
             findings.push({
+                text: `${toneAnalysis.toneShifts} tone/register shifts detected (human avg: 1-2 per document). Formal-informal ratio: ${toneAnalysis.formalRatio || 'N/A'}`,
                 label: 'Tone Shifts',
-                value: `${toneAnalysis.toneShifts} tone changes detected`,
-                note: 'Inconsistent register throughout document',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'medium'
             });
         }
 
-        // Vocabulary consistency
+        // Vocabulary consistency with metrics
         if (vocabAnalysis.inconsistencyScore > 0.5) {
             findings.push({
+                text: `Low vocabulary cohesion: ${(parseFloat(vocabAnalysis.avgOverlap) * 100).toFixed(0)}% word overlap between paragraphs (human avg: 30-50%). Paragraphs may be independently generated.`,
                 label: 'Vocabulary Cohesion',
-                value: 'Low vocabulary overlap between paragraphs',
-                note: 'Paragraphs may be independently generated',
-                indicator: 'ai'
+                indicator: 'ai',
+                severity: 'high'
+            });
+        } else if (parseFloat(vocabAnalysis.avgOverlap) > 0.5) {
+            findings.push({
+                text: `Good vocabulary cohesion: ${(parseFloat(vocabAnalysis.avgOverlap) * 100).toFixed(0)}% word overlap between paragraphs - consistent authorship indicator`,
+                label: 'Vocabulary Cohesion',
+                indicator: 'human',
+                severity: 'low'
             });
         }
 

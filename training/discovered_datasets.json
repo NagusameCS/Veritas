@@ -1,0 +1,6615 @@
+{
+  "artem9k/ai-text-detection-pile": {
+    "downloads": 594,
+    "tags": [
+      "license:mit",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ninaaaaddd/AI_text_detection_dataset": {
+    "downloads": 78,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "akoukas/AITextDetectionDataset": {
+    "downloads": 1,
+    "tags": [
+      "license:mit",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Varun53/AI_text_detection": {
+    "downloads": 8,
+    "tags": [
+      "language:en",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Killerwhale-Park/AI_Generated_Text_Detection": {
+    "downloads": 2,
+    "tags": [
+      "license:mit",
+      "region:us"
+    ]
+  },
+  "Roxanne-WANG/AI-Text_Detection": {
+    "downloads": 77,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "region:us"
+    ]
+  },
+  "optimization-hashira/ai-text-detection-dataset": {
+    "downloads": 27,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "srikanthgali/ai-text-detection-pile-cleaned": {
+    "downloads": 104,
+    "tags": [
+      "task_categories:text-classification",
+      "source_datasets:artem9k/ai-text-detection-pile",
+      "language:en",
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "ai-detection",
+      "text-classification",
+      "human-vs-ai",
+      "deberta",
+      "nlp"
+    ]
+  },
+  "silentone0725/ai-human-text-detection-v1": {
+    "downloads": 34,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "coai/ai-text-detection-training": {
+    "downloads": 8,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "coai/ai-text-detection-benchmark": {
+    "downloads": 33,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Mharis205/ai-text-detection-pile-cleaned": {
+    "downloads": 71,
+    "tags": [
+      "task_categories:text-classification",
+      "source_datasets:artem9k/ai-text-detection-pile",
+      "language:en",
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us",
+      "ai-detection",
+      "text-classification",
+      "human-vs-ai",
+      "deberta",
+      "nlp"
+    ]
+  },
+  "Mharis205/ai-text-detection-pile": {
+    "downloads": 9,
+    "tags": [
+      "license:mit",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "ziq/ai-generated-text-classification": {
+    "downloads": 14,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "dmitva/human_ai_generated_text": {
+    "downloads": 407,
+    "tags": [
+      "language:en",
+      "license:cc-by-4.0",
+      "size_categories:1M<n<10M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2311.15565",
+      "doi:10.57967/hf/1617",
+      "region:us",
+      "nlp",
+      "human",
+      "ai",
+      "text"
+    ]
+  },
+  "GentextS6/AI_generated_Images_with_text": {
+    "downloads": 161,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:imagefolder",
+      "modality:image",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Ateeqq/AI-and-Human-Generated-Text": {
+    "downloads": 302,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ardavey/human-ai-generated-text": {
+    "downloads": 10,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "library:distilabel",
+      "region:us",
+      "synthetic",
+      "distilabel",
+      "rlaif",
+      "datacraft"
+    ]
+  },
+  "FreedomIntelligence/ChatGPT-Detection-PR-HPPT": {
+    "downloads": 10,
+    "tags": [
+      "language:en",
+      "language:zh",
+      "license:apache-2.0",
+      "size_categories:10K<n<100K",
+      "region:us"
+    ]
+  },
+  "OnAnOrange/gpt_explanation_augmented_pun_detection": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DanCip/github-issues-vul-detection-gpt-results": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DanCip/github-issues-vul-detection-gpt-zero-results": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DanCip/github-issues-vul-detection-gpt-few-results": {
+    "downloads": 11,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-zero-results": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-results": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-zero-vul-desc-results": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-vul-desc-results": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-strict-vul-desc-results": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-vul-desc-gpt-enhanced-prompt-results": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-vul-desc-strict-fixed-results": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-max-detection-gpt-few-results": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-results-final": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-results-org-final": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-results-tmp": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-max-detection-gpt-few-results-final": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-max-detection-gpt-few-results-final2": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-results-final-best": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-detection-gpt-few-results-final-best2": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Eathus/github-issues-vul-max-detection-gpt-few-results-final3": {
+    "downloads": 7,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Clement1290/261_DetectionAI_GPT_data": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "jjz5463/llm-detection-generation-1.0": {
+    "downloads": 48,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "datadreamer",
+      "datadreamer-0.25.0",
+      "synthetic",
+      "gpt-4"
+    ]
+  },
+  "jjz5463/llm-detection-generation-contribution2-test": {
+    "downloads": 30,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "datadreamer",
+      "datadreamer-0.25.0",
+      "synthetic",
+      "gpt-4"
+    ]
+  },
+  "jjz5463/llm-detection-generation-contribution2-train": {
+    "downloads": 9,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "datadreamer",
+      "datadreamer-0.25.0",
+      "synthetic",
+      "gpt-4"
+    ]
+  },
+  "jjz5463/llm-detection-generation-failcase-test": {
+    "downloads": 41,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "datadreamer",
+      "datadreamer-0.25.0",
+      "synthetic",
+      "gpt-4"
+    ]
+  },
+  "jjz5463/llm-detection-generation-failcase-train": {
+    "downloads": 22,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "datadreamer",
+      "datadreamer-0.25.0",
+      "synthetic",
+      "gpt-4"
+    ]
+  },
+  "tourist800/LLM-Hallucination-Detection-complex-mathematics": {
+    "downloads": 24,
+    "tags": [
+      "license:mit",
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Vulnerability-Detection/test_set_llm_predictions": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Vulnerability-Detection/llm_predictions": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Zarakun/llm-detection-dataset": {
+    "downloads": 8,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "darkknight25/LLM_Bias_Detection_Dataset": {
+    "downloads": 13,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "arxiv:2009.04264",
+      "region:us",
+      "Bias Classifier",
+      "cybersecurity's"
+    ]
+  },
+  "LLM-CLEM/hymenopteres-detection": {
+    "downloads": 4,
+    "tags": [
+      "license:other",
+      "size_categories:n<1K",
+      "format:imagefolder",
+      "modality:image",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "UniqueData/ocr-generated-machine-readable-zone-mrz-text-detection": {
+    "downloads": 94,
+    "tags": [
+      "task_categories:image-to-text",
+      "task_categories:object-detection",
+      "language:en",
+      "license:cc-by-nc-nd-4.0",
+      "size_categories:n<1K",
+      "format:imagefolder",
+      "modality:image",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us",
+      "text detection",
+      "text recognition",
+      "OCR",
+      "document text recognition"
+    ]
+  },
+  "ThanaritKanjanametawatAU/Machine-Generated-Text-Detection-Dataset": {
+    "downloads": 0,
+    "tags": [
+      "license:apache-2.0",
+      "region:us"
+    ]
+  },
+  "kanwal-mehreen18/Multilingual_Machine_Generated_Text_Detection": {
+    "downloads": 30,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "OSS-forge/HumanVsAICode": {
+    "downloads": 66,
+    "tags": [
+      "license:cc-by-sa-4.0",
+      "size_categories:100K<n<1M",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "kushinm/WID_sym_human_vs_ai": {
+    "downloads": 29,
+    "tags": [
+      "license:mit",
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "hjl/tulu_human_vs_ai": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Hemg/AI-vs-Human-voice": {
+    "downloads": 2,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "ahmadreza13/human-vs-Ai-generated-dataset": {
+    "downloads": 117,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "shahxeebhassan/human_vs_ai_sentences": {
+    "downloads": 89,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ilyasoulk/ai-vs-human": {
+    "downloads": 70,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zcamz/ai-vs-human-HuggingFaceTB-SmolLM2-1.7B-Instruct": {
+    "downloads": 42,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zcamz/ai-vs-human-Qwen-Qwen2.5-1.5B-Instruct": {
+    "downloads": 30,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zcamz/ai-vs-human-HuggingFaceTB-SmolLM2-360M-Instruct": {
+    "downloads": 30,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zcamz/ai-vs-human-google-gemma-2-2b-it": {
+    "downloads": 35,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zcamz/ai-vs-human-meta-llama-Llama-3.2-1B-Instruct": {
+    "downloads": 44,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ilyasoulk/ai-vs-human-meta-llama-Llama-3.1-8B-Instruct": {
+    "downloads": 70,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ilyasoulk/ai-vs-human-meta-llama-Llama-3.1-8B-Instruct-CNN": {
+    "downloads": 3,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "danibor/human-vs-ai-spanish-65k": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "KpopBarbie/survey-ai-vs-human": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Asyq/kaz-lang-human-vs-ai": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Ozkan6774/Ai_vs_Human": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Louisnguyen/HumanvsAICode": {
+    "downloads": 39,
+    "tags": [
+      "modality:text",
+      "region:us"
+    ]
+  },
+  "hassanpositive/human-vs-ai-stories": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "okemdad/human_vs_ai_master_dataset": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ashhadahsan/ai-vs-human-music-dataset": {
+    "downloads": 7,
+    "tags": [
+      "task_categories:audio-classification",
+      "license:mit",
+      "size_categories:n<1K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us",
+      "music"
+    ]
+  },
+  "ashhadahsan/ai-vs-human-music-with-audio": {
+    "downloads": 7,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:audio",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Ransaka/ai-vs-human-generated-dataset": {
+    "downloads": 59,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Ransaka/ai-vs-human-generated-dataset-sample": {
+    "downloads": 28,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Yashodhar29/ai-vs-human-dataset": {
+    "downloads": 5,
+    "tags": [
+      "license:mit",
+      "size_categories:1M<n<10M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Yashodhar29/ai-vs-human-small": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Yashodhar29/finalized-ai-vs-human-dataset": {
+    "downloads": 71,
+    "tags": [
+      "size_categories:1M<n<10M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Yuvrajg2107/demo_ai_vs_human": {
+    "downloads": 2,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "Yashodhar29/finalized-ai-vs-human-10k": {
+    "downloads": 12,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Yashodhar29/finalized-ai-vs-human-300K": {
+    "downloads": 78,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Yashodhar29/finalized-ai-vs-human-100k": {
+    "downloads": 7,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Yashodhar29/finalized-ai-vs-human-python-10k": {
+    "downloads": 22,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Yuvrajg2107/ai_vs_human_images_final": {
+    "downloads": 76,
+    "tags": [
+      "modality:image",
+      "region:us"
+    ]
+  },
+  "Yashodhar29/finalized-ai-vs-human-40k": {
+    "downloads": 20,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Yashodhar29/finalized-ai-vs-human-50k": {
+    "downloads": 11,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "Yuvrajg2107/Marathi-Human-vs-AI-Authentic-1k": {
+    "downloads": 21,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "NicolaiSivesind/human-vs-machine": {
+    "downloads": 117,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:cc",
+      "size_categories:100K<n<1M",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us",
+      "chatgpt",
+      "gpt",
+      "research abstracts",
+      "wikipedia introductions"
+    ]
+  },
+  "gretelai/synthetic_text_to_sql": {
+    "downloads": 2599,
+    "tags": [
+      "task_categories:question-answering",
+      "task_categories:table-question-answering",
+      "task_categories:text-generation",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "library:datadesigner",
+      "arxiv:2306.05685",
+      "region:us",
+      "synthetic",
+      "SQL",
+      "text-to-SQL",
+      "code",
+      "datadesigner"
+    ]
+  },
+  "tay-yozhik/SyntheticTexts": {
+    "downloads": 26,
+    "tags": [
+      "language:ru",
+      "license:apache-2.0",
+      "size_categories:1M<n<10M",
+      "format:text",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "karan4d/machiavellian_synthetic_textbooks": {
+    "downloads": 8,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "cp500/synthetic_hebrew_medical_text": {
+    "downloads": 66,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Caraaaaa/synthetic_image_text": {
+    "downloads": 7,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "pszemraj/synthetic-text-similarity": {
+    "downloads": 205,
+    "tags": [
+      "task_categories:feature-extraction",
+      "task_categories:sentence-similarity",
+      "language:en",
+      "license:odc-by",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "NickyNicky/synthetic_text_to_sql_format_chatML_gemma": {
+    "downloads": 4,
+    "tags": [
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "anuragk16/gretelai-synthetic_text_to_sql-llama2": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "communityai/gretelai___synthetic_text_to_sql": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "communityai/gretelai___synthetic_text_to_sql-10k": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "communityai/gretelai___synthetic_text_to_sql-15k": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "communityai/gretelai___synthetic_text_to_sql-20k": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "communityai/gretelai___synthetic_text_to_sql-25k": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "communityai/gretelai___synthetic_text_to_sql-30k": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "anuragk16/gretelai-synthetic_text_to_sql-llama2-first-10k": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "mlabonne/synthetic_text_to_sql-ShareGPT": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "tom1669/synthetic_customer_texts": {
+    "downloads": 63,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:text",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "tomasonjo/synthetic-text2cypher-gpt4turbo": {
+    "downloads": 13,
+    "tags": [
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "region:us",
+      "code",
+      "synthetic"
+    ]
+  },
+  "v-urushkin/SyntheticTexts6M": {
+    "downloads": 12,
+    "tags": [
+      "task_categories:text-generation",
+      "language:ru",
+      "license:apache-2.0",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "synthetic"
+    ]
+  },
+  "djagatiya/synthetic_text_to_sql_d14": {
+    "downloads": 30,
+    "tags": [
+      "task_categories:question-answering",
+      "task_categories:table-question-answering",
+      "task_categories:text-generation",
+      "language:en",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "kanhatakeyama/SyntheticText": {
+    "downloads": 174,
+    "tags": [
+      "language:ja",
+      "license:cc-by-sa-3.0",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "amrachraf/arXiv-full-text-synthetic-instruct-tune": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "kanhatakeyama/SyntheticTextWikiTranslate": {
+    "downloads": 17,
+    "tags": [
+      "language:ja",
+      "license:cc-by-sa-3.0",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "CoIR-Retrieval/synthetic-text2sql-queries-corpus": {
+    "downloads": 325,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "CoIR-Retrieval/synthetic-text2sql-qrels": {
+    "downloads": 307,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "kanhatakeyama/SyntheticTextOpenMathInstruct": {
+    "downloads": 12,
+    "tags": [
+      "language:ja",
+      "license:other",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "susumuota/SyntheticTextWikiTranslate-askllm-v1": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "stefutz101/db_course-synthetic_text_to_sql_dataset": {
+    "downloads": 7,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "kanhatakeyama/SyntheticTextCCUncleaned": {
+    "downloads": 52,
+    "tags": [
+      "license:other",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "kanhatakeyama/SyntheticTextCC": {
+    "downloads": 113,
+    "tags": [
+      "license:other",
+      "size_categories:1M<n<10M",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ritaranx/clinical-synthetic-text-kg": {
+    "downloads": 281,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:token-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "arxiv:2311.00287",
+      "region:us",
+      "medical",
+      "clinical",
+      "synthetic"
+    ]
+  },
+  "ritaranx/clinical-synthetic-text-llm": {
+    "downloads": 271,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:token-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "arxiv:2311.00287",
+      "region:us",
+      "medical",
+      "clinical",
+      "synthetic",
+      "healthcare",
+      "nlp"
+    ]
+  },
+  "Nitishsancs/synthetic_text_to_sql-llama2-1k": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "HAERAE-HUB/KOREAN-SyntheticText-1.5B": {
+    "downloads": 58,
+    "tags": [
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "mteb/synthetic-text2sql": {
+    "downloads": 10,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "CoIR-Retrieval/synthetic-text2sql": {
+    "downloads": 2584,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "hllj/synthetic-text-embedding": {
+    "downloads": 180,
+    "tags": [
+      "task_categories:text-retrieval",
+      "language:vi",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Cognipeer/synthetic-text-to-sql-tr": {
+    "downloads": 3,
+    "tags": [
+      "task_categories:question-answering",
+      "task_categories:table-question-answering",
+      "task_categories:text-generation",
+      "language:tr",
+      "license:apache-2.0",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "TaylorAI/open_web_text_synthetic_queries": {
+    "downloads": 20,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "kanhatakeyama/synthetic-material-data-text": {
+    "downloads": 9,
+    "tags": [
+      "language:en",
+      "license:cc-by-sa-4.0",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sugiv/synthetic-text-transformation-dataset": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Cartinoe5930/raw_text_synthetic_dataset_50k": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Cartinoe5930/web_text_synthetic_dataset_50k": {
+    "downloads": 18,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sher222/synthetic-elix-text": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AcademieDuNumerique/synthetic_chat_text_to_sql": {
+    "downloads": 3,
+    "tags": [
+      "task_categories:text-generation",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "synthetic",
+      "sql",
+      "entreprise"
+    ]
+  },
+  "chakshu2/sample_synthetic_text_to_sql": {
+    "downloads": 6,
+    "tags": [
+      "task_categories:question-answering",
+      "task_categories:text-generation",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "region:us",
+      "synthetic",
+      "text-to-sql",
+      "text-to-SQL",
+      "SQL",
+      "code"
+    ]
+  },
+  "sert121/synthetic_data_textual": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leavingT_Q_W_O_V_U_X": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_O_V_U_X": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "heegyu/gretelai-synthetic-text-to-sql-trl": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "fanfanfuzzy/synthetic-material-data-text": {
+    "downloads": 30,
+    "tags": [
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U_X_A_Z_R_B_S": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U_X": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U_X_A": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U_X_A_Z": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U_X_A_Z_R": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U_X_A_Z_R_B": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U_X_A_Z_R_B_S_M": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sert121/synthetic_data_textual_leaving_T_Q_W_L_N2_O_V_U_X_A_Z_R_B_S_M_P": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Fishfishfishfishfish/Synthetic_text.txt": {
+    "downloads": 185,
+    "tags": [
+      "language:en",
+      "size_categories:10K<n<100K",
+      "format:text",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "OLAResearch/KOREAN-SyntheticText": {
+    "downloads": 13,
+    "tags": [
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "argilla/synthetic-text-classification-news-multi-label": {
+    "downloads": 89,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "library:distilabel",
+      "region:us",
+      "synthetic",
+      "distilabel",
+      "rlaif",
+      "datacraft"
+    ]
+  },
+  "argilla/synthetic-text-classification-news": {
+    "downloads": 112,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "library:distilabel",
+      "region:us",
+      "synthetic",
+      "distilabel",
+      "rlaif",
+      "datacraft"
+    ]
+  },
+  "dvilasuero/frugalai-text-synthetic": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "library:distilabel",
+      "region:us",
+      "synthetic",
+      "distilabel",
+      "rlaif",
+      "datacraft"
+    ]
+  },
+  "davidberenstein1957/synthetic-domain-texts": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "library:distilabel",
+      "region:us",
+      "synthetic",
+      "distilabel",
+      "rlaif",
+      "datacraft"
+    ]
+  },
+  "argilla/synthetic-domain-text-classification": {
+    "downloads": 64,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "library:distilabel",
+      "region:us",
+      "synthetic",
+      "distilabel",
+      "rlaif",
+      "datacraft"
+    ]
+  },
+  "MCINext/synthetic-persian-text-tone-classification": {
+    "downloads": 8,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "MCINext/synthetic-persian-text-keyword-pair-classification": {
+    "downloads": 19,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "palashsharma15/synthetic-domain-text-classification": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "library:distilabel",
+      "region:us",
+      "synthetic",
+      "distilabel",
+      "rlaif",
+      "datacraft"
+    ]
+  },
+  "Hrishi147/Synthetic_data_text1": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "library:distilabel",
+      "region:us",
+      "synthetic",
+      "distilabel",
+      "rlaif"
+    ]
+  },
+  "ThatsGroes/synthetic-from-text-matching-long-tasks": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ThatsGroes/synthetic-from-text-mathing-short-tasks": {
+    "downloads": 34,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ThatsGroes/synthetic-from-text-matching-long-tasks-danish": {
+    "downloads": 1,
+    "tags": [
+      "task_categories:text-retrieval",
+      "language:da",
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2401.00368",
+      "region:us"
+    ]
+  },
+  "ThatsGroes/synthetic-from-text-matching-short-tasks-danish": {
+    "downloads": 23,
+    "tags": [
+      "task_categories:text-retrieval",
+      "language:da",
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2401.00368",
+      "region:us"
+    ]
+  },
+  "ThatsGroes/synthetic-from-text-matching-long-tasks-swedish": {
+    "downloads": 2,
+    "tags": [
+      "language:sv",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2401.00368",
+      "region:us"
+    ]
+  },
+  "ThatsGroes/synthetic-from-text-mathing-short-tasks-swedish": {
+    "downloads": 33,
+    "tags": [
+      "language:sv",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2401.00368",
+      "region:us"
+    ]
+  },
+  "ThatsGroes/synthetic-from-text-matching-long-tasks-norwegian": {
+    "downloads": 3,
+    "tags": [
+      "language:no",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2401.00368",
+      "region:us"
+    ]
+  },
+  "ThatsGroes/synthetic-from-text-mathing-short-tasks-norwegian": {
+    "downloads": 27,
+    "tags": [
+      "language:no",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2401.00368",
+      "region:us"
+    ]
+  },
+  "philschmid/gretel-synthetic-text-to-sql": {
+    "downloads": 437,
+    "tags": [
+      "task_categories:question-answering",
+      "task_categories:table-question-answering",
+      "task_categories:text-generation",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "synthetic",
+      "SQL",
+      "text-to-SQL",
+      "code"
+    ]
+  },
+  "Yihim/synthetic_text_to_sql-qwen2.5-instruct-curated": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ngocnamk3er/6069_sample_synthetic_text_to_sql": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "decube/synthetic-complex-Text-to-SQL": {
+    "downloads": 0,
+    "tags": [
+      "task_categories:text-generation",
+      "language:en",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "kardosdrur/synthetic-nordic-text_matching": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "1-800-LLMs/synthetic-text-to-sql": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "vinaybagade/synthetic_text_to_sql_with_reasoning": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "TafcoMetawireless/synthetic_text_to_sql_en_es": {
+    "downloads": 4,
+    "tags": [
+      "task_categories:question-answering",
+      "task_categories:table-question-answering",
+      "task_categories:text-generation",
+      "language:en",
+      "language:es",
+      "license:apache-2.0",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2306.05685",
+      "region:us",
+      "synthetic",
+      "SQL",
+      "text-to-SQL",
+      "code"
+    ]
+  },
+  "eagle0504/synthetic-text2sql-dataset": {
+    "downloads": 31,
+    "tags": [
+      "task_categories:question-answering",
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "SQL",
+      "TextGeneration"
+    ]
+  },
+  "AI-Data-Advice-Comp/text-to-python-synthetic": {
+    "downloads": 2,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "benjamintli/synthetic_text_to_sql_formatted": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "rweics5cs7/exo4-Train-Synthetic-data-text": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "rweics5cs7/exo4-Train-Synthetic-data-text-deg": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "mustaphounii04/Synthetic-Medical-Text-Summarization": {
+    "downloads": 3,
+    "tags": [
+      "task_categories:text-generation",
+      "language:es",
+      "language:ca",
+      "license:unlicense",
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "sharmaarushi17/HPCPerfOpt-ChatGPT-generated": {
+    "downloads": 2,
+    "tags": [
+      "license:openrail",
+      "region:us"
+    ]
+  },
+  "Pablocoo/context_question_chatgpt_auto_generated": {
+    "downloads": 0,
+    "tags": [
+      "license:apache-2.0",
+      "region:us"
+    ]
+  },
+  "shuyuej/gsm8k_testing_chatgpt_generated": {
+    "downloads": 8,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "lvulpecula/ChatGPT-generated_fake_news_dataset": {
+    "downloads": 29,
+    "tags": [
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "chatgpt ",
+      "nlp",
+      "fake news detection",
+      "ai detection",
+      "ai",
+      "machine learning"
+    ]
+  },
+  "dshihk/llm-generated-essay": {
+    "downloads": 15,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "hon9kon9ize/38k-zh-yue-translation-llm-generated": {
+    "downloads": 13,
+    "tags": [
+      "license:cc-by-nc-sa-4.0",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "beimnet777/LLM_generated_Amharic_QA_for_Family_Code_of_Ethiopia": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "badrex/royal_society_corpus_LLM_generated_metadata": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "artnitolog/llm-generated-texts": {
+    "downloads": 34,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2305.15047",
+      "arxiv:2303.14822",
+      "region:us"
+    ]
+  },
+  "badrex/LLM-generated-emoji-descriptions": {
+    "downloads": 70,
+    "tags": [
+      "task_categories:sentence-similarity",
+      "task_categories:text-classification",
+      "language:en",
+      "license:cc",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "emoji",
+      "LLM"
+    ]
+  },
+  "shizhuo2/llm-generated-repair-data-combo": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "shizhuo2/llm-generated-train-files": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "bebornddevqasource2/SRS_document_LLM_generated_dataset": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DNA-LLM/generated_seqs": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:tabular",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DNA-LLM/train_generated_seq": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:tabular",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DNA-LLM/test_generated_seq": {
+    "downloads": 8,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DNA-LLM/generated_train_diff": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:tabular",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DNA-LLM/generated_train_diff_v2": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:tabular",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "bat-army/asyncapi-llm_generated-dataset": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:n<1K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "ZhankuiHe/Reindex-Then-Adapt-LLM-Generated-Data": {
+    "downloads": 18,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "psresearch/augmented_dataset_llm_generated_NER": {
+    "downloads": 9,
+    "tags": [
+      "task_categories:token-classification",
+      "task_ids:named-entity-recognition",
+      "annotations_creators:machine-generated",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Wedyan2023/LLM-Generated_News_Dataset": {
+    "downloads": 13,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "AchOk78/LLMgenerated_fictive_medical_report_and_summaries_with_omissions_label_Fr_Healthcare": {
+    "downloads": 1029,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:summarization",
+      "language:fr",
+      "license:cc-by-nc-sa-4.0",
+      "size_categories:n<1K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "medical"
+    ]
+  },
+  "llm-compe-2025-kato/deepmath_data_generated_by_rlt_model": {
+    "downloads": 6,
+    "tags": [
+      "license:mit",
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "maroon14/payment-related-llm-generated": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Gavrilova/llm_generated_data_hw1": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "artfultom/llm-generated-essays": {
+    "downloads": 17,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:text-generation",
+      "language:en",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "nvidia/Aegis-AI-Content-Safety-Dataset-2.0": {
+    "downloads": 2949,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:cc-by-4.0",
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "safety",
+      "content moderation",
+      "LLM safety",
+      "toxicity detection",
+      "nemoguard",
+      "aegis",
+      "nemotron"
+    ]
+  },
+  "nvidia/Aegis-AI-Content-Safety-Dataset-1.0": {
+    "downloads": 1119,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:cc-by-4.0",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2404.05993",
+      "region:us",
+      "safety",
+      "content moderation",
+      "LLM safety",
+      "toxicity detection",
+      "aegis",
+      "nemoguard",
+      "nemotron"
+    ]
+  },
+  "sci-m-wang/Aegis-AI-Content-Safety-Single_label": {
+    "downloads": 7,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "arupkumarm/generative_ai_content_moderation": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "taylornation/aicontent": {
+    "downloads": 0,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-1k-coco": {
+    "downloads": 806,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:imagefolder",
+      "modality:image",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-1k-yolo": {
+    "downloads": 754,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:imagefolder",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo": {
+    "downloads": 950,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:imagefolder",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-10k": {
+    "downloads": 895,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:imagefolder",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-11k": {
+    "downloads": 953,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:imagefolder",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "galtjay/best-ai-content-creator": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "talkpl-ai/cpcd-v1-content": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "talkpl-ai/cpcd-v1-content-track-metadata": {
+    "downloads": 37,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "stem-content-ai-project/swahili-text-corpus": {
+    "downloads": 16,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "iagoalves/aegis-ai-content-safety-dataset-2.0_Qwen3-8B": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "iagoalves/Aegis-AI-Content-Safety-Dataset-2.0_Qwen3-8B_rs": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "stem-content-ai-project/swahili-speech": {
+    "downloads": 601,
+    "tags": [
+      "task_categories:text-to-speech",
+      "language:sw",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:audiofolder",
+      "modality:audio",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-2cls-11k": {
+    "downloads": 6103,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:imagefolder",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-2cls-14k": {
+    "downloads": 3488,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:imagefolder",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-19k": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-2cls-19k": {
+    "downloads": 15,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-21k": {
+    "downloads": 668,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-2cls-21k": {
+    "downloads": 4,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-23k": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-35k": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-46k": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-65k": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "zigg-ai/content-regions-distrib-yolo-100k": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "MingSafeR/xhs_ai_write_content": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "ai-qb/edu-content": {
+    "downloads": 36,
+    "tags": [
+      "size_categories:n<1K",
+      "format:text",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "barc0/100k-gpt4-description-gpt4omini-code_generated_problems": {
+    "downloads": 44,
+    "tags": [
+      "task_categories:text-generation",
+      "language:en",
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "ARC"
+    ]
+  },
+  "barc0/induction_100k-gpt4-description-gpt4omini-code_generated_problems_messages_format_0.3": {
+    "downloads": 28,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "barc0/transduction_100k-gpt4-description-gpt4omini-code_generated_problems_messages_format_0.3": {
+    "downloads": 9,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "barc0/transduction_angmented_100k-gpt4-description-gpt4omini-code_generated_problems": {
+    "downloads": 9,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "taresco/grade_school_math_20k_samples_gpt4_generated": {
+    "downloads": 21,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:10K<n<100K",
+      "modality:text",
+      "region:us"
+    ]
+  },
+  "taresco/grade_school_math_30k_samples_gpt4_generated": {
+    "downloads": 19,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "kaenakiakona/spanglish_claude_generated": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ura-hcmut/Generated-texts-Llama-2-7b-hf-reward_bench": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ura-hcmut/Generated-texts-Llama-2-7b-hf-arc_challenge": {
+    "downloads": 9,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "vinhtran2611/Generated-texts-Llama-2-7b-hf-arc_challenge": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "bad49wolf/syntetic-QaA-healthcare-llama-3-8b-generated": {
+    "downloads": 46,
+    "tags": [
+      "license:llama3",
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "y1xing/llama_chris_examples_generated_synthetic_data_instruct_dataset": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "baldwin6/Llama-3-8B-self-generated-data": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Avvvvva/LIMA-Llama-3.2-1B-Generated-Responses": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "kurogane/DSR1D-Llama-8B-aya-ja-1k-generated": {
+    "downloads": 7,
+    "tags": [
+      "task_categories:text-generation",
+      "language:ja",
+      "license:llama3.1",
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__mmlu__llama_score_llama": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__mmlu__llama_score_qwen": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__mmlu__qwen_score_llama": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__mmlu__zephyr_score_llama": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__arc_challenge__llama_score_llama": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__arc_challenge__llama_score_gemma-2": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__arc_challenge__zephyr_score_llama": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_mc1__llama_score_mistral": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_mc1__llama_test": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_mc1__llama_rsp": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_mc1__mistral_score_llama": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_mc1__llama_score_gemma": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_gen__llama_score_llama": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_gen__llama_score_mistral": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_gen__gemma_score_llama": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_gen__llama_rsp": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_gen__llama_score_gemma": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__wikidyk__llama_test": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__mmlu__llama_score_zephyr": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__mmlu__llama_rsp": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__arc_challenge__gemma-2_score_llama": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__arc_challenge__llama_score_zephyr": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__arc_challenge__llama_rsp": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_mc1__gemma_score_llama": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_gen__mistral_score_llama": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__squadv2__llama_score_llama": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__squadv2__llama_test": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__squadv2__llama_rsp": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__truthfulqa_mc1__llama_score_llama": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__gsm8k__llama_score_llama": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__gsm8k__llama_score_mistral": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__gsm8k__llama_rsp": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__gsm8k__mistral_score_llama": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ErikaaWang/M_0_generated__gsm8k__llama_score_gemma": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "thungvaan/dataset_generated_by_teacher_meta_llama_Llama_2_13b_hf_00-19-15-04-08-25": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Taywon/metamath_Llama-3.1-8B-Instruct_tiger_generated": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Just999999/human-written-text-collection": {
+    "downloads": 13,
+    "tags": [
+      "license:apache-2.0",
+      "region:us"
+    ]
+  },
+  "alexshengzhili/0612_output_processed_final_human_written": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "badhanr/wikipedia_human_written_text": {
+    "downloads": 62,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "geodesic-research/anthropic-propensity-evals-human-written-refined": {
+    "downloads": 797,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "camgeodesic/anthropic-propensity-evals-human-written-refined-filtered-light": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "camgeodesic/anthropic-propensity-evals-human-written-refined-filtered-med": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "camgeodesic/anthropic-propensity-evals-human-written-refined-filtered-strong": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "camgeodesic/anthropic-propensity-evals-human-written-refined-SFM-evals": {
+    "downloads": 3,
+    "tags": [
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "speaknowswiftie/AI.Vocal.Detector.Dataset": {
+    "downloads": 0,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "saivarma2367/ai_sql_xss_detector": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "TsingyuAI-Tech/ai-detector-ref-cn": {
+    "downloads": 4,
+    "tags": [
+      "license:other",
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "TsingyuAI-Tech/ai-detector-ref-en": {
+    "downloads": 6,
+    "tags": [
+      "license:other",
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "mhb-maaz/ai-detector-dataset": {
+    "downloads": 6,
+    "tags": [
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "ronanhansel/data-ai-slop-detector": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "ash12321/ai-detector-benchmark-test-data": {
+    "downloads": 23,
+    "tags": [
+      "task_categories:image-classification",
+      "task_categories:zero-shot-image-classification",
+      "license:apache-2.0",
+      "size_categories:n<1K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us",
+      "ai-detection",
+      "benchmark",
+      "computer-vision",
+      "image-analysis"
+    ]
+  },
+  "anugrahap/testing-output-gpt2": {
+    "downloads": 26,
+    "tags": [
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "spacerini/gpt2-outputs": {
+    "downloads": 110,
+    "tags": [
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "byunggill/gpt-2-output": {
+    "downloads": 11,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "anugrahap/gpt2-output": {
+    "downloads": 7,
+    "tags": [
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "lmarena-ai/PPE-Human-Preference-V1": {
+    "downloads": 652,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2410.14872",
+      "region:us"
+    ]
+  },
+  "Rapidata/Reve-AI-Halfmoon_t2i_human_preference": {
+    "downloads": 153,
+    "tags": [
+      "task_categories:text-to-image",
+      "task_categories:image-to-text",
+      "task_categories:image-classification",
+      "task_categories:reinforcement-learning",
+      "language:en",
+      "license:cdla-permissive-2.0",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "Human",
+      "Preference",
+      "Coherence",
+      "Alignment",
+      "country",
+      "language",
+      "flux",
+      "midjourney",
+      "dalle3",
+      "stabeldiffusion",
+      "alignment",
+      "flux1.1",
+      "flux1",
+      "imagen3",
+      "aurora",
+      "lumina",
+      "recraft",
+      "recraft v2",
+      "ideogram",
+      "frames",
+      "reve ai",
+      "halfmoon"
+    ]
+  },
+  "vanta-research/human-ai-collaboration-1": {
+    "downloads": 37,
+    "tags": [
+      "task_categories:text-generation",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "doi:10.57967/hf/6940",
+      "region:us",
+      "human-ai-collaboration",
+      "LoRA",
+      "problem-solving",
+      "conversational-ai",
+      "vanta-research",
+      "reasoning-datasets",
+      "thinking-models",
+      "collaboration"
+    ]
+  },
+  "vanta-research/human-ai-collaboration-2": {
+    "downloads": 21,
+    "tags": [
+      "task_categories:text-generation",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "human-ai-collaboration",
+      "human-ai-collaboration-2",
+      "LoRA",
+      "problem-solving",
+      "conversational-ai",
+      "vanta-research",
+      "reasoning-datasets",
+      "thinking-models",
+      "collaboration",
+      "warm",
+      "friendly",
+      "chat"
+    ]
+  },
+  "arize-ai/human_actions_quality_drift": {
+    "downloads": 18,
+    "tags": [
+      "task_categories:image-classification",
+      "task_ids:multi-class-classification",
+      "annotations_creators:expert-generated",
+      "language_creators:expert-generated",
+      "multilinguality:monolingual",
+      "source_datasets:extended|imdb",
+      "language:en",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "region:us"
+    ]
+  },
+  "fredguth/aisegmentcn-matting-human": {
+    "downloads": 19,
+    "tags": [
+      "task_categories:image-segmentation",
+      "task_ids:semantic-segmentation",
+      "annotations_creators:Beijing Wanxing Convergence Technology Co",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "region:us",
+      "binary",
+      "aisegment.cn"
+    ]
+  },
+  "airt-ml/twitter-human-bots": {
+    "downloads": 24,
+    "tags": [
+      "license:cc-by-sa-3.0",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "NabeelShar/ai_and_human_text": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "stickn/AI-to-Human-Converter": {
+    "downloads": 1,
+    "tags": [
+      "language:en",
+      "license:mit",
+      "region:us"
+    ]
+  },
+  "bulkbeings/Human-ai-v2": {
+    "downloads": 17,
+    "tags": [
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ai4bharat/human-eval": {
+    "downloads": 27,
+    "tags": [
+      "annotations_creators:expert-generated",
+      "language_creators:expert-generated",
+      "multilinguality:monolingual",
+      "source_datasets:original",
+      "language:hi",
+      "license:cc-by-4.0",
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "bulkbeings/human-ai-v3": {
+    "downloads": 24,
+    "tags": [
+      "language:en",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "andythetechnerd03/AI-human-text": {
+    "downloads": 178,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "code"
+    ]
+  },
+  "eugeneyjy/ai-human-images": {
+    "downloads": 16,
+    "tags": [
+      "task_categories:image-classification",
+      "size_categories:10K<n<100K",
+      "region:us",
+      "art"
+    ]
+  },
+  "likhithasapu/ai-human-gen": {
+    "downloads": 16,
+    "tags": [
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "innova-ai/Human-Style-Answers": {
+    "downloads": 63,
+    "tags": [
+      "task_categories:text-generation",
+      "task_categories:translation",
+      "task_categories:summarization",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us",
+      "human",
+      "friendly",
+      "code"
+    ]
+  },
+  "innova-ai/Code-Human-Like": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "lmarena-ai/arena-human-preference-55k": {
+    "downloads": 760,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2403.04132",
+      "region:us"
+    ]
+  },
+  "omarawad11/ai_human_text": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "Lyra-stellAI/AI_Human_generated_movie_reviews": {
+    "downloads": 33,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "egujr001/toy_human_ai_data": {
+    "downloads": 13,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:image",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "egujr001/human-ai-images-1gb": {
+    "downloads": 1,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "StarsMakeGalaxy/humanaize_education": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "equiron-ai/like_a_human": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Monteiroo/human_ai_pt-br": {
+    "downloads": 6,
+    "tags": [
+      "license:mit",
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "algohype/Human_AI_prompts": {
+    "downloads": 3,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Alignment-Lab-AI/Arc-human-orig": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "v0dkapapi/HospitalData_HumanAI": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "szh/ai_human_eval": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:imagefolder",
+      "modality:image",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "fixie-ai/HeySQuAD_human": {
+    "downloads": 13,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:audio",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "helical-ai/yolksac_human": {
+    "downloads": 146,
+    "tags": [
+      "license:cc0-1.0",
+      "size_categories:10K<n<100K",
+      "region:us",
+      "biology",
+      "rna",
+      "gene expression"
+    ]
+  },
+  "wanghw/human-ai-comparison": {
+    "downloads": 31,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:question-answering",
+      "language:zh",
+      "license:apache-2.0",
+      "size_categories:100K<n<1M",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "finance",
+      "legal",
+      "medical"
+    ]
+  },
+  "humancert/unique_ai_human": {
+    "downloads": 13,
+    "tags": [
+      "language:en",
+      "license:unknown",
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "akansha2k2/human_centered_ai_dataset": {
+    "downloads": 4,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "sindoc/human-ai-relationship-glossary": {
+    "downloads": 11,
+    "tags": [
+      "license:mit",
+      "size_categories:n<1K",
+      "format:imagefolder",
+      "modality:image",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "browndw/human-ai-parallel-corpus": {
+    "downloads": 157,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2410.16107",
+      "doi:10.57967/hf/3770",
+      "region:us"
+    ]
+  },
+  "browndw/human-ai-parallel-corpus-spacy": {
+    "downloads": 34,
+    "tags": [
+      "license:mit",
+      "size_categories:10M<n<100M",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2410.16107",
+      "doi:10.57967/hf/3793",
+      "region:us"
+    ]
+  },
+  "browndw/human-ai-parallel-corpus-biber": {
+    "downloads": 54,
+    "tags": [
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2410.16107",
+      "doi:10.57967/hf/3792",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_HumanAI_M3-details": {
+    "downloads": 12,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_HumanAI_M1-details": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_HumanAI_M2-details": {
+    "downloads": 12,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_001-details": {
+    "downloads": 12,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-booksum-complete-cleaned-human-ai": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "browndw/human-ai-parallel-corpus-mini": {
+    "downloads": 10,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2410.16107",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-booksum-complete-cleaned-human-splitted": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-booksum-complete-cleaned-human-splitted-formatted": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-formatted": {
+    "downloads": 8,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-formatted-ai": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "DeepNLP/Human-Preferences-Alignment-KTO-Dataset-AI-Services-Genuine-User-Reviews": {
+    "downloads": 30,
+    "tags": [
+      "license:mit",
+      "size_categories:n<1K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2203.02155",
+      "region:us"
+    ]
+  },
+  "browndw/human-ai-parallel-corpus-docuscope": {
+    "downloads": 16,
+    "tags": [
+      "license:mit",
+      "size_categories:10M<n<100M",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2410.16107",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-formatted-ai-part1": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-formatted-ai-part2": {
+    "downloads": 9,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-formatted-ai-part3": {
+    "downloads": 10,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-formatted-ai-part4": {
+    "downloads": 9,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-formatted-ai-part5": {
+    "downloads": 8,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-formatted-ai-v1-sft": {
+    "downloads": 9,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-choosed-formatted-ai": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-chosen": {
+    "downloads": 1,
+    "tags": [
+      "format:parquet",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-v2": {
+    "downloads": 9,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-v2-formatted": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AlekseyKorshuk/ai-detection-gutenberg-human-v2-formatted-ai": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_006-details": {
+    "downloads": 20,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_007-details": {
+    "downloads": 25,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_RP-details": {
+    "downloads": 23,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_TextVision-details": {
+    "downloads": 12,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_009_CHAT-details": {
+    "downloads": 21,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_010_CHAT-details": {
+    "downloads": 20,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_011_INSTRUCT-details": {
+    "downloads": 19,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_011_INSTRUCT_ML-details": {
+    "downloads": 24,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_011_INSTRUCT_ML_r1-details": {
+    "downloads": 20,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_012_INSTRUCT_MX-details": {
+    "downloads": 23,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_012_INSTRUCT_XA-details": {
+    "downloads": 43,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard/LeroyDyer__SpydazWeb_AI_HumanAI_012_INSTRUCT_IA-details": {
+    "downloads": 48,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ko-human-ai/ko-human-ai-results": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ko-human-ai/ko-human-ai": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "abir-hr196/human_to_ai_perplexity": {
+    "downloads": 11,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "abir-hr196/human_to_ai_github_curation": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ai2-adapt-dev/instruction_tags_human_labeled": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "aycabostancioglu/Arabic-English-Turkish-AI-Human-Text": {
+    "downloads": 4,
+    "tags": [
+      "license:gpl-3.0",
+      "region:us"
+    ]
+  },
+  "lmarena-ai/arena-human-preference-100k": {
+    "downloads": 242,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "arxiv:2403.04132",
+      "region:us"
+    ]
+  },
+  "ai2-adapt-dev/multipref-human-overall-binarized": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "pipecat-ai/human_5_all": {
+    "downloads": 10,
+    "tags": [
+      "license:bsd-2-clause",
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:audio",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ernanhughes/ai-human": {
+    "downloads": 11,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "svjack/zh-idiom-in-human-machine-eng": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "readerbench/ro-human-machine-60k": {
+    "downloads": 19,
+    "tags": [
+      "task_categories:text-generation",
+      "task_categories:translation",
+      "task_categories:text2text-generation",
+      "language:ro",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "aliajeenah/moral_machine_human_language": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AIxBlock/Human-to-machine-Japanese-audio-call-center-conversations": {
+    "downloads": 10,
+    "tags": [
+      "task_categories:text-to-speech",
+      "language:ja",
+      "license:cc-by-nc-4.0",
+      "size_categories:n<1K",
+      "format:audiofolder",
+      "modality:audio",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "AIxBlock/Thai-human-to-machine-call-center-audio-with-script": {
+    "downloads": 0,
+    "tags": [
+      "task_categories:automatic-speech-recognition",
+      "language:th",
+      "license:cc-by-nc-4.0",
+      "region:us"
+    ]
+  },
+  "abhi099k/machine-and-human-text": {
+    "downloads": 47,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "human",
+      "machine",
+      "ai-detection"
+    ]
+  },
+  "khalidalt/AR_LLM_outputs": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "Prompt-Pool-Agent/prompt-pool-eval-llm-outputs": {
+    "downloads": 55,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "jkazdan/deepseek-llm-7b-chat-kyssen-copyright-outputs": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "jkazdan/deepseek-llm-7b-chat-2-29-kyssen-164-kyssen-copyright-outputs": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "aravdhoot/llm-domain-shift-law_output": {
+    "downloads": 13,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "aravdhoot/llm-domain-shift-fin_output": {
+    "downloads": 7,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "aravdhoot/llm-domain-shift-regulation_output": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "thisisHJLee/ai_essay": {
+    "downloads": 3,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "duohub-ai/essays-rdf": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "BlueSkyXN/AI-Essay": {
+    "downloads": 30,
+    "tags": [
+      "license:gpl-3.0",
+      "region:us"
+    ]
+  },
+  "shisa-ai/demo_persuasive_essay_topics_japanese": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "shisa-ai/persuasive_essay_responses_QwenQwen25-7B-Instruct-GPTQ-Int8_temp_0_2_gemini_judge": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "shisa-ai/persuasive_essay_responses_shisa-aishisa-v2-qwen25-7b-W8A8-INT8_temp_0_2_gemini_judge": {
+    "downloads": 7,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "galileo-ai/20_Newsgroups_Fixed": {
+    "downloads": 384,
+    "tags": [
+      "task_categories:text-classification",
+      "task_ids:multi-class-classification",
+      "task_ids:topic-classification",
+      "annotations_creators:crowdsourced",
+      "language_creators:crowdsourced",
+      "multilinguality:monolingual",
+      "source_datasets:original",
+      "language:en",
+      "license:unknown",
+      "size_categories:10K<n<100K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "FIdo-AI/ua-news": {
+    "downloads": 38,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "maritaca-ai/ag_news_pt": {
+    "downloads": 154,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "modality:text",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "generative-newsai/Generative-AI-News-Predictor": {
+    "downloads": 6,
+    "tags": [
+      "modality:image",
+      "region:us"
+    ]
+  },
+  "lunarflu/HuggingCast-v1-AI-News-and-Demos": {
+    "downloads": 3,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "esteler-ai/idn-news-az": {
+    "downloads": 84,
+    "tags": [
+      "task_categories:text-generation",
+      "task_categories:fill-mask",
+      "language:id",
+      "license:cc-by-4.0",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "doi:10.57967/hf/1474",
+      "region:us"
+    ]
+  },
+  "asas-ai/financial_news": {
+    "downloads": 13,
+    "tags": [
+      "task_categories:translation",
+      "language:ar",
+      "language:en",
+      "license:apache-2.0",
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "finance"
+    ]
+  },
+  "determined-ai/tldr_news_short": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "jbilcke-hf/ai-tube-deep-news": {
+    "downloads": 109,
+    "tags": [
+      "license:cc-by-nc-4.0",
+      "size_categories:n<1K",
+      "format:imagefolder",
+      "modality:image",
+      "library:datasets",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "ai-forever/ria-news-retrieval": {
+    "downloads": 123,
+    "tags": [
+      "task_categories:text-retrieval",
+      "language:ru",
+      "size_categories:100K<n<1M",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Metric-AI/ILUR-news-text-classification-corpus-formatted": {
+    "downloads": 782,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "TwoShipsInTheNight/ai-tube-Difference-Engine-News": {
+    "downloads": 1,
+    "tags": [
+      "license:cc-by-nc-sa-4.0",
+      "region:us"
+    ]
+  },
+  "asas-ai/NewsFANE": {
+    "downloads": 3,
+    "tags": [
+      "task_categories:token-classification",
+      "language:ar",
+      "license:cc-by-sa-3.0",
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "Named Entity Recognition"
+    ]
+  },
+  "AI-everydayy/Dantri_News_Podcast_Dataset_01": {
+    "downloads": 4,
+    "tags": [
+      "license:cc-by-nc-nd-4.0",
+      "modality:audio",
+      "modality:text",
+      "region:us"
+    ]
+  },
+  "meowterspace42/ai-news-rag-embedding-dataset": {
+    "downloads": 46,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "meowterspace42/ai-news-rag-embedding-dataset-apache2": {
+    "downloads": 20,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "HenokLLM/AI-Newsletter-dataset": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:n<1K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "burman-ai/Burmese-News": {
+    "downloads": 5,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "lvulpecula/ai_fake_news_v2": {
+    "downloads": 34,
+    "tags": [
+      "language:en",
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "ai",
+      "fakenews"
+    ]
+  },
+  "lvulpecula/ai_rewritten_news_v2": {
+    "downloads": 2,
+    "tags": [
+      "task_categories:text-classification",
+      "language:en",
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "ai"
+    ]
+  },
+  "lvulpecula/ai_watermarked_fake_news-v2": {
+    "downloads": 16,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:token-classification",
+      "language:en",
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "nlp",
+      "ml",
+      "ai",
+      "fakenews"
+    ]
+  },
+  "mixedbread-ai/public_ohr_v2_news": {
+    "downloads": 20,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:image",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "lvulpecula/AI_rewritten_fake_news": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "regia-ai/news-triplets": {
+    "downloads": 30,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "fdaudens/ai-jobs-news-articles": {
+    "downloads": 4798,
+    "tags": [
+      "task_categories:text-classification",
+      "task_categories:summarization",
+      "task_categories:feature-extraction",
+      "language:en",
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "ai",
+      "jobs",
+      "news",
+      "workforce",
+      "automation",
+      "employment",
+      "technology"
+    ]
+  },
+  "lvulpecula/ai_fake_news_believability-v2": {
+    "downloads": 6,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "lvulpecula/google_ai_fake_news-v1": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AI-Lab-TDTU/legal-pretrain-news": {
+    "downloads": 3,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "lvulpecula/ai_modified_fake_news": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "yjernite/news-ai-labor-coverage": {
+    "downloads": 25,
+    "tags": [
+      "license:odbl",
+      "size_categories:10K<n<100K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "trieunh/vietnamese.human.ai.news.sets": {
+    "downloads": 58,
+    "tags": [
+      "license:apache-2.0",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "doi:10.57967/hf/6233",
+      "region:us"
+    ]
+  },
+  "devparagiri/dataset-AINewsSummarizer-20250824-113319": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "clairvoyance-ai/clairvoyance-news": {
+    "downloads": 14,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:image",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AnhNguyen2299/vietnamese_news_human_ai": {
+    "downloads": 8,
+    "tags": [
+      "task_categories:text-classification",
+      "language:vi",
+      "license:cc-by-4.0",
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "news",
+      "Vietnamese",
+      "AI",
+      "article"
+    ]
+  },
+  "ICCIES-2025-DetectAI/vietnamese_news_human_ai": {
+    "downloads": 52,
+    "tags": [
+      "task_categories:text-classification",
+      "language:vi",
+      "license:cc-by-4.0",
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us",
+      "news",
+      "Vietnamese",
+      "AI",
+      "article"
+    ]
+  },
+  "EmdyaPermuy/AI-News-Classification": {
+    "downloads": 0,
+    "tags": [
+      "license:mit",
+      "region:us"
+    ]
+  },
+  "typedef-ai/hacker-news-dataset": {
+    "downloads": 62,
+    "tags": [
+      "size_categories:10M<n<100M",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "ai-allforever/wiki-ru-en-news-books": {
+    "downloads": 4,
+    "tags": [
+      "task_categories:text-generation",
+      "language:en",
+      "language:ru",
+      "license:cc-by-4.0",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "ireneburresi/awsome-ai-news": {
+    "downloads": 7,
+    "tags": [
+      "license:mit",
+      "region:us"
+    ]
+  },
+  "jaydenccc/AI_Storyteller_Dataset": {
+    "downloads": 44,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "julep-ai-archive/storycommonsense-chatml": {
+    "downloads": 8,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "open-llm-leaderboard-old/details_GOAT-AI__GOAT-70B-Storytelling": {
+    "downloads": 32,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "bubl-ai/story_with_synthetic_test_set": {
+    "downloads": 3,
+    "tags": [
+      "license:mit",
+      "region:us"
+    ]
+  },
+  "Rhine-AI/open-rs-story": {
+    "downloads": 12,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "siavava/ai-tech-articles": {
+    "downloads": 73,
+    "tags": [
+      "task_categories:text-generation",
+      "task_categories:feature-extraction",
+      "language:en",
+      "license:mit",
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "doi:10.57967/hf/1324",
+      "region:us",
+      "temporal series data",
+      "language data"
+    ]
+  },
+  "premio-ai/TheArabicPile_Articles": {
+    "downloads": 20,
+    "tags": [
+      "task_categories:text-generation",
+      "language:ar",
+      "license:cc-by-nc-4.0",
+      "size_categories:1M<n<10M",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "hpe-ai/demo-articles-and-summary": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "probabl-ai/LLM_article": {
+    "downloads": 6,
+    "tags": [
+      "region:us"
+    ]
+  },
+  "asas-ai/Arabic-article-summarization": {
+    "downloads": 1,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "junn991/ai_article": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:n<1K",
+      "format:json",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AI-training-1903/GE_reuters_articles": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "AI-AIMS/25_Articles-Affiliate-Marketing": {
+    "downloads": 0,
+    "tags": [
+      "license:cc0-1.0",
+      "size_categories:n<1K",
+      "format:csv",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "yjernite/ai-economy-labor-articles-annotated-with-embeddings": {
+    "downloads": 129,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "yjernite/ai-economy-labor-articles-annotated": {
+    "downloads": 107,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "yjernite/ai-economy-labor-articles-annotated-processed": {
+    "downloads": 64,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "yjernite/ai-economy-labor-articles-annotated-embed": {
+    "downloads": 72,
+    "tags": [
+      "size_categories:10K<n<100K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:dask",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "d-e-c-d/AI_Articles_Scraped_from_arXiv-Semantic_Scholar": {
+    "downloads": 0,
+    "tags": [
+      "size_categories:100K<n<1M",
+      "format:csv",
+      "modality:tabular",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "Sculpt-AI/random-articles": {
+    "downloads": 7,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  },
+  "CATI-AI/1_3_legal_concept_article_recall_prompts": {
+    "downloads": 4,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "CATI-AI/3_1_article_clause_prediction_prompts": {
+    "downloads": 2,
+    "tags": [
+      "size_categories:n<1K",
+      "format:parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:mlcroissant",
+      "library:polars",
+      "region:us"
+    ]
+  },
+  "regagent-ai/Article-Risk-Factor-classification-data-v1": {
+    "downloads": 55,
+    "tags": [
+      "size_categories:1K<n<10K",
+      "format:parquet",
+      "format:optimized-parquet",
+      "modality:text",
+      "library:datasets",
+      "library:pandas",
+      "library:polars",
+      "library:mlcroissant",
+      "region:us"
+    ]
+  }
+}

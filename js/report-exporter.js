@@ -102,8 +102,10 @@ const ReportExporter = {
         const probability = report.summary.probability;
         const barColor = probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981');
         
-        let html = `
-<!DOCTYPE html>
+        // Build verbose evidence summaries for each category
+        const verboseEvidence = this.buildVerboseEvidence(report, analysisResult);
+        
+        let html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -112,54 +114,64 @@ const ReportExporter = {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
-            font-size: 11pt; 
-            line-height: 1.5; 
+            font-size: 10pt; 
+            line-height: 1.4; 
             color: #1a1a1a;
-            padding: 20px;
+            padding: 15px 20px;
             max-width: 800px;
             margin: 0 auto;
         }
-        h1 { font-size: 24pt; margin-bottom: 5px; color: #111; }
-        h2 { font-size: 16pt; margin: 20px 0 10px; color: #333; border-bottom: 2px solid #e5e5e5; padding-bottom: 5px; }
-        h3 { font-size: 13pt; margin: 15px 0 8px; color: #444; }
-        h4 { font-size: 11pt; margin: 10px 0 5px; color: #555; }
-        p { margin-bottom: 10px; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #333; padding-bottom: 15px; }
-        .meta { color: #666; font-size: 10pt; }
-        .summary-box { background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 8px; padding: 20px; margin: 20px 0; }
-        .verdict { font-size: 14pt; font-weight: bold; margin: 10px 0; }
+        h1 { font-size: 20pt; margin-bottom: 3px; color: #111; }
+        h2 { font-size: 14pt; margin: 12px 0 6px; color: #333; border-bottom: 2px solid #e5e5e5; padding-bottom: 3px; }
+        h3 { font-size: 11pt; margin: 8px 0 4px; color: #444; }
+        h4 { font-size: 10pt; margin: 6px 0 3px; color: #555; }
+        p { margin-bottom: 6px; }
+        .header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .meta { color: #666; font-size: 9pt; }
+        .summary-box { background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 6px; padding: 12px; margin: 10px 0; }
+        .verdict { font-size: 12pt; font-weight: bold; margin: 6px 0; }
         .verdict.high { color: #ef4444; }
         .verdict.moderate { color: #f59e0b; }
         .verdict.low { color: #10b981; }
-        .probability-bar { height: 20px; background: #e5e5e5; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .probability-bar { height: 16px; background: #e5e5e5; border-radius: 8px; overflow: hidden; margin: 6px 0; }
         .probability-fill { height: 100%; background: ${barColor}; transition: width 0.3s; }
-        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 15px 0; }
-        .stat-item { background: #f5f5f5; padding: 10px; border-radius: 5px; }
-        .stat-label { font-size: 9pt; color: #666; text-transform: uppercase; }
-        .stat-value { font-size: 14pt; font-weight: bold; color: #333; }
-        .category-card { border: 1px solid #e5e5e5; border-radius: 8px; padding: 15px; margin: 15px 0; page-break-inside: avoid; }
-        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .category-name { font-weight: bold; font-size: 12pt; }
-        .category-score { font-weight: bold; padding: 3px 10px; border-radius: 15px; font-size: 11pt; }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0; }
+        .stat-item { background: #f5f5f5; padding: 6px 8px; border-radius: 4px; }
+        .stat-label { font-size: 7pt; color: #666; text-transform: uppercase; }
+        .stat-value { font-size: 11pt; font-weight: bold; color: #333; }
+        .category-card { border: 1px solid #e5e5e5; border-radius: 6px; padding: 10px; margin: 8px 0; page-break-inside: avoid; }
+        .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .category-name { font-weight: bold; font-size: 10pt; }
+        .category-score { font-weight: bold; padding: 2px 8px; border-radius: 12px; font-size: 9pt; }
         .score-high { background: #fee2e2; color: #b91c1c; }
         .score-moderate { background: #fef3c7; color: #b45309; }
         .score-low { background: #d1fae5; color: #047857; }
-        .category-bar { height: 8px; background: #e5e5e5; border-radius: 4px; overflow: hidden; margin: 8px 0; }
-        .category-fill { height: 100%; border-radius: 4px; }
-        .weight-info { font-size: 9pt; color: #888; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; }
-        .finding { padding: 5px 0 5px 20px; border-left: 3px solid #ddd; margin: 5px 0; font-size: 10pt; }
-        .finding.ai { border-left-color: #ef4444; }
-        .finding.human { border-left-color: #10b981; }
-        .finding.mixed { border-left-color: #f59e0b; }
-        .chart { margin: 20px 0; }
+        .category-bar { height: 6px; background: #e5e5e5; border-radius: 3px; overflow: hidden; margin: 4px 0; }
+        .category-fill { height: 100%; border-radius: 3px; }
+        .weight-info { font-size: 8pt; color: #888; margin-top: 6px; padding-top: 6px; border-top: 1px solid #eee; }
+        .finding { padding: 3px 0 3px 12px; border-left: 2px solid #ddd; margin: 3px 0; font-size: 9pt; }
+        .finding.ai { border-left-color: #ef4444; background: #fff5f5; }
+        .finding.human { border-left-color: #10b981; background: #f0fdf4; }
+        .finding.mixed { border-left-color: #f59e0b; background: #fffbeb; }
+        .evidence-stats { font-size: 8pt; color: #666; margin-top: 4px; padding: 4px 8px; background: #f9fafb; border-radius: 3px; }
+        .evidence-stats strong { color: #333; }
+        .chart { margin: 10px 0; }
         .bar-chart { width: 100%; }
-        .bar-row { display: flex; align-items: center; margin: 5px 0; }
-        .bar-label { width: 180px; font-size: 9pt; text-align: right; padding-right: 10px; }
-        .bar-track { flex: 1; height: 18px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+        .bar-row { display: flex; align-items: center; margin: 3px 0; }
+        .bar-label { width: 150px; font-size: 8pt; text-align: right; padding-right: 8px; }
+        .bar-track { flex: 1; height: 14px; background: #f0f0f0; border-radius: 2px; overflow: hidden; }
         .bar-fill-ai { background: #737373; }
-        .bar-value { width: 50px; text-align: right; font-size: 10pt; font-weight: bold; padding-left: 8px; }
-        .disclaimer { background: #fff8e6; border: 1px solid #ffd666; border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 10pt; }
-        .methodology { background: #f0f7ff; border-radius: 8px; padding: 15px; margin: 20px 0; font-size: 10pt; }
+        .bar-value { width: 45px; text-align: right; font-size: 9pt; font-weight: bold; padding-left: 6px; }
+        .disclaimer { background: #fff8e6; border: 1px solid #ffd666; border-radius: 6px; padding: 10px; margin: 12px 0; font-size: 9pt; }
+        .methodology { background: #f0f7ff; border-radius: 6px; padding: 10px; margin: 12px 0; font-size: 9pt; }
+        .signal-summary { background: #fafafa; border: 1px solid #e5e5e5; border-radius: 6px; padding: 10px; margin: 10px 0; }
+        .signal-summary h3 { margin-top: 0; }
+        .signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .signal-item { padding: 6px; border-radius: 4px; }
+        .signal-item.ai-signal { background: #fee2e2; border-left: 3px solid #ef4444; }
+        .signal-item.human-signal { background: #d1fae5; border-left: 3px solid #10b981; }
+        .signal-item .signal-label { font-size: 8pt; color: #666; }
+        .signal-item .signal-value { font-size: 10pt; font-weight: bold; }
         table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 10pt; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background: #f5f5f5; font-weight: 600; }
@@ -254,6 +266,9 @@ const ReportExporter = {
     </div>`;
         }
 
+        // Add verbose signal summary before sentence breakdown
+        html += this.generateSignalSummaryHtml(analysisResult, verboseEvidence);
+
         // Sentence breakdown if available
         if (analysisResult.sentenceScores && analysisResult.sentenceScores.length > 0) {
             const aiSentences = analysisResult.sentenceScores.filter(s => s.classification === 'ai').length;
@@ -262,7 +277,6 @@ const ReportExporter = {
             const total = analysisResult.sentenceScores.length;
             
             html += `
-    <div class="page-break"></div>
     <h2>Sentence-Level Analysis</h2>
     <p>Each sentence was individually analyzed and classified:</p>
     <table>
@@ -324,6 +338,200 @@ const ReportExporter = {
     </div>
 </body>
 </html>`;
+
+        return html;
+    },
+
+    /**
+     * Build verbose evidence from analysis results with specific statistics
+     */
+    buildVerboseEvidence(report, analysisResult) {
+        const evidence = {
+            aiSignals: [],
+            humanSignals: [],
+            statistics: {}
+        };
+
+        const advStats = analysisResult.advancedStats || {};
+        const stats = analysisResult.stats || {};
+
+        // Sentence structure evidence
+        if (advStats.sentences) {
+            const cv = advStats.sentences.coefficientOfVariation;
+            evidence.statistics.sentenceCV = cv;
+            if (cv < 0.35) {
+                evidence.aiSignals.push({
+                    label: 'Low Sentence Variance',
+                    value: `CV: ${(cv * 100).toFixed(1)}% (human avg: 45-60%)`,
+                    severity: cv < 0.25 ? 'high' : 'medium'
+                });
+            } else if (cv > 0.5) {
+                evidence.humanSignals.push({
+                    label: 'Natural Sentence Variance',
+                    value: `CV: ${(cv * 100).toFixed(1)}%`
+                });
+            }
+        }
+
+        // Burstiness evidence
+        if (advStats.burstiness) {
+            const burst = advStats.burstiness.sentenceLength;
+            evidence.statistics.burstiness = burst;
+            if (burst < 0.15) {
+                evidence.aiSignals.push({
+                    label: 'Low Burstiness',
+                    value: `${(burst * 100).toFixed(1)}% (human avg: 25-40%)`,
+                    severity: burst < 0.1 ? 'high' : 'medium'
+                });
+            } else if (burst > 0.25) {
+                evidence.humanSignals.push({
+                    label: 'Natural Burstiness',
+                    value: `${(burst * 100).toFixed(1)}%`
+                });
+            }
+        }
+
+        // Vocabulary diversity
+        if (advStats.vocabulary) {
+            const hapax = advStats.vocabulary.hapaxLegomenaRatio;
+            evidence.statistics.hapaxRatio = hapax;
+            if (hapax < 0.35) {
+                evidence.aiSignals.push({
+                    label: 'Low Hapax Ratio',
+                    value: `${(hapax * 100).toFixed(1)}% unique words (human avg: 40-55%)`,
+                    severity: hapax < 0.3 ? 'high' : 'medium'
+                });
+            }
+        }
+
+        // Personal pronouns
+        if (advStats.wordPatterns) {
+            const fp = advStats.wordPatterns.firstPersonRatio;
+            evidence.statistics.firstPersonRatio = fp;
+            if (fp < 0.005) {
+                evidence.aiSignals.push({
+                    label: 'No Personal Pronouns',
+                    value: `${(fp * 100).toFixed(2)}% first-person usage`,
+                    severity: 'medium'
+                });
+            } else if (fp > 0.02) {
+                evidence.humanSignals.push({
+                    label: 'Personal Experience Markers',
+                    value: `${(fp * 100).toFixed(2)}% first-person pronouns`
+                });
+            }
+
+            const hedging = advStats.wordPatterns.hedgingRatio;
+            if (hedging > 0.02) {
+                evidence.aiSignals.push({
+                    label: 'Excessive Hedging',
+                    value: `${(hedging * 100).toFixed(2)}% hedging words (AI typically >2%)`,
+                    severity: hedging > 0.03 ? 'high' : 'medium'
+                });
+            }
+        }
+
+        // Uniformity metrics
+        if (advStats.burstiness?.overallUniformity) {
+            const uniformity = advStats.burstiness.overallUniformity;
+            evidence.statistics.overallUniformity = uniformity;
+            if (uniformity > 0.7) {
+                evidence.aiSignals.push({
+                    label: 'High Uniformity Score',
+                    value: `${(uniformity * 100).toFixed(1)}% (human avg: 40-60%)`,
+                    severity: uniformity > 0.8 ? 'high' : 'medium'
+                });
+            }
+        }
+
+        // AI signatures
+        if (advStats.aiSignatures) {
+            if (advStats.aiSignatures.contractionRate < 0.05) {
+                evidence.aiSignals.push({
+                    label: 'No Contractions',
+                    value: `${advStats.aiSignatures.contractionRate.toFixed(2)} per sentence (human avg: 0.2-0.5)`,
+                    severity: 'low'
+                });
+            }
+            if (advStats.aiSignatures.sentenceStarterVariety < 0.4) {
+                evidence.aiSignals.push({
+                    label: 'Repetitive Sentence Starters',
+                    value: `${(advStats.aiSignatures.sentenceStarterVariety * 100).toFixed(1)}% variety`,
+                    severity: 'medium'
+                });
+            }
+        }
+
+        // Category-specific evidence
+        for (const cat of (analysisResult.categoryResults || [])) {
+            if (cat.aiProbability > 0.65 && cat.confidence > 0.5) {
+                const weightInfo = this.categoryWeightInfo[cat.category];
+                if (weightInfo && weightInfo.weight > 0.08) {
+                    evidence.aiSignals.push({
+                        label: cat.name,
+                        value: `${Math.round(cat.aiProbability * 100)}% AI probability, ${Math.round(cat.confidence * 100)}% confidence`,
+                        severity: cat.aiProbability > 0.8 ? 'high' : 'medium'
+                    });
+                }
+            } else if (cat.aiProbability < 0.35 && cat.confidence > 0.5) {
+                evidence.humanSignals.push({
+                    label: cat.name,
+                    value: `${Math.round(cat.aiProbability * 100)}% AI probability`
+                });
+            }
+        }
+
+        return evidence;
+    },
+
+    /**
+     * Generate signal summary HTML section
+     */
+    generateSignalSummaryHtml(analysisResult, evidence) {
+        if (!evidence || (evidence.aiSignals.length === 0 && evidence.humanSignals.length === 0)) {
+            return '';
+        }
+
+        let html = `
+    <div class="signal-summary">
+        <h3>Detection Signal Summary</h3>
+        <p style="font-size:9pt;color:#666;">Specific statistical evidence supporting the classification:</p>
+        <div class="signal-grid">`;
+
+        // AI signals column
+        html += `<div>
+            <h4 style="color:#b91c1c;font-size:10pt;margin-bottom:6px;">🔴 AI Indicators (${evidence.aiSignals.length})</h4>`;
+        
+        for (const signal of evidence.aiSignals.slice(0, 6)) {
+            const severityColor = signal.severity === 'high' ? '#991b1b' : (signal.severity === 'medium' ? '#b91c1c' : '#dc2626');
+            html += `
+            <div class="signal-item ai-signal">
+                <div class="signal-label">${signal.label}</div>
+                <div class="signal-value" style="color:${severityColor}">${signal.value}</div>
+            </div>`;
+        }
+        html += `</div>`;
+
+        // Human signals column
+        html += `<div>
+            <h4 style="color:#047857;font-size:10pt;margin-bottom:6px;">🟢 Human Indicators (${evidence.humanSignals.length})</h4>`;
+        
+        for (const signal of evidence.humanSignals.slice(0, 6)) {
+            html += `
+            <div class="signal-item human-signal">
+                <div class="signal-label">${signal.label}</div>
+                <div class="signal-value" style="color:#047857">${signal.value}</div>
+            </div>`;
+        }
+        
+        if (evidence.humanSignals.length === 0) {
+            html += `<p style="font-size:9pt;color:#888;padding:6px;">No significant human indicators found</p>`;
+        }
+        html += `</div>`;
+
+        html += `
+        </div>
+    </div>`;
 
         return html;
     },

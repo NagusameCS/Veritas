@@ -4,3 +4,5 @@ __pycache__/
 training/.cache/
 training/__pycache__/
 training/models/
+training/training_log.txt
+*.log

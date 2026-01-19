@@ -110,6 +110,9 @@ const AnalyzerEngine = {
         // Calculate overall AI probability using variance-based scoring
         const overallResult = this.calculateVarianceBasedProbability(categoryResults);
         
+        // Run humanizer detection (second-order analysis for AI-written, human-modified text)
+        const humanizerSignals = this.detectHumanizerSignalsWithCategories(text, sentences, advancedStats, categoryResults);
+        
         // Generate sentence-level scores for highlighting
         const sentenceScores = this.scoreSentences(text, sentences, categoryResults);
         
@@ -132,6 +135,14 @@ const AnalyzerEngine = {
         const falsePositiveRisk = this.assessFalsePositiveRisk(categoryResults, text);
 
         const endTime = performance.now();
+        
+        // Get verdict with humanizer detection factored in
+        const verdict = this.getVerdictWithHumanizer(
+            overallResult.aiProbability, 
+            overallResult.confidence, 
+            humanizerSignals,
+            overallResult.signalCounts
+        );
 
         return {
             // Overall results
@@ -141,7 +152,8 @@ const AnalyzerEngine = {
             confidence: overallResult.confidence,
             confidenceInterval,
             falsePositiveRisk,
-            verdict: this.getVerdict(overallResult.aiProbability, overallResult.confidence),
+            verdict,
+            humanizerSignals,
             
             // Variance-specific data
             varianceProfile: overallResult.varianceProfile,
@@ -480,6 +492,121 @@ const AnalyzerEngine = {
     },
 
     /**
+     * Enhanced humanizer detection that incorporates category results for contradiction analysis
+     * Used in the main analyze() function after category analysis is complete
+     */
+    detectHumanizerSignalsWithCategories(text, sentences, advancedStats, categoryResults) {
+        // Get base signals from advancedStats if available
+        const baseSignals = advancedStats?.humanizerSignals || {};
+        
+        // Analyze category-level contradictions
+        const contradictionAnalysis = this.analyzeContradictions(categoryResults);
+        
+        // Merge signals
+        const signals = {
+            ...baseSignals,
+            ...contradictionAnalysis
+        };
+        
+        // Enhanced flag detection including contradiction
+        const flagCount = [
+            signals.stableVarianceFlag,
+            signals.flatAutocorrelationFlag,
+            signals.brokenCorrelationFlag,
+            signals.synonymSubstitutionFlag,
+            signals.artificialContractionFlag,
+            signals.categoryContradictionFlag
+        ].filter(Boolean).length;
+        
+        // Higher probability when both structural and surface-level contradictions exist
+        const contradictionBoost = contradictionAnalysis.contradictionScore > 0.5 ? 0.2 : 0;
+        
+        signals.humanizerProbability = Math.min(1, (flagCount / 3.5) + contradictionBoost);
+        signals.isLikelyHumanized = flagCount >= 2 || (contradictionAnalysis.contradictionScore > 0.6);
+        signals.flagCount = flagCount;
+        
+        return signals;
+    },
+
+    /**
+     * Analyze contradictions in category results
+     * Key patterns for humanized text:
+     * - High uniformity in structure but high variance in surface features
+     * - AI patterns in grammar/syntax but human patterns in personal markers
+     * - Perfect mechanics but chaotic vocabulary
+     */
+    analyzeContradictions(categoryResults) {
+        const analysis = {
+            categoryContradictionFlag: false,
+            contradictionScore: 0,
+            contradictingCategories: []
+        };
+        
+        if (!categoryResults || categoryResults.length < 4) {
+            return analysis;
+        }
+        
+        // Sort into AI-indicating and human-indicating categories
+        const aiCategories = [];
+        const humanCategories = [];
+        
+        for (const result of categoryResults) {
+            if (result.aiProbability > 0.65) {
+                aiCategories.push({ name: result.name, prob: result.aiProbability });
+            } else if (result.aiProbability < 0.35) {
+                humanCategories.push({ name: result.name, prob: result.aiProbability });
+            }
+        }
+        
+        // Contradiction: Having strong signals from both sides
+        if (aiCategories.length >= 2 && humanCategories.length >= 2) {
+            analysis.categoryContradictionFlag = true;
+            
+            // Score based on how polarized the results are
+            const avgAiProb = aiCategories.reduce((s, c) => s + c.prob, 0) / aiCategories.length;
+            const avgHumanProb = humanCategories.reduce((s, c) => s + (1 - c.prob), 0) / humanCategories.length;
+            
+            analysis.contradictionScore = (avgAiProb + avgHumanProb) / 2;
+            analysis.contradictingCategories = {
+                aiIndicators: aiCategories.map(c => c.name),
+                humanIndicators: humanCategories.map(c => c.name)
+            };
+        }
+        
+        // Special contradiction patterns (highly indicative of humanization)
+        const categoryMap = {};
+        for (const result of categoryResults) {
+            const nameLower = result.name?.toLowerCase() || '';
+            categoryMap[nameLower] = result.aiProbability;
+        }
+        
+        // Pattern 1: Perfect grammar/syntax (AI) but high personal markers (humanized)
+        const grammarAI = (categoryMap['grammar'] || categoryMap['grammar patterns'] || 0.5) > 0.6;
+        const authorshipHuman = (categoryMap['authorship'] || categoryMap['authorship markers'] || 0.5) < 0.4;
+        
+        // Pattern 2: Uniform structure (AI) but chaotic vocabulary (humanized)
+        const syntaxAI = (categoryMap['syntax'] || categoryMap['syntax variance'] || 0.5) > 0.6;
+        const lexicalHuman = (categoryMap['lexical'] || categoryMap['lexical diversity'] || 0.5) < 0.4;
+        
+        // Pattern 3: Stable tone (AI) but varied semantic fields (humanized)
+        const toneAI = (categoryMap['tone'] || categoryMap['emotional tone'] || 0.5) > 0.6;
+        const semanticHuman = (categoryMap['semantic'] || categoryMap['semantic analysis'] || 0.5) < 0.4;
+        
+        const patternFlags = [
+            grammarAI && authorshipHuman,
+            syntaxAI && lexicalHuman,
+            toneAI && semanticHuman
+        ].filter(Boolean).length;
+        
+        if (patternFlags >= 1) {
+            analysis.categoryContradictionFlag = true;
+            analysis.contradictionScore = Math.max(analysis.contradictionScore, 0.4 + patternFlags * 0.15);
+        }
+        
+        return analysis;
+    },
+
+    /**
      * Pearson correlation coefficient
      */
     pearsonCorrelation(x, y) {
@@ -760,10 +887,10 @@ const AnalyzerEngine = {
      * Calculate overall AI probability using variance-based methodology
      * Key principle: High uniformity = AI, High variance = Human
      * 
-     * ENHANCED v2.2: Uses Gaussian bell curve philosophy
-     * - Humans fall in the "reasonable middle" of a normal distribution
-     * - BOTH extremes (too perfect AND too chaotic) are suspicious
-     * - Bayesian combination with calibrated confidence
+     * ENHANCED v2.3: Improved signal aggregation
+     * - Strong individual AI signals should have more impact
+     * - Multiple agreeing signals compound their effect
+     * - Human signals can only reduce AI probability proportionally
      */
     calculateVarianceBasedProbability(categoryResults) {
         const validResults = categoryResults.filter(r => 
@@ -785,6 +912,14 @@ const AnalyzerEngine = {
         const featureContributions = [];
         const probabilities = [];
         const weights = [];
+        
+        // Track strong signals separately
+        let strongAiSignalCount = 0;
+        let strongHumanSignalCount = 0;
+        let aiWeightedSum = 0;
+        let humanWeightedSum = 0;
+        let totalAiWeight = 0;
+        let totalHumanWeight = 0;
 
         for (const result of validResults) {
             // Map categories to weight keys
@@ -797,6 +932,17 @@ const AnalyzerEngine = {
             probabilities.push(result.aiProbability);
             weights.push(effectiveWeight);
             
+            // Count strong signals and track weighted contributions
+            if (result.aiProbability > 0.65) {
+                strongAiSignalCount++;
+                aiWeightedSum += result.aiProbability * effectiveWeight;
+                totalAiWeight += effectiveWeight;
+            } else if (result.aiProbability < 0.35) {
+                strongHumanSignalCount++;
+                humanWeightedSum += (1 - result.aiProbability) * effectiveWeight;
+                totalHumanWeight += effectiveWeight;
+            }
+            
             featureContributions.push({
                 category: result.category,
                 name: result.name,
@@ -807,18 +953,54 @@ const AnalyzerEngine = {
             });
         }
 
-        // Use Bayesian combination for more accurate probability aggregation
-        // This handles correlated signals better than weighted average
-        const bayesianProb = VarianceUtils.bayesianCombine(probabilities, weights);
-        
-        // Also calculate weighted average for comparison
+        // Calculate base weighted average
         const weightedAvgProb = weights.reduce((sum, w, i) => sum + w * probabilities[i], 0) / 
                                weights.reduce((sum, w) => sum + w, 0);
         
-        // Blend methods: Bayesian for extremes, weighted for middle
-        // This prevents over-confidence at the extremes
-        const blendFactor = Math.abs(bayesianProb - 0.5) * 2; // 0 at center, 1 at extremes
-        const aiProbability = bayesianProb * blendFactor + weightedAvgProb * (1 - blendFactor);
+        // Apply signal majority adjustment
+        // When AI signals dominate, boost the probability
+        // When human signals dominate, reduce it
+        let adjustedProbability = weightedAvgProb;
+        
+        const aiSignalRatio = validResults.length > 0 
+            ? probabilities.filter(p => p > 0.55).length / validResults.length 
+            : 0.5;
+        
+        // Strong AI indicator presence boost
+        if (strongAiSignalCount >= 3 && strongAiSignalCount > strongHumanSignalCount) {
+            // Multiple strong AI signals - compound effect
+            const avgStrongAiProb = totalAiWeight > 0 ? aiWeightedSum / totalAiWeight : 0.5;
+            const boostFactor = Math.min(0.25, strongAiSignalCount * 0.05);
+            adjustedProbability = weightedAvgProb + (avgStrongAiProb - weightedAvgProb) * boostFactor * 2;
+        }
+        
+        // When very high percentage of categories indicate AI, push toward higher probability
+        if (aiSignalRatio > 0.7) {
+            const pushFactor = (aiSignalRatio - 0.5) * 0.5;
+            adjustedProbability = adjustedProbability + (1 - adjustedProbability) * pushFactor;
+        }
+        
+        // Bayesian combination for additional signal
+        const bayesianProb = VarianceUtils.bayesianCombine(probabilities, weights);
+        
+        // Use the higher of adjusted weighted or Bayesian when AI signals dominate
+        let finalProbability;
+        if (strongAiSignalCount > strongHumanSignalCount * 2) {
+            // AI signals strongly dominate - use more aggressive estimate
+            finalProbability = Math.max(adjustedProbability, bayesianProb);
+        } else if (strongHumanSignalCount > strongAiSignalCount * 2) {
+            // Human signals strongly dominate - use more conservative estimate
+            finalProbability = Math.min(adjustedProbability, bayesianProb);
+        } else {
+            // Mixed signals - blend approaches
+            finalProbability = (adjustedProbability + bayesianProb) / 2;
+        }
+        
+        // Apply floor/ceiling based on strong signal counts
+        // If 4+ strong AI signals with high confidence, minimum 50%
+        if (strongAiSignalCount >= 4 && finalProbability < 0.5) {
+            finalProbability = 0.5 + (strongAiSignalCount - 4) * 0.05;
+        }
         
         // Calculate calibrated confidence based on multiple factors
         const confidence = this.calculateCalibratedConfidence(validResults, probabilities);
@@ -831,14 +1013,19 @@ const AnalyzerEngine = {
         const varianceProfile = this.buildVarianceProfile(validResults);
 
         return {
-            aiProbability: Math.max(0, Math.min(1, aiProbability)),
+            aiProbability: Math.max(0, Math.min(1, finalProbability)),
             confidence,
             mixedProbability,
             varianceProfile,
             featureContributions: featureContributions.sort((a, b) => b.contribution - a.contribution),
-            combinationMethod: 'bayesian-blend',
+            combinationMethod: 'signal-weighted',
             rawBayesian: bayesianProb,
-            rawWeighted: weightedAvgProb
+            rawWeighted: weightedAvgProb,
+            signalCounts: {
+                strongAi: strongAiSignalCount,
+                strongHuman: strongHumanSignalCount,
+                aiRatio: aiSignalRatio
+            }
         };
     },
 
@@ -1116,6 +1303,149 @@ const AnalyzerEngine = {
                                'High confidence: ';
 
         // Probability bands with more nuanced thresholds
+        if (aiProbability < 0.15) {
+            return {
+                label: confidenceLevel + 'Human Written',
+                description: 'This text shows strong, consistent human-writing characteristics',
+                level: 'human',
+                band: 'definitely-human',
+                probability: aiProbability,
+                confidence
+            };
+        } else if (aiProbability < 0.30) {
+            return {
+                label: confidenceLevel + 'Likely Human',
+                description: 'This text exhibits predominantly human patterns with minimal AI signals',
+                level: 'probably-human',
+                band: 'likely-human',
+                probability: aiProbability,
+                confidence
+            };
+        } else if (aiProbability < 0.45) {
+            return {
+                label: confidenceLevel + 'Possibly Human',
+                description: 'This text appears mostly human but has some uncertain elements',
+                level: 'leaning-human',
+                band: 'possibly-human',
+                probability: aiProbability,
+                confidence
+            };
+        } else if (aiProbability < 0.55) {
+            return {
+                label: 'Inconclusive',
+                description: 'This text shows mixed signals — could be human, AI, or a mixture',
+                level: 'mixed',
+                band: 'inconclusive',
+                probability: aiProbability,
+                confidence
+            };
+        } else if (aiProbability < 0.70) {
+            return {
+                label: confidenceLevel + 'Possibly AI',
+                description: 'This text has notable AI-typical patterns but some human elements',
+                level: 'leaning-ai',
+                band: 'possibly-ai',
+                probability: aiProbability,
+                confidence
+            };
+        } else if (aiProbability < 0.85) {
+            return {
+                label: confidenceLevel + 'Likely AI',
+                description: 'This text exhibits strong AI-generated characteristics',
+                level: 'probably-ai',
+                band: 'likely-ai',
+                probability: aiProbability,
+                confidence
+            };
+        } else {
+            return {
+                label: confidenceLevel + 'AI Generated',
+                description: 'This text shows overwhelming AI-generated patterns',
+                level: 'ai',
+                band: 'definitely-ai',
+                probability: aiProbability,
+                confidence
+            };
+        }
+    },
+
+    /**
+     * Enhanced verdict with humanizer detection
+     * Identifies three states: Human, AI, or Humanized (AI modified by human or tool)
+     * 
+     * Key insight: Contradictory signals (AI structural patterns + human-like surface features)
+     * often indicate AI text that has been run through a "humanizer" tool or manually edited.
+     */
+    getVerdictWithHumanizer(aiProbability, confidence = 0.5, humanizerSignals = null, signalCounts = null) {
+        // Check for humanizer signals first - this takes precedence
+        const isHumanized = humanizerSignals?.isLikelyHumanized || false;
+        const humanizerProb = humanizerSignals?.humanizerProbability || 0;
+        const flagCount = humanizerSignals?.flagCount || 0;
+        
+        // Detect contradiction: Strong AI signals in some areas but human-like in others
+        const hasContradiction = signalCounts && 
+            signalCounts.strongAi >= 2 && 
+            signalCounts.strongHuman >= 2;
+        
+        // Calculate contradiction score (higher = more contradictory)
+        let contradictionScore = 0;
+        if (signalCounts) {
+            const totalStrong = signalCounts.strongAi + signalCounts.strongHuman;
+            if (totalStrong > 0) {
+                // Maximum contradiction when equal strong signals from both sides
+                const balance = Math.min(signalCounts.strongAi, signalCounts.strongHuman) / Math.max(1, totalStrong / 2);
+                contradictionScore = balance * Math.min(1, totalStrong / 6);
+            }
+        }
+        
+        // Confidence qualifier
+        const confidenceLevel = confidence < 0.4 ? 'Low confidence: ' : 
+                               confidence < 0.7 ? '' : 
+                               'High confidence: ';
+
+        // HUMANIZED DETECTION
+        // Conditions for "Humanized" verdict:
+        // 1. High humanizer probability (2+ flags from second-order analysis)
+        // 2. Strong contradiction (many AI signals AND many human signals)
+        // 3. AI probability in the "mixed" range (0.35-0.75) with contradiction
+        
+        const humanizerThreshold = 0.4; // 2+ flags out of 5
+        const contradictionThreshold = 0.4;
+        const isContradictory = contradictionScore > contradictionThreshold || hasContradiction;
+        
+        // Humanized if: explicit humanizer signals OR (AI-leaning with high contradiction)
+        if (isHumanized || 
+            (humanizerProb >= humanizerThreshold) ||
+            (aiProbability >= 0.35 && aiProbability <= 0.75 && isContradictory)) {
+            
+            // Determine humanizer confidence level
+            const humanizerConfidence = Math.max(humanizerProb, contradictionScore);
+            const humanizerLevel = humanizerConfidence > 0.6 ? 'High confidence: ' : 
+                                  humanizerConfidence > 0.35 ? '' : 'Possible: ';
+            
+            return {
+                label: humanizerLevel + 'AI Humanized',
+                description: 'This text shows AI origin with humanization attempts — likely AI-generated then modified by tools or manual editing',
+                level: 'humanized',
+                band: 'humanized',
+                probability: aiProbability,
+                confidence,
+                humanizerDetails: {
+                    humanizerProbability: humanizerProb,
+                    contradictionScore,
+                    flagCount,
+                    signals: {
+                        stableVariance: humanizerSignals?.stableVarianceFlag || false,
+                        flatAutocorrelation: humanizerSignals?.flatAutocorrelationFlag || false,
+                        brokenCorrelation: humanizerSignals?.brokenCorrelationFlag || false,
+                        synonymSubstitution: humanizerSignals?.synonymSubstitutionFlag || false,
+                        artificialContraction: humanizerSignals?.artificialContractionFlag || false
+                    }
+                }
+            };
+        }
+        
+        // Standard probability bands
         if (aiProbability < 0.15) {
             return {
                 label: confidenceLevel + 'Human Written',
