@@ -167,7 +167,23 @@ const ReportExporter = {
         p { margin-bottom: 5px; }
         .header { text-align: center; margin-bottom: 12px; border-bottom: 2px solid #333; padding-bottom: 8px; }
         .meta { color: #666; font-size: 9pt; }
-        .summary-box { background: #f8f9fa; border: 1px solid #e5e5e5; border-radius: 4px; padding: 10px; margin: 8px 0; page-break-inside: avoid; }
+        .summary-box { background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border: 1px solid #e5e5e5; border-radius: 8px; padding: 15px; margin: 12px 0; page-break-inside: avoid; }
+        .verdict-container { display: flex; align-items: center; gap: 15px; margin: 10px 0; }
+        .verdict-gauge { width: 80px; height: 80px; position: relative; flex-shrink: 0; }
+        .verdict-gauge-circle { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(${barColor} calc(${probability} * 3.6deg), #e5e5e5 0deg); display: flex; align-items: center; justify-content: center; }
+        .verdict-gauge-inner { width: 60px; height: 60px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .verdict-gauge-value { font-size: 16pt; font-weight: bold; color: ${barColor}; line-height: 1; }
+        .verdict-gauge-label { font-size: 6pt; color: #666; text-transform: uppercase; }
+        .verdict-info { flex: 1; }
+        .verdict-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 10pt; margin-bottom: 6px; }
+        .verdict-badge.high { background: #fee2e2; color: #b91c1c; }
+        .verdict-badge.moderate { background: #fef3c7; color: #b45309; }
+        .verdict-badge.low { background: #d1fae5; color: #047857; }
+        .verdict-badge.humanized { background: #f3e8ff; color: #7c3aed; }
+        .confidence-range { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 8pt; color: #666; }
+        .confidence-bar { flex: 1; height: 6px; background: #e5e5e5; border-radius: 3px; position: relative; max-width: 200px; }
+        .confidence-range-fill { position: absolute; height: 100%; background: linear-gradient(90deg, #d1d5db, ${barColor}); border-radius: 3px; }
+        .confidence-marker { position: absolute; width: 2px; height: 10px; background: #333; top: -2px; transform: translateX(-50%); }
         .verdict { font-size: 11pt; font-weight: bold; margin: 5px 0; }
         .verdict.high { color: #ef4444; }
         .verdict.moderate { color: #f59e0b; }
@@ -177,10 +193,10 @@ const ReportExporter = {
         .humanized-warning h4 { color: #7c3aed; margin-bottom: 4px; }
         .probability-bar { height: 14px; background: #e5e5e5; border-radius: 7px; overflow: hidden; margin: 5px 0; }
         .probability-fill { height: 100%; background: ${barColor}; min-width: 1px; }
-        .stat-grid { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
-        .stat-item { background: #f5f5f5; padding: 5px 8px; border-radius: 3px; flex: 1; min-width: 80px; }
-        .stat-label { font-size: 7pt; color: #666; text-transform: uppercase; display: block; }
-        .stat-value { font-size: 10pt; font-weight: bold; color: #333; }
+        .stat-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+        .stat-item { background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); padding: 10px 12px; border-radius: 6px; flex: 1; min-width: 100px; border: 1px solid #e5e5e5; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-label { font-size: 7pt; color: #888; text-transform: uppercase; display: block; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .stat-value { font-size: 12pt; font-weight: bold; color: #333; }
         .category-card { border: 1px solid #e5e5e5; border-radius: 4px; padding: 8px; margin: 6px 0; page-break-inside: avoid; break-inside: avoid; }
         .category-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .category-name { font-weight: bold; font-size: 9pt; }
@@ -237,20 +253,40 @@ const ReportExporter = {
     </div>
 
     <div class="summary-box">
-        <h2 style="margin-top:0;border:none;font-size:12pt;">Executive Summary</h2>
-        <div class="probability-bar">
-            <div class="probability-fill" style="width: ${Math.max(1, probability)}%"></div>
+        <h2 style="margin-top:0;border:none;font-size:13pt;margin-bottom:12px;">Executive Summary</h2>
+        
+        <div class="verdict-container">
+            <div class="verdict-gauge">
+                <div class="verdict-gauge-circle">
+                    <div class="verdict-gauge-inner">
+                        <span class="verdict-gauge-value">${probability}%</span>
+                        <span class="verdict-gauge-label">AI Prob</span>
+                    </div>
+                </div>
+            </div>
+            <div class="verdict-info">
+                <span class="verdict-badge ${isLikelyHumanized ? 'humanized' : (probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low'))}">${isLikelyHumanized ? '🔄 Possibly Humanized AI' : report.verdict.label}</span>
+                <p style="margin:4px 0;font-size:9pt;color:#555;">${isLikelyHumanized ? 'This text shows AI origin with humanization attempts — likely AI-generated then modified by tools or manual editing to appear more human-like.' : report.verdict.description}</p>
+                <div class="confidence-range">
+                    <span>Confidence: ${report.summary.confidence}%</span>
+                    <div class="confidence-bar">
+                        <div class="confidence-range-fill" style="left:${Math.round(report.verdict.confidenceInterval?.lower * 100 || 8)}%;width:${Math.round((report.verdict.confidenceInterval?.upper - report.verdict.confidenceInterval?.lower) * 100 || 68)}%;"></div>
+                        <div class="confidence-marker" style="left:${probability}%;"></div>
+                    </div>
+                    <span>${Math.round(report.verdict.confidenceInterval?.lower * 100 || 8)}% — ${Math.round(report.verdict.confidenceInterval?.upper * 100 || 76)}%</span>
+                </div>
+            </div>
         </div>
-        <p><strong>AI Probability: ${probability}%</strong> (${report.summary.band}) | Confidence: ${report.summary.confidence}%</p>
-        <p class="verdict ${isLikelyHumanized ? 'humanized' : (probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low'))}">${isLikelyHumanized ? 'Possibly Humanized AI' : report.verdict.label}</p>
-        ${isLikelyHumanized ? `<p style="font-size:9pt;color:#7c3aed;"><strong>⚠️ Humanization Detected:</strong> This text shows signs of AI-generated content that has been modified to appear more human-like. High disagreement between detection categories suggests post-processing or editing of AI output.</p>` : ''}
-        <p style="font-size:9pt;">${report.summary.text}</p>
+        
+        ${isLikelyHumanized ? `<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:6px;padding:8px 12px;margin:10px 0;"><p style="font-size:9pt;color:#7c3aed;margin:0;"><strong>⚠️ Humanization Detected:</strong> High disagreement between detection categories suggests post-processing or editing of AI output. Manual review recommended.</p></div>` : ''}
+        
+        <p style="font-size:9pt;color:#444;line-height:1.5;margin-top:10px;">${report.summary.text}</p>
     </div>
 
     <div class="stat-grid">
-        <div class="stat-item"><div class="stat-label">Words</div><div class="stat-value">${report.statistics.wordCount}</div></div>
-        <div class="stat-item"><div class="stat-label">Sentences</div><div class="stat-value">${report.statistics.sentenceCount}</div></div>
-        <div class="stat-item"><div class="stat-label">Paragraphs</div><div class="stat-value">${report.statistics.paragraphCount}</div></div>
+        <div class="stat-item"><div class="stat-label">Words</div><div class="stat-value">${report.statistics.wordCount.toLocaleString()}</div></div>
+        <div class="stat-item"><div class="stat-label">Sentences</div><div class="stat-value">${report.statistics.sentenceCount.toLocaleString()}</div></div>
+        <div class="stat-item"><div class="stat-label">Paragraphs</div><div class="stat-value">${report.statistics.paragraphCount.toLocaleString()}</div></div>
         <div class="stat-item"><div class="stat-label">Analysis Time</div><div class="stat-value">${report.statistics.analysisTime}</div></div>
     </div>`;
 
@@ -515,6 +551,14 @@ const ReportExporter = {
         // Add verbose signal summary
         html += this.generateSignalSummaryHtml(analysisResult, verboseEvidence);
 
+        // Add the original analyzed text
+        html += `
+    <h2 class="page-break">📄 Analyzed Text</h2>
+    <div style="background:#fafafa;border:1px solid #e5e5e5;border-radius:6px;padding:12px;margin:10px 0;max-height:none;">
+        <p style="font-size:8pt;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Original Text (${report.statistics.wordCount.toLocaleString()} words)</p>
+        <div style="font-size:9pt;line-height:1.6;color:#333;white-space:pre-wrap;word-wrap:break-word;font-family:'Georgia',serif;">${this.escapeHtml(report.analyzedText || '')}</div>
+    </div>`;
+
         html += `
     <div class="methodology">
         <h3>${report.methodology.title}</h3>
@@ -545,10 +589,15 @@ const ReportExporter = {
         html += `
     </table>
 
-    <div style="margin-top: 40px; text-align: center; color: #888; font-size: 9pt;">
-        <p>Generated by VERITAS AI Detection System | Powered by Sunrise Model v3.0</p>
-        <p>Model Accuracy: 98.08% | F1 Score: 98.09% | Trained on 29,976 samples</p>
-        <p style="margin-top: 8px; font-size: 8pt; color: #aaa;">No single metric is definitive — Context matters — Confidence varies with text length — AI detection methods continuously adapt</p>
+    <div style="margin-top: 40px; padding: 20px; background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius: 8px; border: 1px solid #e5e5e5; text-align: center;">
+        <div style="font-size: 14pt; font-weight: bold; color: #333; margin-bottom: 8px;">◈ VERITAS</div>
+        <p style="color: #666; font-size: 9pt; margin: 4px 0;">AI Text Detection Analysis System</p>
+        <p style="color: #888; font-size: 8pt; margin: 4px 0;">Powered by Sunrise Model v3.0 | 98.08% Accuracy | 29,976 Training Samples</p>
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd;">
+            <p style="font-size: 7pt; color: #aaa; line-height: 1.6;">
+                ⚠️ <strong>Important:</strong> No single metric is definitive • Context and domain matter significantly • Confidence varies with text length and complexity • AI detection methods continuously evolve • This report is for informational purposes only and should not be the sole basis for any decision.
+            </p>
+        </div>
     </div>
 </body>
 </html>`;
@@ -1566,6 +1615,19 @@ ${escaped}
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+    },
+
+    /**
+     * Escape HTML special characters
+     */
+    escapeHtml(text) {
+        if (!text) return '';
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     },
 
     /**
