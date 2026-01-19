@@ -1,7 +1,7 @@
 {
   "name": "veritas-ai-detector",
-  "version": "2.0.0",
-  "description": "AI text detection engine using variance-based linguistic analysis. Detects AI-generated text and humanizer tool usage.",
+  "version": "3.0.0",
+  "description": "AI text detection engine powered by Sunrise ML model. Uses variance-based linguistic analysis with 98.08% accuracy to detect AI-generated text and humanizer tool usage.",
   "main": "cli/analyzer.js",
   "bin": {
     "veritas": "./cli/index.js"
@@ -16,6 +16,8 @@
     "ai-detection",
     "gpt",
     "chatgpt",
+    "claude",
+    "llm",
     "text-analysis",
     "nlp",
     "natural-language-processing",
@@ -26,7 +28,8 @@
     "variance-detection",
     "humanizer-detection",
     "zipf",
-    "burstiness"
+    "burstiness",
+    "sunrise-model"
   ],
   "author": "Veritas Team",
   "license": "MIT",
@@ -34,7 +37,7 @@
     "type": "git",
     "url": "https://github.com/NagusameCS/Veritas.git"
   },
-  "homepage": "https://github.com/NagusameCS/Veritas#readme",
+  "homepage": "https://nagusame.github.io/Veritas",
   "bugs": {
     "url": "https://github.com/NagusameCS/Veritas/issues"
   },

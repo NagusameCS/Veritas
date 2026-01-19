@@ -176,23 +176,11 @@ const App = {
             gdocsBtn.addEventListener('click', () => this.promptGoogleDocsUrl());
         }
 
-        // Export dropdown
-        const exportDropdownBtn = document.getElementById('exportDropdownBtn');
-        const exportMenu = document.getElementById('exportMenu');
-        if (exportDropdownBtn && exportMenu) {
-            exportDropdownBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                exportMenu.classList.toggle('active');
-            });
-            document.addEventListener('click', () => {
-                exportMenu.classList.remove('active');
-            });
+        // View Full Report button
+        const viewFullReportBtn = document.getElementById('viewFullReportBtn');
+        if (viewFullReportBtn) {
+            viewFullReportBtn.addEventListener('click', () => this.openFullReport());
         }
-
-        // Export format options
-        document.querySelectorAll('.export-option[data-format]').forEach(option => {
-            option.addEventListener('click', () => this.exportReport(option.dataset.format));
-        });
     },
 
     /**
@@ -438,9 +426,20 @@ const App = {
      * Hide loading state / clear skeletons
      */
     hideLoadingState() {
-        const scoreCard = document.querySelector('.overall-score');
-        if (scoreCard) {
-            scoreCard.innerHTML = '<p class="no-data">Analysis failed - please try again</p>';
+        // Restore the overall-score structure if it was replaced
+        const overallScore = document.querySelector('.overall-score');
+        if (overallScore && overallScore.querySelector('.skeleton')) {
+            overallScore.innerHTML = `
+                <div class="score-ring-container"></div>
+                <div class="verdict">
+                    <span class="verdict-label"></span>
+                    <span class="verdict-description"></span>
+                </div>
+                <div class="confidence">
+                    <span class="confidence-label">Confidence:</span>
+                    <span class="confidence-value">-</span>
+                </div>
+            `;
         }
 
         const findingsContainer = document.getElementById('findingsList');
@@ -527,6 +526,22 @@ const App = {
      * Display analysis results
      */
     displayResults(result) {
+        // Restore overall-score structure if it was replaced by skeleton
+        const overallScore = document.querySelector('.overall-score');
+        if (overallScore && (overallScore.querySelector('.skeleton') || !overallScore.querySelector('.score-ring-container'))) {
+            overallScore.innerHTML = `
+                <div class="score-ring-container"></div>
+                <div class="verdict">
+                    <span class="verdict-label"></span>
+                    <span class="verdict-description"></span>
+                </div>
+                <div class="confidence">
+                    <span class="confidence-label">Confidence:</span>
+                    <span class="confidence-value">-</span>
+                </div>
+            `;
+        }
+
         // Overall score
         const scoreContainer = document.querySelector('.score-ring-container');
         if (scoreContainer) {
@@ -1676,6 +1691,126 @@ These findings have important implications for urban planning and public health 
             console.error('Export error:', error);
             this.showToast('Error exporting report: ' + error.message, 'error');
         }
+    },
+
+    /**
+     * Open the full report in a new browser tab for printing/saving
+     * This replaces the broken PDF/DOCX export with a more reliable approach
+     */
+    openFullReport() {
+        if (!this.currentResult) {
+            this.showToast('No analysis to view', 'warning');
+            return;
+        }
+
+        const textInput = document.getElementById('textInput');
+        const originalText = textInput?.value || '';
+
+        try {
+            if (typeof ReportExporter !== 'undefined') {
+                // Generate the report content
+                const reportContent = ReportExporter.generateReportContent(this.currentResult, originalText);
+                
+                // Generate complete HTML report
+                const htmlContent = ReportExporter.generateHtmlReport(reportContent, this.currentResult);
+                
+                // Open in new tab
+                const reportWindow = window.open('', '_blank');
+                if (reportWindow) {
+                    reportWindow.document.write(htmlContent);
+                    reportWindow.document.close();
+                    
+                    // Add print/save instructions
+                    const infoBar = reportWindow.document.createElement('div');
+                    infoBar.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#3b82f6;color:white;padding:10px 20px;font-family:system-ui,sans-serif;font-size:14px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 2px 10px rgba(0,0,0,0.2);';
+                    infoBar.innerHTML = `
+                        <span>📄 VERITAS Analysis Report — Use <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">Ctrl+P</kbd> / <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">⌘P</kbd> to save as PDF or print</span>
+                        <button onclick="this.parentElement.remove()" style="background:#2563eb;border:none;color:white;padding:5px 15px;border-radius:4px;cursor:pointer;font-size:12px;">Dismiss</button>
+                    `;
+                    reportWindow.document.body.insertBefore(infoBar, reportWindow.document.body.firstChild);
+                    
+                    // Add padding to body to account for fixed header
+                    reportWindow.document.body.style.paddingTop = '50px';
+                    
+                    this.showToast('Report opened in new tab', 'success');
+                } else {
+                    this.showToast('Pop-up blocked. Please allow pop-ups for this site.', 'error');
+                }
+            } else {
+                // Fallback: generate basic HTML report
+                const report = AnalyzerEngine.generateReport(this.currentResult);
+                const basicHtml = this.generateBasicHtmlReport(report, originalText);
+                
+                const reportWindow = window.open('', '_blank');
+                if (reportWindow) {
+                    reportWindow.document.write(basicHtml);
+                    reportWindow.document.close();
+                    this.showToast('Report opened in new tab', 'success');
+                }
+            }
+        } catch (error) {
+            console.error('Error opening report:', error);
+            this.showToast('Error generating report: ' + error.message, 'error');
+        }
+    },
+
+    /**
+     * Generate basic HTML report (fallback)
+     */
+    generateBasicHtmlReport(report, originalText) {
+        const prob = report.overall.aiProbability;
+        const barColor = prob >= 60 ? '#ef4444' : (prob >= 40 ? '#f59e0b' : '#10b981');
+        
+        return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VERITAS Analysis Report</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; color: #333; }
+        h1 { color: #111; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        h2 { color: #333; margin-top: 30px; }
+        .verdict { font-size: 1.5em; font-weight: bold; color: ${barColor}; }
+        .bar { height: 20px; background: #e5e5e5; border-radius: 10px; overflow: hidden; margin: 15px 0; }
+        .fill { height: 100%; background: ${barColor}; }
+        .stats { display: flex; gap: 20px; flex-wrap: wrap; }
+        .stat { background: #f5f5f5; padding: 15px; border-radius: 8px; flex: 1; min-width: 120px; }
+        .stat-label { font-size: 0.8em; color: #666; text-transform: uppercase; }
+        .stat-value { font-size: 1.5em; font-weight: bold; }
+        .text-sample { background: #f9fafb; border: 1px solid #e5e5e5; padding: 15px; border-radius: 8px; margin-top: 20px; white-space: pre-wrap; font-size: 0.9em; max-height: 400px; overflow-y: auto; }
+        @media print { .info-bar { display: none !important; } body { padding-top: 0 !important; } }
+    </style>
+</head>
+<body>
+    <h1>◈ VERITAS Analysis Report</h1>
+    <p>Generated: ${new Date().toLocaleString()}</p>
+    
+    <div class="verdict">${report.overall.verdict.label}</div>
+    <div class="bar"><div class="fill" style="width: ${Math.max(1, prob)}%"></div></div>
+    <p><strong>AI Probability:</strong> ${prob}% | <strong>Confidence:</strong> ${report.overall.confidence}%</p>
+    
+    <h2>Text Statistics</h2>
+    <div class="stats">
+        <div class="stat"><div class="stat-label">Words</div><div class="stat-value">${report.stats.words}</div></div>
+        <div class="stat"><div class="stat-label">Sentences</div><div class="stat-value">${report.stats.sentences}</div></div>
+        <div class="stat"><div class="stat-label">Paragraphs</div><div class="stat-value">${report.stats.paragraphs}</div></div>
+    </div>
+    
+    <h2>Category Analysis</h2>
+    ${report.sections.map(s => `
+        <h3>${s.number}. ${s.name} — ${s.aiScore}% AI</h3>
+        <p>Confidence: ${s.confidence}%</p>
+        ${s.findings.length > 0 ? `<ul>${s.findings.slice(0, 5).map(f => `<li>${f.text}</li>`).join('')}</ul>` : ''}
+    `).join('')}
+    
+    <h2>Analyzed Text</h2>
+    <div class="text-sample">${originalText.substring(0, 2000)}${originalText.length > 2000 ? '...' : ''}</div>
+    
+    <p style="margin-top: 40px; color: #888; font-size: 0.9em; text-align: center;">
+        Generated by VERITAS AI Detection System | Sunrise Model v3.0 | 98.08% Accuracy
+    </p>
+</body>
+</html>`;
     },
 
     /**

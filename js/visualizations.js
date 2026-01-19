@@ -349,39 +349,175 @@ const Visualizations = {
     },
 
     /**
-     * Render highlighted text
+     * Render text with annotated trend observations instead of unreliable per-sentence highlighting
      */
-    renderHighlightedText(container, sentences, sentenceScores) {
+    renderHighlightedText(container, sentences, sentenceScores, analysisResult = null) {
         if (!sentences || sentences.length === 0) {
             container.innerHTML = '<p class="no-text">No text to display</p>';
             return;
         }
 
-        const html = sentences.map((sentence, i) => {
-            const score = sentenceScores[i] || { classification: 'mixed', aiProbability: 0.5 };
-            const className = `highlight-${score.classification}`;
-            const tooltip = `AI Probability: ${Math.round(score.aiProbability * 100)}%`;
-            
-            return `<span class="${className}" data-tooltip="${tooltip}" data-index="${i}">${this.escapeHtml(sentence)}</span>`;
+        // Gather observed trends from analysis
+        const trends = this.extractObservedTrends(sentences, sentenceScores, analysisResult);
+        
+        // Render clean text with trend annotations
+        const textHtml = sentences.map((sentence, i) => {
+            return `<span class="text-sentence" data-index="${i}">${this.escapeHtml(sentence)}</span>`;
         }).join(' ');
 
+        // Render trend observations sidebar
+        const trendsHtml = trends.length > 0 
+            ? trends.map(trend => `
+                <div class="trend-item ${trend.type}">
+                    <span class="trend-icon">${trend.icon}</span>
+                    <div class="trend-content">
+                        <span class="trend-title">${this.escapeHtml(trend.title)}</span>
+                        <span class="trend-detail">${this.escapeHtml(trend.detail)}</span>
+                    </div>
+                </div>
+            `).join('')
+            : '<p class="no-trends">No significant patterns detected</p>';
+
         container.innerHTML = `
-            <div class="highlighted-text-content">${html}</div>
-            <div class="highlight-legend">
-                <div class="legend-item">
-                    <span class="legend-color highlight-ai"></span>
-                    <span class="legend-label">Likely AI</span>
+            <div class="annotated-text-container">
+                <div class="text-display">
+                    <div class="text-content">${textHtml}</div>
                 </div>
-                <div class="legend-item">
-                    <span class="legend-color highlight-mixed"></span>
-                    <span class="legend-label">Mixed/Uncertain</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-color highlight-human"></span>
-                    <span class="legend-label">Likely Human</span>
+                <div class="trends-panel">
+                    <h4>Observed Trends</h4>
+                    <div class="trends-list">${trendsHtml}</div>
                 </div>
             </div>
         `;
+    },
+
+    /**
+     * Extract meaningful trends from the analysis
+     */
+    extractObservedTrends(sentences, sentenceScores, analysisResult) {
+        const trends = [];
+        
+        if (!sentences || sentences.length === 0) return trends;
+        
+        // Calculate sentence length stats
+        const lengths = sentences.map(s => s.split(/\s+/).length);
+        const avgLength = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+        const lengthVariance = lengths.reduce((a, b) => a + Math.pow(b - avgLength, 2), 0) / lengths.length;
+        const lengthCV = Math.sqrt(lengthVariance) / avgLength;
+        
+        // Sentence length uniformity
+        if (lengthCV < 0.3) {
+            trends.push({
+                type: 'ai-signal',
+                icon: '📏',
+                title: 'Uniform sentence length',
+                detail: `Low variance (CV: ${(lengthCV * 100).toFixed(0)}%) — typical of AI text`
+            });
+        } else if (lengthCV > 0.6) {
+            trends.push({
+                type: 'human-signal',
+                icon: '✏️',
+                title: 'Variable sentence length',
+                detail: `High variance (CV: ${(lengthCV * 100).toFixed(0)}%) — typical of human writing`
+            });
+        }
+        
+        // Paragraph structure
+        const paragraphs = sentences.join(' ').split(/\n\s*\n/).filter(p => p.trim());
+        if (paragraphs.length === 1 && sentences.length > 5) {
+            trends.push({
+                type: 'neutral',
+                icon: '📄',
+                title: 'Single paragraph structure',
+                detail: `${sentences.length} sentences in one block`
+            });
+        }
+        
+        // Word repetition patterns
+        const allWords = sentences.join(' ').toLowerCase().split(/\s+/);
+        const wordFreq = {};
+        allWords.forEach(w => wordFreq[w] = (wordFreq[w] || 0) + 1);
+        const repeatedWords = Object.entries(wordFreq).filter(([w, c]) => c >= 3 && w.length > 4);
+        if (repeatedWords.length > 5) {
+            trends.push({
+                type: 'ai-signal',
+                icon: '🔄',
+                title: 'Repetitive vocabulary',
+                detail: `${repeatedWords.length} words repeated 3+ times`
+            });
+        }
+        
+        // Check for AI-typical phrases
+        const text = sentences.join(' ').toLowerCase();
+        const aiPhrases = ['it is important to note', 'in conclusion', 'furthermore', 'moreover', 'it is worth noting', 'in summary', 'as such'];
+        const foundPhrases = aiPhrases.filter(p => text.includes(p));
+        if (foundPhrases.length >= 2) {
+            trends.push({
+                type: 'ai-signal',
+                icon: '💬',
+                title: 'Formulaic transitions',
+                detail: `Found: "${foundPhrases.slice(0, 2).join('", "')}"`
+            });
+        }
+        
+        // Personal pronouns
+        const firstPersonCount = (text.match(/\b(i|me|my|myself|we|our|us)\b/gi) || []).length;
+        const firstPersonRatio = firstPersonCount / allWords.length;
+        if (firstPersonRatio > 0.02) {
+            trends.push({
+                type: 'human-signal',
+                icon: '👤',
+                title: 'Personal voice present',
+                detail: `${firstPersonCount} first-person references found`
+            });
+        } else if (firstPersonRatio < 0.005 && sentences.length > 3) {
+            trends.push({
+                type: 'ai-signal',
+                icon: '🤖',
+                title: 'Impersonal tone',
+                detail: 'Minimal first-person pronouns'
+            });
+        }
+        
+        // Contractions
+        const contractions = (text.match(/\b\w+'\w+\b/g) || []).length;
+        if (contractions > 3) {
+            trends.push({
+                type: 'human-signal',
+                icon: '💡',
+                title: 'Natural contractions',
+                detail: `${contractions} contractions used`
+            });
+        } else if (contractions === 0 && sentences.length > 5) {
+            trends.push({
+                type: 'ai-signal',
+                icon: '📝',
+                title: 'No contractions',
+                detail: 'Formal style without contractions'
+            });
+        }
+        
+        // Questions and exclamations
+        const questions = sentences.filter(s => s.trim().endsWith('?')).length;
+        const exclamations = sentences.filter(s => s.trim().endsWith('!')).length;
+        if (questions > 0) {
+            trends.push({
+                type: 'human-signal',
+                icon: '❓',
+                title: 'Rhetorical questions',
+                detail: `${questions} question${questions > 1 ? 's' : ''} in text`
+            });
+        }
+        if (exclamations > 0) {
+            trends.push({
+                type: 'human-signal',
+                icon: '❗',
+                title: 'Expressive punctuation',
+                detail: `${exclamations} exclamation${exclamations > 1 ? 's' : ''} used`
+            });
+        }
+        
+        return trends.slice(0, 8); // Limit to 8 trends
     },
 
     /**
