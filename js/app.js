@@ -805,6 +805,15 @@ const App = {
         // Render false positive warnings
         this.renderFalsePositiveWarnings(result);
 
+        // Render certainty curve
+        this.renderCertaintyCurve(result);
+
+        // Render verbose conclusion
+        this.renderVerboseConclusion(result);
+
+        // Render humanization advisory
+        this.renderHumanizationAdvisory(result);
+
         // Stats
         const statsContainer = document.querySelector('.text-stats');
         if (statsContainer && result.stats) {
@@ -1750,6 +1759,275 @@ const App = {
             </div>
         `;
         container.insertAdjacentHTML('beforeend', noteHtml);
+    },
+
+    /**
+     * Render certainty curve visualization
+     * Shows where the detection result falls on a probability spectrum
+     */
+    renderCertaintyCurve(result) {
+        const container = document.getElementById('certaintyCurve');
+        if (!container) return;
+
+        const prob = result.aiProbability;
+        const conf = result.confidence;
+        const ci = result.confidenceInterval || { lower: prob - 0.1, upper: prob + 0.1 };
+        
+        // Determine which zone the result falls in
+        const zones = [
+            { min: 0, max: 0.15, label: 'Definitely Human', color: 'var(--human-color)', description: 'Strong human writing patterns' },
+            { min: 0.15, max: 0.30, label: 'Likely Human', color: 'var(--human-color-light)', description: 'Predominantly human patterns' },
+            { min: 0.30, max: 0.45, label: 'Possibly Human', color: 'var(--neutral-color)', description: 'Mostly human with some uncertainty' },
+            { min: 0.45, max: 0.55, label: 'Inconclusive', color: 'var(--gray-400)', description: 'Mixed signals, could be either' },
+            { min: 0.55, max: 0.70, label: 'Possibly AI', color: 'var(--neutral-color)', description: 'Some AI patterns detected' },
+            { min: 0.70, max: 0.85, label: 'Likely AI', color: 'var(--ai-color-light)', description: 'Strong AI patterns present' },
+            { min: 0.85, max: 1.0, label: 'Definitely AI', color: 'var(--ai-color)', description: 'Overwhelming AI signatures' }
+        ];
+
+        const currentZone = zones.find(z => prob >= z.min && prob < z.max) || zones[zones.length - 1];
+        
+        container.innerHTML = `
+            <div class="certainty-curve">
+                <h4 class="certainty-title">Certainty Spectrum</h4>
+                <div class="curve-container">
+                    <div class="curve-gradient">
+                        ${zones.map(z => `
+                            <div class="curve-zone ${prob >= z.min && prob < z.max ? 'active' : ''}" 
+                                 style="left: ${z.min * 100}%; width: ${(z.max - z.min) * 100}%;"
+                                 title="${z.label}: ${z.description}">
+                            </div>
+                        `).join('')}
+                        <div class="curve-marker" style="left: ${prob * 100}%">
+                            <div class="marker-dot"></div>
+                            <div class="marker-label">${Math.round(prob * 100)}%</div>
+                        </div>
+                        <div class="curve-interval" style="left: ${Math.max(0, ci.lower) * 100}%; width: ${Math.min(1, ci.upper - ci.lower) * 100}%"></div>
+                    </div>
+                    <div class="curve-labels">
+                        <span class="curve-label-human">Human</span>
+                        <span class="curve-label-uncertain">Uncertain</span>
+                        <span class="curve-label-ai">AI</span>
+                    </div>
+                </div>
+                <div class="curve-zone-indicator">
+                    <span class="zone-badge" style="background: ${currentZone.color}">${currentZone.label}</span>
+                    <span class="zone-description">${currentZone.description}</span>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * Render verbose conclusion with detailed analysis explanation
+     */
+    renderVerboseConclusion(result) {
+        const container = document.getElementById('verboseConclusion');
+        if (!container) return;
+
+        const prob = result.aiProbability;
+        const conf = result.confidence;
+        const stats = result.stats || {};
+        const featureContributions = result.featureContributions || [];
+        const categoryResults = result.categoryResults || [];
+        
+        // Get top contributing factors
+        const topAiFactors = featureContributions
+            .filter(f => f.aiProbability > 0.6)
+            .slice(0, 3)
+            .map(f => f.name);
+        const topHumanFactors = featureContributions
+            .filter(f => f.aiProbability < 0.4)
+            .slice(0, 3)
+            .map(f => f.name);
+        
+        // Count analyzer agreement
+        const aiLeaning = categoryResults.filter(c => c.aiProbability > 0.55).length;
+        const humanLeaning = categoryResults.filter(c => c.aiProbability < 0.45).length;
+        const totalAnalyzers = categoryResults.length;
+        
+        // Build detailed explanation
+        let explanation = '';
+        let confidenceNote = '';
+        
+        if (prob < 0.30) {
+            explanation = `This text demonstrates characteristics strongly consistent with human authorship. `;
+            if (topHumanFactors.length > 0) {
+                explanation += `Key human indicators include: ${topHumanFactors.join(', ')}. `;
+            }
+            explanation += `The writing exhibits natural variation in sentence structure, authentic vocabulary choices, and organic flow patterns typical of human expression. `;
+            if (humanLeaning > aiLeaning) {
+                explanation += `${humanLeaning} out of ${totalAnalyzers} analysis modules agreed this appears human-written.`;
+            }
+        } else if (prob < 0.55) {
+            explanation = `This text shows mixed characteristics that make definitive classification challenging. `;
+            explanation += `While some patterns suggest human authorship (${topHumanFactors.join(', ') || 'natural flow'}), `;
+            explanation += `other elements could indicate AI involvement (${topAiFactors.join(', ') || 'structural uniformity'}). `;
+            explanation += `The analysis modules were split: ${humanLeaning} leaning human, ${aiLeaning} leaning AI, and ${totalAnalyzers - humanLeaning - aiLeaning} neutral. `;
+            explanation += `This could indicate human writing with unusual patterns, AI text that was heavily edited, or collaborative human-AI content.`;
+        } else if (prob < 0.75) {
+            explanation = `This text exhibits notable patterns commonly associated with AI-generated content. `;
+            if (topAiFactors.length > 0) {
+                explanation += `Detected AI indicators include: ${topAiFactors.join(', ')}. `;
+            }
+            explanation += `However, some human-like elements are present, suggesting either the base AI output has been edited, or the human author's style happens to align with AI patterns. `;
+            explanation += `${aiLeaning} out of ${totalAnalyzers} analysis modules flagged AI characteristics.`;
+        } else {
+            explanation = `This text displays strong characteristics typical of AI-generated content. `;
+            if (topAiFactors.length > 0) {
+                explanation += `Primary AI signatures detected: ${topAiFactors.join(', ')}. `;
+            }
+            explanation += `The writing shows patterns of uniform sentence construction, predictable vocabulary distribution, and structural regularity commonly observed in large language model outputs. `;
+            explanation += `${aiLeaning} out of ${totalAnalyzers} analysis modules identified AI patterns with high confidence.`;
+        }
+        
+        // Confidence qualifier
+        if (conf < 0.4) {
+            confidenceNote = `⚠️ <strong>Low Confidence:</strong> The analysis has limited certainty due to short text length, unusual writing style, or conflicting signals. Consider this result as indicative rather than definitive.`;
+        } else if (conf < 0.7) {
+            confidenceNote = `📊 <strong>Moderate Confidence:</strong> The analysis has reasonable certainty, though some factors introduce ambiguity. The true origin is likely within the stated probability range.`;
+        } else {
+            confidenceNote = `✅ <strong>High Confidence:</strong> Multiple analyzers strongly agree on this assessment. The detected patterns are consistent and clear.`;
+        }
+        
+        // Statistics summary
+        const statsSummary = `
+            <div class="conclusion-stats">
+                <span class="stat-item"><strong>${stats.words || 0}</strong> words analyzed</span>
+                <span class="stat-item"><strong>${stats.sentences || 0}</strong> sentences</span>
+                <span class="stat-item"><strong>${totalAnalyzers}</strong> analysis modules</span>
+                <span class="stat-item"><strong>${result.analysisTime || '?ms'}</strong> processing time</span>
+            </div>
+        `;
+        
+        container.innerHTML = `
+            <div class="verbose-conclusion-content">
+                <h4 class="conclusion-title">📋 Detailed Analysis</h4>
+                ${statsSummary}
+                <div class="conclusion-explanation">
+                    <p>${explanation}</p>
+                </div>
+                <div class="conclusion-confidence">
+                    <p>${confidenceNote}</p>
+                </div>
+                <div class="conclusion-methodology">
+                    <details>
+                        <summary>How was this determined?</summary>
+                        <p>Veritas analyzes text using ${totalAnalyzers} specialized detection modules examining:</p>
+                        <ul>
+                            <li><strong>Lexical patterns:</strong> Vocabulary richness, word choice distribution, repetition</li>
+                            <li><strong>Syntactic structure:</strong> Sentence length variation, complexity, grammar patterns</li>
+                            <li><strong>Semantic coherence:</strong> Topic flow, logical connections, idea development</li>
+                            <li><strong>Statistical signatures:</strong> Zipf's law deviation, burstiness, entropy measures</li>
+                            <li><strong>Stylistic markers:</strong> Punctuation use, contractions, discourse markers</li>
+                            <li><strong>Second-order patterns:</strong> Contradiction detection, humanization signals</li>
+                        </ul>
+                        <p>Each module produces a probability score, which are combined using weighted Bayesian inference based on module confidence and historical accuracy.</p>
+                    </details>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * Render humanization advisory panel
+     * Shows whether the text might be AI-generated but modified to appear human
+     */
+    renderHumanizationAdvisory(result) {
+        const container = document.getElementById('humanizationAdvisory');
+        if (!container) return;
+
+        const humanizerSignals = result.humanizerSignals || {};
+        const flagCount = humanizerSignals.flagCount || 0;
+        const prob = result.aiProbability;
+        
+        // Calculate humanization likelihood
+        const signals = {
+            stableVariance: humanizerSignals.stableVarianceFlag,
+            flatAutocorrelation: humanizerSignals.flatAutocorrelationFlag,
+            brokenCorrelation: humanizerSignals.brokenCorrelationFlag,
+            synonymSubstitution: humanizerSignals.synonymSubstitutionFlag,
+            artificialContraction: humanizerSignals.artificialContractionFlag
+        };
+        
+        const activeSignals = Object.entries(signals).filter(([k, v]) => v);
+        
+        // Determine advisory level
+        let advisoryLevel = 'none';
+        let advisoryColor = 'var(--text-tertiary)';
+        let advisoryText = '';
+        let advisoryIcon = '✓';
+        
+        if (flagCount === 0 && prob < 0.4) {
+            advisoryLevel = 'none';
+            advisoryIcon = '✅';
+            advisoryColor = 'var(--human-color)';
+            advisoryText = 'No humanization signals detected. This text appears to be authentically human-written.';
+        } else if (flagCount === 0 && prob >= 0.4) {
+            advisoryLevel = 'none';
+            advisoryIcon = '🤖';
+            advisoryColor = 'var(--ai-color)';
+            advisoryText = 'No humanization signals detected. This appears to be unmodified AI-generated text.';
+        } else if (flagCount <= 2) {
+            advisoryLevel = 'possible';
+            advisoryIcon = '🔍';
+            advisoryColor = 'var(--warning-color, #f59e0b)';
+            advisoryText = `Possible humanization detected (${flagCount}/5 signals). This could be AI text that was lightly edited or run through a paraphrasing tool.`;
+        } else if (flagCount <= 3) {
+            advisoryLevel = 'likely';
+            advisoryIcon = '⚠️';
+            advisoryColor = 'var(--warning-color, #f59e0b)';
+            advisoryText = `Likely humanization detected (${flagCount}/5 signals). Strong indicators suggest this text originated from AI but was modified to appear more human.`;
+        } else {
+            advisoryLevel = 'confident';
+            advisoryIcon = '🚨';
+            advisoryColor = 'var(--ai-color)';
+            advisoryText = `High confidence humanization (${flagCount}/5 signals). Multiple clear indicators that AI-generated text was processed through humanization tools or extensive manual editing.`;
+        }
+        
+        // Signal explanations
+        const signalExplanations = {
+            stableVariance: { name: 'Artificial Variance', desc: 'Sentence lengths are too uniform, lacking natural human variation' },
+            flatAutocorrelation: { name: 'Flat Autocorrelation', desc: 'Sequential sentence patterns show random noise instead of natural flow' },
+            brokenCorrelation: { name: 'Broken Correlations', desc: 'Features that normally correlate in human writing are disconnected' },
+            synonymSubstitution: { name: 'Synonym Substitution', desc: 'Word sophistication varies chaotically, suggesting find-and-replace editing' },
+            artificialContraction: { name: 'Artificial Contractions', desc: 'Contraction usage patterns suggest they were added artificially' }
+        };
+        
+        const signalDetails = activeSignals.length > 0 ? `
+            <div class="signal-details">
+                <h5>Detected Signals:</h5>
+                <ul class="signal-list">
+                    ${activeSignals.map(([key, _]) => {
+                        const info = signalExplanations[key];
+                        return `<li><strong>${info.name}:</strong> ${info.desc}</li>`;
+                    }).join('')}
+                </ul>
+            </div>
+        ` : '';
+        
+        container.innerHTML = `
+            <div class="humanization-advisory-content ${advisoryLevel}">
+                <h4 class="advisory-title">
+                    <span class="advisory-icon">${advisoryIcon}</span>
+                    Humanization Advisory
+                </h4>
+                <div class="advisory-meter">
+                    <div class="meter-track">
+                        <div class="meter-fill" style="width: ${(flagCount / 5) * 100}%; background: ${advisoryColor}"></div>
+                    </div>
+                    <div class="meter-labels">
+                        <span>Authentic</span>
+                        <span>Humanized</span>
+                    </div>
+                </div>
+                <p class="advisory-text" style="border-left-color: ${advisoryColor}">${advisoryText}</p>
+                ${signalDetails}
+                <p class="advisory-disclaimer">
+                    <em>Note: This is an advisory indicator, not a definitive classification. Some human-written text may trigger false positives, 
+                    and sophisticated humanization may evade detection.</em>
+                </p>
+            </div>
+        `;
     },
 
     /**
