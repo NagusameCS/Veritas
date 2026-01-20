@@ -376,7 +376,7 @@
                             <p class="section-intro">Veritas offers multiple specialized detection models, each optimized for different use cases. Select the model that best fits your needs when analyzing text.</p>
                             
                             <div class="about-model-carousel">
-                                <div class="about-model-card featured" onclick="VeritasApp.selectModelAndAnalyze('helios')" style="cursor:pointer">
+                                <div class="about-model-card featured" data-model="helios">
                                     <div class="model-header helios">
                                         <span class="material-icons model-sun-icon">flare</span>
                                         <h4>Helios</h4>
@@ -390,14 +390,17 @@
                                         <li>Tone & hedging analysis</li>
                                         <li>Best overall accuracy</li>
                                     </ul>
-                                    <span class="model-cta" onclick="event.stopPropagation(); document.querySelector('[data-view=methodology]').click();">View methodology ℹ️</span>
+                                    <div class="model-card-hover-overlay">
+                                        <span class="material-icons">analytics</span>
+                                        <span>View Benchmarks</span>
+                                    </div>
                                 </div>
                                 
-                                <div class="about-model-card" onclick="VeritasApp.selectModelAndAnalyze('zenith')" style="cursor:pointer">
+                                <div class="about-model-card" data-model="zenith">
                                     <div class="model-header zenith">
                                         <span class="material-icons model-sun-icon">brightness_high</span>
                                         <h4>Zenith</h4>
-                                        <span class="model-badge">Perplexity</span>
+                                        <span class="model-badge">Recommended</span>
                                     </div>
                                     <div class="model-accuracy">99.57%</div>
                                     <p class="model-desc-text">Specialized entropy and burstiness analysis optimized for detecting AI text modified by humanizer tools.</p>
@@ -407,10 +410,33 @@
                                         <li>Burstiness metrics</li>
                                         <li>Best for bypass tools</li>
                                     </ul>
-                                    <span class="model-cta" onclick="event.stopPropagation(); document.querySelector('[data-view=methodology]').click();">View methodology ℹ️</span>
+                                    <div class="model-card-hover-overlay">
+                                        <span class="material-icons">analytics</span>
+                                        <span>View Benchmarks</span>
+                                    </div>
                                 </div>
                                 
-                                <div class="about-model-card" onclick="VeritasApp.selectModelAndAnalyze('sunrise')" style="cursor:pointer">
+                                <div class="about-model-card" data-model="flare">
+                                    <div class="model-header flare">
+                                        <span class="material-icons model-sun-icon">local_fire_department</span>
+                                        <h4>Flare</h4>
+                                        <span class="model-badge">Anti-Humanizer</span>
+                                    </div>
+                                    <div class="model-accuracy">99.84%</div>
+                                    <p class="model-desc-text">Specialized detector for humanized AI text. Achieves 99.3% detection rate on texts processed by AI humanization tools.</p>
+                                    <ul class="model-highlights">
+                                        <li>99.3% humanized detection</li>
+                                        <li>66 specialized features</li>
+                                        <li>CV Mean: 96.74%</li>
+                                        <li>Best for humanizers</li>
+                                    </ul>
+                                    <div class="model-card-hover-overlay">
+                                        <span class="material-icons">analytics</span>
+                                        <span>View Benchmarks</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="about-model-card" data-model="sunrise">
                                     <div class="model-header sunrise">
                                         <span class="material-icons model-sun-icon">wb_sunny</span>
                                         <h4>Sunrise</h4>
@@ -424,10 +450,13 @@
                                         <li>Well-rounded metrics</li>
                                         <li>Good all-rounder</li>
                                     </ul>
-                                    <span class="model-cta" onclick="event.stopPropagation(); document.querySelector('[data-view=methodology]').click();">View methodology ℹ️</span>
+                                    <div class="model-card-hover-overlay">
+                                        <span class="material-icons">analytics</span>
+                                        <span>View Benchmarks</span>
+                                    </div>
                                 </div>
                                 
-                                <div class="about-model-card" onclick="VeritasApp.selectModelAndAnalyze('dawn')" style="cursor:pointer">
+                                <div class="about-model-card" data-model="dawn">
                                     <div class="model-header dawn">
                                         <span class="material-icons model-sun-icon">wb_twilight</span>
                                         <h4>Dawn</h4>
@@ -441,7 +470,10 @@
                                         <li>Fast execution</li>
                                         <li>Baseline reference</li>
                                     </ul>
-                                    <span class="model-cta" onclick="event.stopPropagation(); document.querySelector('[data-view=methodology]').click();">View methodology ℹ️</span>
+                                    <div class="model-card-hover-overlay">
+                                        <span class="material-icons">analytics</span>
+                                        <span>View Benchmarks</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1085,7 +1117,7 @@
                         </div>
 
                         <!-- 8. Model Training & Performance -->
-                        <div class="methodology-section paper-section">
+                        <div class="methodology-section paper-section" id="model-benchmarks">
                             <h2>8. Model Training & Performance</h2>
                             
                             <h3>8.1 Training Data</h3>
@@ -1156,7 +1188,7 @@
                                 
                                 <div class="receipt-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;">
                                     <!-- Helios Receipt -->
-                                    <div class="receipt-card" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
+                                    <div class="receipt-card" id="benchmark-helios" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                                             <span style="font-weight:700;font-size:11pt;color:#111;">Helios v4.0</span>
                                             <span style="background:#3b82f6;color:#fff;padding:2px 8px;border-radius:4px;font-size:8pt;">FLAGSHIP</span>
@@ -1176,7 +1208,7 @@
                                     </div>
                                     
                                     <!-- Zenith Receipt -->
-                                    <div class="receipt-card" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
+                                    <div class="receipt-card" id="benchmark-zenith" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                                             <span style="font-weight:700;font-size:11pt;color:#111;">Zenith v1.0</span>
                                             <span style="background:#9333ea;color:#fff;padding:2px 8px;border-radius:4px;font-size:8pt;">HYBRID</span>
@@ -1195,7 +1227,7 @@
                                     </div>
                                     
                                     <!-- Flare Receipt -->
-                                    <div class="receipt-card" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
+                                    <div class="receipt-card" id="benchmark-flare" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                                             <span style="font-weight:700;font-size:11pt;color:#111;">Flare v2.0</span>
                                             <span style="background:#f97316;color:#fff;padding:2px 8px;border-radius:4px;font-size:8pt;">ANTI-HUMANIZER</span>
@@ -1215,7 +1247,7 @@
                                     </div>
                                     
                                     <!-- Sunrise Receipt -->
-                                    <div class="receipt-card" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
+                                    <div class="receipt-card" id="benchmark-sunrise" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
                                             <span style="font-weight:700;font-size:11pt;color:#111;">Sunrise v3.0</span>
                                             <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:4px;font-size:8pt;">BALANCED</span>

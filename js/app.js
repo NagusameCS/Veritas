@@ -270,6 +270,45 @@ const App = {
         
         // Model selector events
         this.bindModelSelectorEvents();
+        
+        // About page model card events
+        this.bindAboutModelCards();
+    },
+    
+    /**
+     * Bind about page model cards to navigate to benchmarks
+     */
+    bindAboutModelCards() {
+        document.querySelectorAll('.about-model-card[data-model]').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const modelId = card.dataset.model;
+                this.navigateToBenchmark(modelId);
+            });
+        });
+    },
+    
+    /**
+     * Navigate to methodology page and scroll to specific model benchmark
+     */
+    navigateToBenchmark(modelId) {
+        // Switch to methodology view
+        this.showView('methodology');
+        
+        // Wait for view to render, then scroll to the model's benchmark section
+        setTimeout(() => {
+            const targetId = modelId === 'dawn' ? 'model-benchmarks' : `benchmark-${modelId}`;
+            const targetElement = document.getElementById(targetId);
+            
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Add highlight animation
+                targetElement.classList.add('benchmark-highlight');
+                setTimeout(() => {
+                    targetElement.classList.remove('benchmark-highlight');
+                }, 2000);
+            }
+        }, 100);
     },
     
     /**
@@ -360,6 +399,14 @@ const App = {
                     <p class="model-card-desc">${model.desc}</p>
                 </div>
             `;
+            
+            // Add click handler to navigate to benchmarks
+            const cardInner = display.querySelector('.model-card-inner');
+            if (cardInner) {
+                cardInner.addEventListener('click', () => {
+                    this.navigateToBenchmark(model.id);
+                });
+            }
         }
         
         // Update hidden radio

@@ -271,6 +271,32 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
+   Benchmark Highlight Animation
+   ───────────────────────────────────────────────────────────────────────────── */
+.benchmark-highlight {
+    animation: benchmarkPulse 2s ease-out;
+}
+
+@keyframes benchmarkPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+        transform: scale(1);
+    }
+    20% {
+        box-shadow: 0 0 0 15px rgba(59, 130, 246, 0.3);
+        transform: scale(1.02);
+    }
+    50% {
+        box-shadow: 0 0 0 25px rgba(59, 130, 246, 0);
+        transform: scale(1);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+        transform: scale(1);
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
    Reduced Motion
    ───────────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

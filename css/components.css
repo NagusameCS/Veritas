@@ -1089,6 +1089,30 @@
     background: var(--bg-primary);
     border: 2px solid var(--accent);
     border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+/* Hover hint for model card */
+.model-card-inner::after {
+    content: 'View benchmarks →';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 4px;
+    transform: translateY(100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.model-card-inner:hover::after {
+    transform: translateY(0);
 }
 
 .model-card-header {
@@ -1598,12 +1622,45 @@
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     transition: all var(--transition-normal);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
 }
 
 .about-model-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
+
+/* Hover overlay with slide-up animation */
+.model-card-hover-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.about-model-card:hover .model-card-hover-overlay {
+    transform: translateY(0);
+}
+
+.model-card-hover-overlay .material-icons {
+    font-size: 1.25rem;
+}
+
+/* Flare model header color */
+.model-header.flare { --header-color: #f97316; }
 
 .about-model-card.featured {
     border-color: var(--accent);
