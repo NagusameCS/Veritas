@@ -16,7 +16,7 @@ const AnalyzerEngine = {
      * Set the active model
      */
     setModel(modelType) {
-        const validModels = ['helios', 'zenith', 'sunrise', 'dawn'];
+        const validModels = ['helios', 'zenith', 'sunrise', 'dawn', 'flare'];
         if (validModels.includes(modelType)) {
             this.currentModel = modelType;
             console.log(`AnalyzerEngine: Model set to ${modelType}`);
@@ -34,6 +34,8 @@ const AnalyzerEngine = {
                 return typeof VERITAS_ZENITH_CONFIG !== 'undefined' ? VERITAS_ZENITH_CONFIG : null;
             case 'sunrise':
                 return typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
+            case 'flare':
+                return typeof FlareConfig !== 'undefined' ? FlareConfig : null;
             case 'dawn':
                 return null; // Dawn uses rule-based defaults
             default:
@@ -73,6 +75,18 @@ const AnalyzerEngine = {
                     perplexity: 0.10,
                     authorshipDrift: 0.12,
                     metadataFormatting: 0.27
+                };
+            } else if (this.currentModel === 'flare') {
+                // Flare focuses on humanization detection features
+                return {
+                    syntaxVariance: 0.15,
+                    lexicalDiversity: 0.10,
+                    repetitionUniformity: 0.08,
+                    toneStability: 0.05,
+                    grammarEntropy: 0.02,
+                    perplexity: 0.20,  // Entropy stability important
+                    authorshipDrift: 0.15,  // Variance patterns
+                    metadataFormatting: 0.25
                 };
             }
         }
@@ -136,6 +150,11 @@ const AnalyzerEngine = {
         
         if (!text || text.trim().length === 0) {
             return this.getEmptyResult();
+        }
+
+        // Special handling for Flare model - dedicated humanization detection
+        if (this.currentModel === 'flare') {
+            return this.analyzeWithFlare(text, metadata, startTime);
         }
 
         // Precompute common values
@@ -249,6 +268,164 @@ const AnalyzerEngine = {
             tokens, // For word frequency chart
             metadata: metadata || null,
             analysisTime: (endTime - startTime).toFixed(0) + 'ms'
+        };
+    },
+
+    /**
+     * Special analysis for Flare model - focused on humanization detection
+     * Flare assumes the text could be human-written OR humanized AI
+     * It doesn't care about raw AI vs human - only about detecting humanization
+     */
+    analyzeWithFlare(text, metadata, startTime) {
+        const sentences = Utils.splitSentences(text);
+        const tokens = Utils.tokenize(text);
+        const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+
+        // Basic stats
+        const stats = {
+            characters: text.length,
+            words: tokens.length,
+            sentences: sentences.length,
+            paragraphs: paragraphs.length,
+            avgWordsPerSentence: sentences.length > 0 ? (tokens.length / sentences.length).toFixed(1) : 0
+        };
+
+        // Run FlareAnalyzer if available
+        let flareResult = null;
+        if (typeof FlareAnalyzer !== 'undefined') {
+            try {
+                const analyzer = new FlareAnalyzer();
+                if (typeof FlareConfig !== 'undefined') {
+                    analyzer.loadConfig(FlareConfig);
+                }
+                flareResult = analyzer.analyze(text);
+            } catch (e) {
+                console.error('Flare analysis error:', e);
+            }
+        }
+
+        // Also run standard humanization detection for comparison
+        const advancedStats = this.computeAdvancedStatistics(text, tokens, sentences);
+        
+        // Run standard analyzers for additional context
+        const categoryResults = [];
+        for (const analyzer of this.analyzers) {
+            if (!analyzer) continue;
+            try {
+                const result = analyzer.analyze(text, metadata);
+                categoryResults.push(result);
+            } catch (error) {
+                console.error(`Error in ${analyzer?.name || 'unknown'}:`, error);
+            }
+        }
+
+        // Get humanizer signals from existing system
+        const humanizerSignals = this.detectHumanizerSignalsWithCategories(text, sentences, advancedStats, categoryResults);
+
+        // Combine Flare result with humanizer signals
+        const humanizedProbability = flareResult?.humanizedProbability ?? humanizerSignals.probability;
+        const isHumanized = humanizedProbability >= 0.5 || humanizerSignals.isLikelyHumanized;
+        
+        // Build comprehensive flag list
+        const flags = [];
+        if (flareResult?.flags) {
+            flags.push(...flareResult.flags);
+        }
+        if (humanizerSignals.flags) {
+            flags.push(...humanizerSignals.flags);
+        }
+
+        // Determine verdict (in format expected by displayResults)
+        let verdictLabel, verdictLevel, verdictDescription;
+        if (humanizedProbability >= 0.85) {
+            verdictLabel = 'HUMANIZED AI DETECTED';
+            verdictLevel = 'ai';
+            verdictDescription = 'Strong evidence of AI-generated text processed through humanization tools';
+        } else if (humanizedProbability >= 0.65) {
+            verdictLabel = 'LIKELY HUMANIZED AI';
+            verdictLevel = 'likely-ai';
+            verdictDescription = 'Significant humanization patterns detected in the text';
+        } else if (humanizedProbability >= 0.45) {
+            verdictLabel = 'POSSIBLE HUMANIZATION';
+            verdictLevel = 'mixed';
+            verdictDescription = 'Some humanization signals present but not conclusive';
+        } else if (humanizedProbability >= 0.25) {
+            verdictLabel = 'WEAK HUMANIZATION SIGNALS';
+            verdictLevel = 'likely-human';
+            verdictDescription = 'Minor patterns detected but likely authentic human writing';
+        } else {
+            verdictLabel = 'GENUINE HUMAN WRITING';
+            verdictLevel = 'human';
+            verdictDescription = 'No evidence of humanization tools or AI post-processing';
+        }
+
+        const verdict = {
+            label: verdictLabel,
+            level: verdictLevel,
+            description: verdictDescription
+        };
+
+        // Generate findings
+        const findings = [];
+        if (humanizedProbability >= 0.5) {
+            findings.push({
+                indicator: 'ai',
+                severity: 'high',
+                message: 'Humanization artifacts detected',
+                detail: 'Text shows patterns consistent with AI-to-human post-processing tools'
+            });
+        }
+        
+        for (const flag of flags.slice(0, 5)) {
+            findings.push({
+                indicator: flag.severity === 'high' ? 'ai' : 'mixed',
+                severity: flag.severity || 'medium',
+                message: flag.message,
+                detail: flag.detail
+            });
+        }
+
+        const endTime = performance.now();
+
+        // Return Flare-specific result format
+        return {
+            // Overall results - Flare treats humanized probability as "AI probability"
+            aiProbability: humanizedProbability,
+            humanProbability: 1 - humanizedProbability,
+            mixedProbability: 0,
+            confidence: flareResult?.confidence ?? 0.8,
+            verdict,
+            
+            // Flare-specific data
+            flareResult,
+            humanizedProbability,
+            isHumanized,
+            humanizerSignals,
+            humanizationFlags: flags,
+            
+            // Feature analysis from Flare
+            flareFeatures: flareResult?.features || {},
+            flareAnalysis: flareResult?.analysis || '',
+            
+            // Standard data
+            categoryResults,
+            sentences,
+            sentenceScores: this.scoreSentences(text, sentences, categoryResults),
+            findings,
+            stats,
+            advancedStats,
+            tokens,
+            metadata: metadata || null,
+            analysisTime: (endTime - startTime).toFixed(0) + 'ms',
+            
+            // Model info
+            modelInfo: {
+                id: 'flare',
+                name: 'Flare',
+                specialty: 'Humanization Detection',
+                accuracy: '99.84%',
+                description: 'Specialized model for detecting AI text that has been processed through humanization tools'
+            }
         };
     },
 

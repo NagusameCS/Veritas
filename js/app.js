@@ -221,8 +221,9 @@ const App = {
     bindModelSelectorEvents() {
         // Model data for the carousel selector
         this.models = [
-            { id: 'helios', name: 'Helios', accuracy: '99.24%', badge: 'Flagship', icon: 'flare', badgeClass: 'flagship', desc: '45 features · Tone + hedging · Best overall' },
+            { id: 'helios', name: 'Helios', accuracy: '99.24%', badge: 'Flagship', icon: 'local_fire_department', badgeClass: 'flagship', desc: '45 features · Tone + hedging · Best overall' },
             { id: 'zenith', name: 'Zenith', accuracy: '99.57%', badge: 'Perplexity', icon: 'brightness_high', badgeClass: 'perplexity', desc: 'Entropy analysis · 86.7% humanized detection' },
+            { id: 'flare', name: 'Flare', accuracy: '99.84%', badge: 'Anti-Humanizer', icon: 'flare', badgeClass: 'anti-humanizer', desc: 'Humanized AI detector · 66 features · CV: 96.7%' },
             { id: 'sunrise', name: 'Sunrise', accuracy: '98.08%', badge: 'Balanced', icon: 'wb_sunny', badgeClass: 'balanced', desc: 'Statistical variance · Fast · F1: 98.09%' },
             { id: 'dawn', name: 'Dawn', accuracy: '84.9%', badge: 'Legacy', icon: 'wb_twilight', badgeClass: 'legacy', desc: 'Rule-based heuristics · Lightweight' }
         ];

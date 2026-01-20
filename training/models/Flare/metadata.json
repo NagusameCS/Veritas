@@ -1,0 +1,13 @@
+{
+  "modelName": "Flare",
+  "version": "2.0",
+  "type": "humanization-detection",
+  "created": "2026-01-20T01:49:35.021312",
+  "accuracy": 0.9984444444444445,
+  "f1Score": 0.9984420209214333,
+  "precision": 1.0,
+  "recall": 0.9968888888888889,
+  "cvAccuracy": 0.9674222222222222,
+  "cvStd": 0.002229321991819455,
+  "featureCount": 66
+}
