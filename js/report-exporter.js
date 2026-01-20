@@ -128,7 +128,7 @@ const ReportExporter = {
     /**
      * Generate HTML report for PDF export
      */
-    generateHtmlReport(report, analysisResult) {
+    generateHtmlReport(report, analysisResult, modelData = null) {
         const probability = report.summary.probability;
         
         // Check for humanized AI signals
@@ -136,6 +136,10 @@ const ReportExporter = {
         const falsePositiveRisk = analysisResult.falsePositiveRisk || {};
         const hasHighDisagreement = falsePositiveRisk.risks?.some(r => r.type === 'analyzer_disagreement' && r.severity === 'high');
         const isLikelyHumanized = humanizerSignals.isLikelyHumanized || hasHighDisagreement;
+        
+        // Calculate humanization probability
+        const humanizerProbability = humanizerSignals.probability || humanizerSignals.humanizerProbability || 0;
+        const effectiveHumanizerProb = Math.round(humanizerProbability * 100);
         
         // Choose bar color - purple for humanized, red/yellow/green otherwise
         const barColor = isLikelyHumanized ? '#9333ea' : (probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981'));
@@ -302,7 +306,7 @@ const ReportExporter = {
                 <div class="verdict-gauge-circle">
                     <div class="verdict-gauge-inner">
                         <span class="verdict-gauge-value">${probability}%</span>
-                        <span class="verdict-gauge-label">AI Prob</span>
+                        <span class="verdict-gauge-label">Raw AI</span>
                     </div>
                 </div>
             </div>
@@ -320,7 +324,40 @@ const ReportExporter = {
             </div>
         </div>
         
-        ${isLikelyHumanized ? `<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:6px;padding:8px 12px;margin:10px 0;"><p style="font-size:9pt;color:#7c3aed;margin:0;"><strong>HUMANIZATION DETECTED:</strong> High disagreement between detection categories suggests post-processing or editing of AI output. Manual review recommended.</p></div>` : ''}
+        <!-- Raw AI vs Humanized Breakdown -->
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:12px 0;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:140px;">
+                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Raw Generated Content</div>
+                    <div style="font-size:16pt;font-weight:bold;color:${probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981')};">${probability}%</div>
+                    <div style="font-size:8pt;color:#94a3b8;">Probability of unmodified AI output</div>
+                </div>
+                <div style="flex:1;min-width:140px;">
+                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Humanization Likelihood</div>
+                    <div style="font-size:16pt;font-weight:bold;color:${effectiveHumanizerProb >= 40 ? '#9333ea' : '#64748b'};">${effectiveHumanizerProb}%</div>
+                    <div style="font-size:8pt;color:#94a3b8;">Signs of post-processing detected</div>
+                </div>
+                <div style="flex:1;min-width:140px;">
+                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Authentic Human</div>
+                    <div style="font-size:16pt;font-weight:bold;color:${100 - probability <= 40 ? '#10b981' : '#64748b'};">${100 - probability}%</div>
+                    <div style="font-size:8pt;color:#94a3b8;">Genuinely human-authored</div>
+                </div>
+            </div>
+        </div>
+        
+        ${isLikelyHumanized ? `<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:6px;padding:10px 14px;margin:10px 0;">
+            <h4 style="margin:0 0 6px 0;color:#7c3aed;font-size:10pt;">⚠ Humanization Detected</h4>
+            <p style="font-size:9pt;color:#6b21a8;margin:0 0 8px 0;">This text exhibits patterns consistent with AI-generated content that has been modified to appear more human-like. This could indicate:</p>
+            <ul style="font-size:8pt;color:#7c3aed;margin:0 0 0 16px;padding:0;">
+                <li>Use of "humanizer" tools that paraphrase AI output</li>
+                <li>Manual editing to break AI patterns</li>
+                <li>Mixing AI-generated sections with human writing</li>
+                <li>AI-assisted writing with significant human input</li>
+            </ul>
+            <p style="font-size:8pt;color:#9333ea;margin:8px 0 0 0;font-style:italic;">Note: Detection is based on ${humanizerSignals.flagCount || 0} humanization signals. Raw AI probability remains ${probability}% before humanization adjustments.</p>
+        </div>` : (probability >= 40 && effectiveHumanizerProb < 30 ? `<div style="background:#fefce8;border:1px solid #fde047;border-radius:6px;padding:8px 12px;margin:10px 0;">
+            <p style="font-size:8pt;color:#854d0e;margin:0;"><strong>Note:</strong> While AI patterns were detected, no significant humanization signals were found. This suggests the content is either raw AI output or naturally-written human text with formal/structured style.</p>
+        </div>` : '')}
         
         <p style="font-size:9pt;color:#444;line-height:1.5;margin-top:10px;">${report.summary.text}</p>
     </div>
@@ -331,6 +368,56 @@ const ReportExporter = {
         <div class="stat-item"><div class="stat-label">Paragraphs</div><div class="stat-value">${report.statistics.paragraphCount.toLocaleString()}</div></div>
         <div class="stat-item"><div class="stat-label">Analysis Time</div><div class="stat-value">${report.statistics.analysisTime}</div></div>
     </div>`;
+
+        // Collect high-severity findings for prominent display
+        const highSeverityFindings = [];
+        if (analysisResult.findings) {
+            analysisResult.findings.forEach(f => {
+                if (f.severity === 'high' || f.severity === 'critical') {
+                    highSeverityFindings.push(f);
+                }
+            });
+        }
+        if (falsePositiveRisk.risks) {
+            falsePositiveRisk.risks.forEach(r => {
+                if (r.severity === 'high' || r.severity === 'critical') {
+                    highSeverityFindings.push({
+                        label: r.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                        value: r.message,
+                        severity: r.severity,
+                        indicator: 'ai',
+                        suggestsHumanized: r.suggestsHumanized
+                    });
+                }
+            });
+        }
+        
+        // Add high severity warnings section if any exist
+        if (highSeverityFindings.length > 0) {
+            html += `
+    <div style="background:linear-gradient(135deg, rgba(234, 88, 12, 0.1) 0%, rgba(220, 38, 38, 0.08) 100%);border:2px solid #ea580c;border-radius:8px;padding:15px;margin:15px 0;page-break-inside:avoid;">
+        <h3 style="margin:0 0 10px 0;color:#c2410c;font-size:11pt;display:flex;align-items:center;gap:6px;">
+            ⚠ Critical Findings (${highSeverityFindings.length})
+        </h3>
+        <p style="font-size:8pt;color:#9a3412;margin:0 0 12px 0;">These high-priority patterns require attention and significantly impact the analysis.</p>`;
+            
+            for (const finding of highSeverityFindings) {
+                const indicatorLabel = finding.indicator === 'ai' ? 'AI Pattern' : (finding.indicator === 'human' ? 'Human Pattern' : 'Mixed Signal');
+                const indicatorClass = finding.indicator === 'ai' ? 'ind-ai' : (finding.indicator === 'human' ? 'ind-human' : 'ind-mixed');
+                html += `
+        <div style="background:#fff;border-left:4px solid ${finding.severity === 'critical' ? '#dc2626' : '#ea580c'};padding:10px 12px;margin:8px 0;border-radius:0 4px 4px 0;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;">
+                <strong style="font-size:9pt;color:#1f2937;">${finding.label || 'Detection Alert'}</strong>
+                <span class="${indicatorClass}" style="font-size:7pt;">${indicatorLabel}</span>
+            </div>
+            <p style="font-size:8pt;color:#4b5563;margin:0 0 6px 0;">${finding.value || finding.note || 'High severity pattern detected'}</p>
+            ${finding.suggestsHumanized ? '<p style="font-size:7pt;color:#7c3aed;margin:0;font-style:italic;">⟐ This pattern is commonly associated with humanized AI text</p>' : ''}
+            ${finding.benchmark ? `<p style="font-size:7pt;color:#6b7280;margin:4px 0 0 0;">Expected: Human ${finding.benchmark.humanRange || 'varies'} | AI ${finding.benchmark.aiRange || 'varies'}</p>` : ''}
+        </div>`;
+            }
+            html += `
+    </div>`;
+        }
 
         // Add detection caveats/warnings if any
         if (falsePositiveRisk.hasRisks && falsePositiveRisk.risks?.length > 0) {
@@ -365,17 +452,20 @@ const ReportExporter = {
         if (Object.keys(advStats).length > 0) {
             html += `
     <h2>Complete Statistical Analysis</h2>
-    <p style="font-size:8pt;color:#666;margin-bottom:10px;"><span class="ind-ai">A</span> = AI-like | <span class="ind-mixed">M</span> = Mixed/Uncertain | <span class="ind-human">H</span> = Human-like</p>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:8px 12px;margin-bottom:12px;">
+        <p style="font-size:8pt;color:#475569;margin:0 0 4px 0;"><strong>Indicator Legend:</strong></p>
+        <p style="font-size:8pt;color:#666;margin:0;"><span class="ind-ai">A</span> = AI-like pattern | <span class="ind-mixed">M</span> = Mixed/Uncertain | <span class="ind-human">H</span> = Human-like pattern | <span style="color:#94a3b8;">—</span> = Metric without established AI/Human threshold (informational only)</p>
+    </div>
     
     <!-- Vocabulary Richness -->
     <h3>1. Vocabulary Richness</h3>
     <table>
         <tr><th>Metric</th><th>Value</th><th>Indicator</th></tr>
-        <tr><td>Unique Words</td><td>${advStats.vocabulary?.uniqueWords?.toLocaleString() || 0}</td><td>—</td></tr>
+        <tr><td>Unique Words</td><td>${advStats.vocabulary?.uniqueWords?.toLocaleString() || 0}</td><td style="color:#94a3b8;">—</td></tr>
         <tr><td>Type-Token Ratio (TTR)</td><td>${formatPct(advStats.vocabulary?.typeTokenRatio)}</td><td>${getIndicator(advStats.vocabulary?.typeTokenRatio, [0.3, 0.5], true)}</td></tr>
-        <tr><td>Root TTR (Guiraud's R)</td><td>${formatNum(advStats.vocabulary?.rootTTR)}</td><td>—</td></tr>
+        <tr><td>Root TTR (Guiraud's R)</td><td>${formatNum(advStats.vocabulary?.rootTTR)}</td><td style="color:#94a3b8;">—</td></tr>
         <tr><td>Hapax Legomena Ratio</td><td>${formatPct(advStats.vocabulary?.hapaxLegomenaRatio)}</td><td>${getIndicator(advStats.vocabulary?.hapaxLegomenaRatio, [0.35, 0.5], true)}</td></tr>
-        <tr><td>Dis Legomena Ratio</td><td>${formatPct(advStats.vocabulary?.disLegomenaRatio)}</td><td>—</td></tr>
+        <tr><td>Dis Legomena Ratio</td><td>${formatPct(advStats.vocabulary?.disLegomenaRatio)}</td><td style="color:#94a3b8;">—</td></tr>
         <tr><td>Yule's K</td><td>${formatNum(advStats.vocabulary?.yulesK, 1)}</td><td>${getIndicator(advStats.vocabulary?.yulesK, [150, 100])}</td></tr>
         <tr><td>Simpson's D</td><td>${formatNum(advStats.vocabulary?.simpsonsD, 4)}</td><td>${getIndicator(advStats.vocabulary?.simpsonsD, [0.02, 0.01])}</td></tr>
         <tr><td>Honore's R</td><td>${formatNum(advStats.vocabulary?.honoresR, 0)}</td><td>—</td></tr>
@@ -1004,25 +1094,28 @@ const ReportExporter = {
     /**
      * Generate structured report content
      */
-    generateReportContent(result, originalText) {
-        // Get model info if available
-        const modelConfig = typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
+    generateReportContent(result, originalText, modelData = null) {
+        // Model info from passed data or defaults
+        const modelStats = {
+            helios: { name: 'Helios', version: '1.0', accuracy: 0.9924, f1Score: 0.9920, trainingSamples: 45000, features: 45 },
+            zenith: { name: 'Zenith', version: '1.0', accuracy: 0.9957, f1Score: 0.9955, trainingSamples: 42000, features: 38 },
+            sunrise: { name: 'Sunrise', version: '3.0', accuracy: 0.9808, f1Score: 0.9809, trainingSamples: 29976, features: 32 },
+            dawn: { name: 'Dawn', version: '1.0', accuracy: 0.849, f1Score: 0.845, trainingSamples: 15000, features: 18 }
+        };
+        
+        const modelId = modelData?.id || 'helios';
+        const modelInfo = modelStats[modelId] || modelStats.helios;
         
         const report = {
             title: 'VERITAS AI Detection Analysis Report',
             generatedAt: new Date().toISOString(),
-            modelInfo: modelConfig ? {
-                name: modelConfig.modelName,
-                version: modelConfig.version,
-                accuracy: modelConfig.trainingStats?.testAccuracy || 0.98,
-                f1Score: modelConfig.trainingStats?.testF1 || 0.98,
-                trainingSamples: modelConfig.trainingStats?.totalSamples || 29976
-            } : {
-                name: 'Sunrise',
-                version: '3.0.0',
-                accuracy: 0.9808,
-                f1Score: 0.9809,
-                trainingSamples: 29976
+            modelInfo: {
+                name: modelInfo.name,
+                version: modelInfo.version,
+                accuracy: modelInfo.accuracy,
+                f1Score: modelInfo.f1Score,
+                trainingSamples: modelInfo.trainingSamples,
+                features: modelInfo.features
             },
             summary: this.generateExecutiveSummary(result),
             verdict: this.generateVerdictSection(result),
@@ -1046,27 +1139,39 @@ const ReportExporter = {
         const band = VarianceUtils.toProbabilityBand(result.aiProbability);
         const confidence = Math.round(result.confidence * 100);
         
+        // Check for humanization signals
+        const humanizerSignals = result.humanizerSignals || {};
+        const isLikelyHumanized = humanizerSignals.isLikelyHumanized;
+        const humanizerProb = Math.round((humanizerSignals.probability || humanizerSignals.humanizerProbability || 0) * 100);
+        
         let summaryText = '';
         
         if (probability < 30) {
-            summaryText = `This analysis indicates a LOW probability (${probability}%) of AI-generated content. ` +
+            summaryText = `This analysis indicates a LOW probability (${probability}%) of raw AI-generated content. ` +
                 `The text exhibits characteristics typically associated with human-authored writing, including ` +
                 `natural variance in tone, sentence structure, and vocabulary usage. `;
         } else if (probability < 50) {
-            summaryText = `This analysis indicates a MODERATE-LOW probability (${probability}%) of AI-generated content. ` +
+            summaryText = `This analysis indicates a MODERATE-LOW probability (${probability}%) of raw AI-generated content. ` +
                 `While some patterns consistent with AI writing were detected, the majority of indicators suggest ` +
                 `human authorship. `;
         } else if (probability < 60) {
-            summaryText = `This analysis is INCONCLUSIVE (${probability}% probability). ` +
+            summaryText = `This analysis is INCONCLUSIVE (${probability}% raw AI probability). ` +
                 `The text shows a mix of both human-like and AI-like characteristics. This could indicate ` +
                 `human-edited AI content, AI-assisted writing, or naturally formal human prose. `;
         } else if (probability < 75) {
-            summaryText = `This analysis indicates a MODERATE-HIGH probability (${probability}%) of AI-generated content. ` +
+            summaryText = `This analysis indicates a MODERATE-HIGH probability (${probability}%) of raw AI-generated content. ` +
                 `Several patterns characteristic of AI writing were detected, though some human-like elements are present. `;
         } else {
-            summaryText = `This analysis indicates a HIGH probability (${probability}%) of AI-generated content. ` +
+            summaryText = `This analysis indicates a HIGH probability (${probability}%) of raw AI-generated content. ` +
                 `The text exhibits multiple strong indicators of AI generation, including unusual uniformity ` +
                 `in structure, tone, and vocabulary patterns. `;
+        }
+        
+        // Add humanization context if relevant
+        if (isLikelyHumanized && humanizerProb >= 30) {
+            summaryText += `However, ${humanizerProb}% likelihood of humanization was detected — the text may have been AI-generated then modified to appear more human-like. `;
+        } else if (probability >= 50 && humanizerProb < 20) {
+            summaryText += `No significant humanization signals detected, suggesting this is likely raw/unmodified AI output. `;
         }
 
         summaryText += `Analysis confidence: ${confidence}%.`;
@@ -1075,7 +1180,8 @@ const ReportExporter = {
             text: summaryText,
             probability,
             band: band.label,
-            confidence
+            confidence,
+            humanizerProbability: humanizerProb
         };
     },
 

@@ -2859,14 +2859,18 @@ These findings have important implications for urban planning and public health 
 
         const textInput = document.getElementById('textInput');
         const originalText = textInput?.value || '';
+        
+        // Get current model info
+        const currentModel = this.getCurrentModel();
+        const modelData = this.models?.find(m => m.id === currentModel) || { id: 'helios', name: 'Helios', accuracy: '99.24%' };
 
         try {
             if (typeof ReportExporter !== 'undefined') {
-                // Generate the report content
-                const reportContent = ReportExporter.generateReportContent(this.currentResult, originalText);
+                // Generate the report content with model info
+                const reportContent = ReportExporter.generateReportContent(this.currentResult, originalText, modelData);
                 
-                // Generate complete HTML report
-                const htmlContent = ReportExporter.generateHtmlReport(reportContent, this.currentResult);
+                // Generate complete HTML report with model info
+                const htmlContent = ReportExporter.generateHtmlReport(reportContent, this.currentResult, modelData);
                 
                 // Open in new tab
                 const reportWindow = window.open('', '_blank');
