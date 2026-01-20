@@ -829,18 +829,14 @@ const ReportExporter = {
     <p style="font-size:9pt;color:#666;margin-bottom:15px;">Each category is analyzed independently. Categories with higher ML weights (shown in parentheses) have more influence on the final AI probability score.</p>`;
 
         // All categories with full details
-        let categoryIndex = 0;
         for (const cat of report.categoryAnalyses) {
             const weightInfo = this.categoryWeightInfo[cat.category] || { weight: 0.05, description: 'Analyzes various text characteristics.' };
             const weightPct = Math.round(weightInfo.weight * 100);
             const scoreClass = cat.aiProbability >= 60 ? 'score-high' : (cat.aiProbability >= 40 ? 'score-moderate' : 'score-low');
             const fillColor = cat.aiProbability >= 60 ? '#ef4444' : (cat.aiProbability >= 40 ? '#f59e0b' : '#10b981');
             
-            // Add page break every 4 categories to avoid clutter
-            const pageBreakClass = categoryIndex > 0 && categoryIndex % 4 === 0 ? 'page-break' : '';
-            
             html += `
-    <div class="category-card ${pageBreakClass}">
+    <div class="category-card">
         <div class="category-header">
             <span class="category-name">${cat.category}. ${cat.name}</span>
             <span class="category-score ${scoreClass}">${cat.aiProbability}% AI</span>
@@ -909,33 +905,32 @@ const ReportExporter = {
             <strong>Category Weight:</strong> ${weightPct}% of total score | ${weightInfo.description}
         </div>
     </div>`;
-            categoryIndex++;
         }
 
-        // Add verbose signal summary with page break
-        html += `<div class="section-break"></div>`;
+        // Add verbose signal summary - new section
         html += this.generateSignalSummaryHtml(analysisResult, verboseEvidence);
 
-        // Add the original analyzed text with page break
+        // Add the original analyzed text - new section
         html += `
-    <h2 class="page-break">Analyzed Text</h2>
+    <h2 class="section-break">Analyzed Text</h2>
     <div style="background:#fafafa;border:1px solid #e5e5e5;border-radius:6px;padding:12px;margin:10px 0;max-height:none;">
         <p style="font-size:8pt;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">Original Text (${report.statistics.wordCount.toLocaleString()} words)</p>
         <div style="font-size:9pt;line-height:1.6;color:#333;white-space:pre-wrap;word-wrap:break-word;font-family:'Georgia',serif;">${this.escapeHtml(report.analyzedText || '')}</div>
     </div>`;
 
         html += `
-    <div class="methodology page-break">
+    <div class="methodology section-break">
         <h2 style="border-bottom: 2px solid #333; margin-bottom: 10px;">${report.methodology.title}</h2>
         <div style="font-size: 9pt; line-height: 1.7;">${report.methodology.content.replace(/\n\n/g, '</p><p style="margin-top:10px;">').replace(/\n/g, '<br>')}</div>
     </div>
 
+    <h2 class="section-break">Disclaimer & Guidelines</h2>
     <div class="disclaimer">
         <h3>${report.disclaimer.title}</h3>
         <p>${report.disclaimer.content.replace(/\n/g, '<br>')}</p>
     </div>
 
-    <h2>Category Weight Reference Table</h2>
+    <h2 class="section-break">Category Weight Reference Table</h2>
     <table>
         <tr><th>Category</th><th>Weight</th><th>What It Measures</th></tr>`;
         
@@ -1253,8 +1248,8 @@ const ReportExporter = {
         }
 
         let html = `
+    <h2 class="section-break">Detection Signal Summary</h2>
     <div class="signal-summary">
-        <h3>Detection Signal Summary</h3>
         <p style="font-size:9pt;color:#666;">Key findings from the analysis supporting the classification:</p>
         <div class="signal-grid">`;
 
