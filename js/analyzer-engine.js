@@ -297,12 +297,29 @@ const AnalyzerEngine = {
 
         // Assess false positive risk
         const falsePositiveRisk = this.assessFalsePositiveRisk(categoryResults, text);
+        
+        // Apply false positive risk adjustment to AI probability
+        let adjustedAiProbability = overallResult.aiProbability;
+        if (falsePositiveRisk.adjustmentWeight && falsePositiveRisk.adjustmentWeight < 1.0) {
+            // Reduce AI probability based on false positive risk factors
+            // The adjustment moves probability toward 0.5 (uncertain) proportionally
+            const adjustment = (overallResult.aiProbability - 0.5) * (1 - falsePositiveRisk.adjustmentWeight);
+            adjustedAiProbability = overallResult.aiProbability - adjustment;
+        }
+        
+        // Human indicators can further reduce AI probability
+        if (falsePositiveRisk.humanIndicatorCount > 0) {
+            adjustedAiProbability = adjustedAiProbability * (1 - 0.05 * falsePositiveRisk.humanIndicatorCount);
+        }
+        
+        // Clamp to valid range
+        adjustedAiProbability = Math.max(0, Math.min(1, adjustedAiProbability));
 
         const endTime = performance.now();
         
         // Get verdict with humanizer detection factored in
         const verdict = this.getVerdictWithHumanizer(
-            overallResult.aiProbability, 
+            adjustedAiProbability, 
             overallResult.confidence, 
             humanizerSignals,
             overallResult.signalCounts
@@ -310,8 +327,9 @@ const AnalyzerEngine = {
 
         return {
             // Overall results
-            aiProbability: overallResult.aiProbability,
-            humanProbability: 1 - overallResult.aiProbability,
+            aiProbability: adjustedAiProbability,
+            rawAiProbability: overallResult.aiProbability, // Keep original for reference
+            humanProbability: 1 - adjustedAiProbability,
             mixedProbability: overallResult.mixedProbability,
             confidence: overallResult.confidence,
             confidenceInterval,
@@ -1476,6 +1494,7 @@ const AnalyzerEngine = {
      */
     assessFalsePositiveRisk(categoryResults, text) {
         const risks = [];
+        const lowerText = text.toLowerCase();
         
         // Check for academic/formal writing (often mistaken for AI)
         const formalIndicators = (text.match(/\b(furthermore|moreover|consequently|thus|hence|therefore)\b/gi) || []).length;
@@ -1506,6 +1525,84 @@ const AnalyzerEngine = {
                 severity: 'low'
             });
         }
+        
+        // Check for instructional/educational tone (often false flagged)
+        const instructionalMarkers = [
+            'step 1', 'step 2', 'first,', 'second,', 'third,', 'finally,',
+            'how to', 'in order to', 'you can', 'you should', 'make sure to',
+            'remember to', 'don\'t forget', 'keep in mind', 'note that'
+        ];
+        const instructionalCount = instructionalMarkers.filter(m => lowerText.includes(m)).length;
+        if (instructionalCount >= 3) {
+            risks.push({
+                type: 'instructional_tone',
+                message: 'Instructional/how-to content naturally uses structured language similar to AI',
+                severity: 'medium',
+                adjustWeight: 0.85 // Reduce AI probability weight
+            });
+        }
+        
+        // Check for business/professional tone
+        const businessMarkers = [
+            'dear', 'sincerely', 'regards', 'best regards', 'thank you for',
+            'please let me know', 'i am writing to', 'as discussed',
+            'per our conversation', 'attached', 'following up'
+        ];
+        const businessCount = businessMarkers.filter(m => lowerText.includes(m)).length;
+        if (businessCount >= 2) {
+            risks.push({
+                type: 'business_correspondence',
+                message: 'Professional/business writing often has formal patterns similar to AI',
+                severity: 'medium',
+                adjustWeight: 0.85
+            });
+        }
+        
+        // Check for journalistic/news style
+        const journalisticMarkers = [
+            'according to', 'sources say', 'reported that', 'in a statement',
+            'breaking:', 'update:', 'developing story'
+        ];
+        const journalisticCount = journalisticMarkers.filter(m => lowerText.includes(m)).length;
+        if (journalisticCount >= 2) {
+            risks.push({
+                type: 'journalistic_style',
+                message: 'News/journalistic writing has structured patterns that may trigger false positives',
+                severity: 'low',
+                adjustWeight: 0.9
+            });
+        }
+        
+        // Check for ESL/non-native speaker patterns
+        // These often get flagged because of simpler vocabulary choices
+        const sentences = Utils.splitSentences(text);
+        const avgSentenceLength = sentences.length > 0 ? wordCount / sentences.length : 0;
+        const uniqueWords = new Set(Utils.tokenize(lowerText)).size;
+        const vocabDiversity = wordCount > 0 ? uniqueWords / wordCount : 0;
+        
+        if (avgSentenceLength < 12 && vocabDiversity < 0.5 && wordCount > 50) {
+            risks.push({
+                type: 'simple_vocabulary',
+                message: 'Simple vocabulary and short sentences may indicate ESL writer, not AI',
+                severity: 'medium',
+                adjustWeight: 0.85
+            });
+        }
+        
+        // Check for creative/narrative writing
+        const narrativeMarkers = [
+            'i felt', 'i thought', 'i wondered', 'i remember', 'i realized',
+            'she said', 'he said', 'they said', 'my heart', 'my mind'
+        ];
+        const narrativeCount = narrativeMarkers.filter(m => lowerText.includes(m)).length;
+        if (narrativeCount >= 3) {
+            risks.push({
+                type: 'narrative_writing',
+                message: 'Personal narrative/creative writing detected - reduces false positive likelihood',
+                severity: 'low',
+                isHumanIndicator: true
+            });
+        }
 
         // Check for disagreement between analyzers - may indicate humanized AI
         const validResults = categoryResults.filter(r => r.confidence > 0.3);
@@ -1521,12 +1618,26 @@ const AnalyzerEngine = {
                 });
             }
         }
+        
+        // Calculate overall adjustment weight based on risks
+        let adjustmentWeight = 1.0;
+        let humanIndicatorCount = 0;
+        for (const risk of risks) {
+            if (risk.adjustWeight) {
+                adjustmentWeight *= risk.adjustWeight;
+            }
+            if (risk.isHumanIndicator) {
+                humanIndicatorCount++;
+            }
+        }
 
         return {
             hasRisks: risks.length > 0,
             risks,
             overallRisk: risks.length === 0 ? 'low' : 
-                         risks.some(r => r.severity === 'high') ? 'high' : 'medium'
+                         risks.some(r => r.severity === 'high') ? 'high' : 'medium',
+            adjustmentWeight,
+            humanIndicatorCount
         };
     },
 

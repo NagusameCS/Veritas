@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERITAS Benchmark Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f0f; 
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #00d4ff; margin-bottom: 10px; }
+        h2 { color: #00ff88; margin: 20px 0 10px; font-size: 1.3rem; }
+        .subtitle { color: #888; margin-bottom: 30px; }
+        
+        .controls { margin-bottom: 30px; }
+        button {
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            border: none;
+            color: #000;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+        button:hover { opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .progress {
+            background: #1a1a1a;
+            border-radius: 4px;
+            height: 24px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .results-section {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .test-result {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            border-radius: 4px;
+            background: #252525;
+        }
+        .test-result.correct { border-left: 4px solid #00ff88; }
+        .test-result.incorrect { border-left: 4px solid #ff4444; }
+        
+        .test-id { flex: 1; font-family: monospace; }
+        .test-prob { 
+            width: 120px; 
+            text-align: right;
+            font-weight: bold;
+        }
+        .test-prob.ai { color: #ff6b6b; }
+        .test-prob.human { color: #00ff88; }
+        .test-prob.uncertain { color: #ffcc00; }
+        .test-status { width: 150px; text-align: right; font-size: 0.9rem; }
+        .test-status.correct { color: #00ff88; }
+        .test-status.incorrect { color: #ff4444; }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .summary-card {
+            background: #252525;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .summary-card h3 { color: #888; font-size: 0.9rem; margin-bottom: 10px; }
+        .summary-card .value { font-size: 2rem; font-weight: bold; }
+        .summary-card .value.good { color: #00ff88; }
+        .summary-card .value.warning { color: #ffcc00; }
+        .summary-card .value.bad { color: #ff4444; }
+        
+        .risks-list { font-size: 0.85rem; color: #888; margin-top: 4px; padding-left: 20px; }
+        
+        #log {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 VERITAS Benchmark Suite</h1>
+        <p class="subtitle">Testing detection accuracy across human, AI, and edge case samples</p>
+        
+        <div class="controls">
+            <button id="runBtn" onclick="runBenchmarks()">Run Full Benchmark</button>
+            <button id="quickBtn" onclick="runQuickTest()">Quick Test (5 samples)</button>
+        </div>
+        
+        <div class="progress" style="display: none;">
+            <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+        </div>
+        
+        <div id="results"></div>
+        
+        <div id="log"></div>
+    </div>
+
+    <!-- Load VERITAS dependencies -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/analyzers/lexical.js"></script>
+    <script src="../js/analyzers/syntax.js"></script>
+    <script src="../js/analyzers/semantic.js"></script>
+    <script src="../js/analyzers/tone.js"></script>
+    <script src="../js/analyzers/statistical.js"></script>
+    <script src="../js/analyzers/discourse.js"></script>
+    <script src="../js/analyzers/grammar.js"></script>
+    <script src="../js/analyzers/metapatterns.js"></script>
+    <script src="../js/analyzers/repetition.js"></script>
+    <script src="../js/analyzers/archaic.js"></script>
+    <script src="../js/analyzers/partofspeech.js"></script>
+    <script src="../js/analyzers/authorship.js"></script>
+    <script src="../js/analyzers/dialect.js"></script>
+    <script src="../js/analyzers/flare.js"></script>
+    <script src="../js/analyzer-engine.js"></script>
+    <script src="benchmark.js"></script>
+    
+    <script>
+        function log(msg) {
+            const logEl = document.getElementById('log');
+            logEl.textContent += msg + '\n';
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function updateProgress(current, total) {
+            const pct = Math.round((current / total) * 100);
+            const bar = document.getElementById('progressBar');
+            bar.style.width = pct + '%';
+            bar.textContent = `${current}/${total} (${pct}%)`;
+        }
+        
+        async function testSample(sample) {
+            try {
+                const result = await AnalyzerEngine.analyze(sample.text);
+                return {
+                    id: sample.id,
+                    expectedLabel: sample.label,
+                    description: sample.description,
+                    model: sample.model || null,
+                    aiProbability: result.aiProbability,
+                    humanProbability: result.humanProbability,
+                    confidence: result.confidence,
+                    falsePositiveRisk: result.falsePositiveRisk,
+                    rawAiProbability: result.rawAiProbability
+                };
+            } catch (err) {
+                log(`Error testing ${sample.id}: ${err.message}`);
+                return {
+                    id: sample.id,
+                    expectedLabel: sample.label,
+                    error: err.message,
+                    aiProbability: 0.5
+                };
+            }
+        }
+        
+        function renderResults(results) {
+            const container = document.getElementById('results');
+            let html = '';
+            
+            // Human samples section
+            html += `<div class="results-section">
+                <h2>👤 Human Samples (${results.human.correct}/${results.human.total})</h2>`;
+            for (const r of results.human.samples) {
+                const isCorrect = r.aiProbability < 0.5;
+                const probClass = r.aiProbability >= 0.6 ? 'ai' : (r.aiProbability <= 0.4 ? 'human' : 'uncertain');
+                html += `<div class="test-result ${isCorrect ? 'correct' : 'incorrect'}">
+                    <span class="test-id">${r.id}</span>
+                    <span class="test-prob ${probClass}">${(r.aiProbability * 100).toFixed(1)}% AI</span>
+                    <span class="test-status ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '✓ CORRECT' : '✗ FALSE POSITIVE'}</span>
+                </div>`;
+                if (r.falsePositiveRisk?.risks?.length > 0) {
+                    html += `<div class="risks-list">→ ${r.falsePositiveRisk.risks.map(x => x.type).join(', ')}</div>`;
+                }
+            }
+            html += `</div>`;
+            
+            // AI samples section
+            html += `<div class="results-section">
+                <h2>🤖 AI Samples (${results.ai.correct}/${results.ai.total})</h2>`;
+            for (const r of results.ai.samples) {
+                const isCorrect = r.aiProbability >= 0.5;
+                const probClass = r.aiProbability >= 0.6 ? 'ai' : (r.aiProbability <= 0.4 ? 'human' : 'uncertain');
+                html += `<div class="test-result ${isCorrect ? 'correct' : 'incorrect'}">
+                    <span class="test-id">${r.id} ${r.model ? `(${r.model})` : ''}</span>
+                    <span class="test-prob ${probClass}">${(r.aiProbability * 100).toFixed(1)}% AI</span>
+                    <span class="test-status ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '✓ CORRECT' : '✗ FALSE NEGATIVE'}</span>
+                </div>`;
+            }
+            html += `</div>`;
+            
+            // Edge cases section
+            html += `<div class="results-section">
+                <h2>⚠️ Edge Cases (${results.edgeCases.correct}/${results.edgeCases.total})</h2>`;
+            for (const r of results.edgeCases.samples) {
+                const isCorrect = r.expectedLabel === 'human' ? r.aiProbability < 0.5 : r.aiProbability >= 0.5;
+                const probClass = r.aiProbability >= 0.6 ? 'ai' : (r.aiProbability <= 0.4 ? 'human' : 'uncertain');
+                const errorType = r.expectedLabel === 'human' ? 'FALSE POSITIVE' : 'FALSE NEGATIVE';
+                html += `<div class="test-result ${isCorrect ? 'correct' : 'incorrect'}">
+                    <span class="test-id">${r.id} (expected: ${r.expectedLabel})</span>
+                    <span class="test-prob ${probClass}">${(r.aiProbability * 100).toFixed(1)}% AI</span>
+                    <span class="test-status ${isCorrect ? 'correct' : 'incorrect'}">${isCorrect ? '✓ CORRECT' : `✗ ${errorType}`}</span>
+                </div>`;
+                if (r.falsePositiveRisk?.risks?.length > 0) {
+                    html += `<div class="risks-list">→ ${r.falsePositiveRisk.risks.map(x => x.type).join(', ')}</div>`;
+                }
+            }
+            html += `</div>`;
+            
+            // Summary cards
+            const humanAcc = (results.human.correct / results.human.total * 100);
+            const aiAcc = (results.ai.correct / results.ai.total * 100);
+            const edgeAcc = (results.edgeCases.correct / results.edgeCases.total * 100);
+            const overall = ((results.human.correct + results.ai.correct + results.edgeCases.correct) / 
+                           (results.human.total + results.ai.total + results.edgeCases.total) * 100);
+            
+            html += `<div class="results-section">
+                <h2>📊 Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Human Detection</h3>
+                        <div class="value ${humanAcc >= 80 ? 'good' : humanAcc >= 60 ? 'warning' : 'bad'}">${humanAcc.toFixed(1)}%</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>AI Detection</h3>
+                        <div class="value ${aiAcc >= 80 ? 'good' : aiAcc >= 60 ? 'warning' : 'bad'}">${aiAcc.toFixed(1)}%</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Edge Cases</h3>
+                        <div class="value ${edgeAcc >= 60 ? 'good' : edgeAcc >= 40 ? 'warning' : 'bad'}">${edgeAcc.toFixed(1)}%</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Overall Accuracy</h3>
+                        <div class="value ${overall >= 80 ? 'good' : overall >= 60 ? 'warning' : 'bad'}">${overall.toFixed(1)}%</div>
+                    </div>
+                </div>
+            </div>`;
+            
+            container.innerHTML = html;
+        }
+        
+        async function runBenchmarks() {
+            const runBtn = document.getElementById('runBtn');
+            const quickBtn = document.getElementById('quickBtn');
+            const progress = document.querySelector('.progress');
+            
+            runBtn.disabled = true;
+            quickBtn.disabled = true;
+            progress.style.display = 'block';
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('log').textContent = '';
+            
+            log('Starting VERITAS Benchmark Suite...');
+            log('');
+            
+            const results = {
+                human: { correct: 0, total: 0, samples: [] },
+                ai: { correct: 0, total: 0, samples: [] },
+                edgeCases: { correct: 0, total: 0, samples: [] }
+            };
+            
+            const allSamples = [
+                ...testSamples.human.map(s => ({...s, category: 'human'})),
+                ...testSamples.ai.map(s => ({...s, category: 'ai'})),
+                ...testSamples.edgeCases.map(s => ({...s, category: 'edgeCases'}))
+            ];
+            
+            for (let i = 0; i < allSamples.length; i++) {
+                const sample = allSamples[i];
+                updateProgress(i + 1, allSamples.length);
+                
+                log(`Testing: ${sample.id}...`);
+                const result = await testSample(sample);
+                
+                results[sample.category].total++;
+                results[sample.category].samples.push(result);
+                
+                const isCorrect = sample.label === 'human' 
+                    ? result.aiProbability < 0.5 
+                    : result.aiProbability >= 0.5;
+                    
+                if (isCorrect) {
+                    results[sample.category].correct++;
+                    log(`  ✓ ${(result.aiProbability * 100).toFixed(1)}% AI - CORRECT`);
+                } else {
+                    log(`  ✗ ${(result.aiProbability * 100).toFixed(1)}% AI - INCORRECT`);
+                }
+                
+                // Small delay to prevent UI freeze
+                await new Promise(r => setTimeout(r, 50));
+            }
+            
+            log('');
+            log('Benchmark complete!');
+            
+            renderResults(results);
+            
+            runBtn.disabled = false;
+            quickBtn.disabled = false;
+        }
+        
+        async function runQuickTest() {
+            const quickSamples = [
+                testSamples.human[0],
+                testSamples.human[2],
+                testSamples.ai[0],
+                testSamples.ai[1],
+                testSamples.edgeCases[0]
+            ];
+            
+            // Temporarily replace testSamples for quick test
+            const origHuman = testSamples.human;
+            const origAi = testSamples.ai;
+            const origEdge = testSamples.edgeCases;
+            
+            testSamples.human = [quickSamples[0], quickSamples[1]];
+            testSamples.ai = [quickSamples[2], quickSamples[3]];
+            testSamples.edgeCases = [quickSamples[4]];
+            
+            await runBenchmarks();
+            
+            testSamples.human = origHuman;
+            testSamples.ai = origAi;
+            testSamples.edgeCases = origEdge;
+        }
+        
+        // Auto-initialize
+        log('VERITAS Benchmark Suite ready.');
+        log('Click "Run Full Benchmark" to test all samples.');
+    </script>
+</body>
+</html>

@@ -6611,5 +6611,14 @@
       "library:mlcroissant",
       "region:us"
     ]
+  },
+  "DeepNLP/ChatGPT-Gemini-Claude-Perplexity-Human-Evaluation-Multi-Aspects-Review-Dataset": {
+    "downloads": 38,
+    "tags": [
+      "license:mit",
+      "size_categories:n<1K",
+      "modality:text"
+    ],
+    "note": "Multi-model comparison dataset - useful for modern AI detection patterns"
   }
 }
