@@ -135,14 +135,26 @@ const ReportExporter = {
         const humanizerSignals = analysisResult.humanizerSignals || {};
         const falsePositiveRisk = analysisResult.falsePositiveRisk || {};
         const hasHighDisagreement = falsePositiveRisk.risks?.some(r => r.type === 'analyzer_disagreement' && r.severity === 'high');
-        const isLikelyHumanized = humanizerSignals.isLikelyHumanized || hasHighDisagreement;
         
         // Calculate humanization probability
         const humanizerProbability = humanizerSignals.probability || humanizerSignals.humanizerProbability || 0;
         const effectiveHumanizerProb = Math.round(humanizerProbability * 100);
         
-        // Choose bar color - purple for humanized, red/yellow/green otherwise
-        const barColor = isLikelyHumanized ? '#9333ea' : (probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981'));
+        // Only consider it "humanized" if there's actual evidence (probability > 30% OR explicit flag with signals)
+        // Disagreement alone is not enough - it could just mean uncertain/mixed content
+        const hasActualHumanizationEvidence = effectiveHumanizerProb >= 30 || 
+            (humanizerSignals.isLikelyHumanized && (humanizerSignals.flagCount || 0) >= 2);
+        
+        // For display: is this likely humanized AI vs raw AI vs human?
+        const isLikelyHumanized = hasActualHumanizationEvidence && probability >= 40;
+        
+        // Uncertain state: high disagreement but low humanization signals could mean genuinely mixed/uncertain
+        const isUncertain = hasHighDisagreement && !hasActualHumanizationEvidence && probability >= 30 && probability <= 70;
+        
+        // Choose bar color
+        const barColor = isLikelyHumanized ? '#9333ea' : 
+                        isUncertain ? '#6366f1' :
+                        (probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981'));
         
         // Build verbose evidence summaries for each category
         const verboseEvidence = this.buildVerboseEvidence(report, analysisResult);
@@ -200,6 +212,7 @@ const ReportExporter = {
         .verdict-badge.moderate { border-color: #b45309; color: #b45309; background: #fff; }
         .verdict-badge.low { border-color: #047857; color: #047857; background: #fff; }
         .verdict-badge.humanized { border-color: #7c3aed; color: #7c3aed; background: #fff; }
+        .verdict-badge.uncertain { border-color: #6366f1; color: #6366f1; background: #fff; }
         
         /* === CONFIDENCE RANGE === */
         .confidence-range { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 8pt; color: #555; }
@@ -311,8 +324,8 @@ const ReportExporter = {
                 </div>
             </div>
             <div class="verdict-info">
-                <span class="verdict-badge ${isLikelyHumanized ? 'humanized' : (probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low'))}">${isLikelyHumanized ? 'POSSIBLY HUMANIZED AI' : report.verdict.label}</span>
-                <p style="margin:4px 0;font-size:9pt;color:#555;">${isLikelyHumanized ? 'This text shows AI origin with humanization attempts — likely AI-generated then modified by tools or manual editing to appear more human-like.' : report.verdict.description}</p>
+                <span class="verdict-badge ${isLikelyHumanized ? 'humanized' : (isUncertain ? 'uncertain' : (probability >= 60 ? 'high' : (probability >= 40 ? 'moderate' : 'low')))}">${isLikelyHumanized ? 'POSSIBLY HUMANIZED AI' : (isUncertain ? 'UNCERTAIN / MIXED SIGNALS' : report.verdict.label)}</span>
+                <p style="margin:4px 0;font-size:9pt;color:#555;">${isLikelyHumanized ? 'This text shows AI origin with humanization attempts — likely AI-generated then modified by tools or manual editing to appear more human-like.' : (isUncertain ? 'Detection methods show significant disagreement. This could indicate mixed human/AI authorship, AI-assisted writing, or text that genuinely falls between typical patterns. Additional context may be needed.' : report.verdict.description)}</p>
                 <div class="confidence-range">
                     <span>Confidence: ${report.summary.confidence}%</span>
                     <div class="confidence-bar">
@@ -354,10 +367,20 @@ const ReportExporter = {
                 <li>Mixing AI-generated sections with human writing</li>
                 <li>AI-assisted writing with significant human input</li>
             </ul>
-            <p style="font-size:8pt;color:#9333ea;margin:8px 0 0 0;font-style:italic;">Note: Detection is based on ${humanizerSignals.flagCount || 0} humanization signals. Raw AI probability remains ${probability}% before humanization adjustments.</p>
+            <p style="font-size:8pt;color:#9333ea;margin:8px 0 0 0;font-style:italic;">Note: Detection is based on ${humanizerSignals.flagCount || 0} humanization signals (${effectiveHumanizerProb}% humanization likelihood).</p>
+        </div>` : (isUncertain ? `<div style="background:#eef2ff;border:1px solid #a5b4fc;border-radius:6px;padding:10px 14px;margin:10px 0;">
+            <h4 style="margin:0 0 6px 0;color:#4f46e5;font-size:10pt;">ℹ Uncertain Classification</h4>
+            <p style="font-size:9pt;color:#3730a3;margin:0 0 8px 0;">Detection methods show significant disagreement on this text. This is not the same as humanization — it indicates genuine uncertainty. Possible explanations:</p>
+            <ul style="font-size:8pt;color:#4f46e5;margin:0 0 0 16px;padding:0;">
+                <li>Text contains a genuine mix of human and AI-written sections</li>
+                <li>Writing style falls between typical human and AI patterns</li>
+                <li>Technical or formal content that mimics AI uniformity</li>
+                <li>Collaborative human-AI writing process</li>
+            </ul>
+            <p style="font-size:8pt;color:#6366f1;margin:8px 0 0 0;font-style:italic;">Humanization likelihood: ${effectiveHumanizerProb}% — insufficient evidence to conclude post-processing occurred.</p>
         </div>` : (probability >= 40 && effectiveHumanizerProb < 30 ? `<div style="background:#fefce8;border:1px solid #fde047;border-radius:6px;padding:8px 12px;margin:10px 0;">
-            <p style="font-size:8pt;color:#854d0e;margin:0;"><strong>Note:</strong> While AI patterns were detected, no significant humanization signals were found. This suggests the content is either raw AI output or naturally-written human text with formal/structured style.</p>
-        </div>` : '')}
+            <p style="font-size:8pt;color:#854d0e;margin:0;"><strong>Note:</strong> While some AI patterns were detected, no significant humanization signals were found. This suggests either raw AI output or naturally formal human writing.</p>
+        </div>` : ''))}
         
         <p style="font-size:9pt;color:#444;line-height:1.5;margin-top:10px;">${report.summary.text}</p>
     </div>
