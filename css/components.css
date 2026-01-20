@@ -1047,40 +1047,23 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Model Carousel
+   Compact Model Selector (Horizontal Single-Item)
    ───────────────────────────────────────────────────────────────────────────── */
-.model-carousel-container {
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+.model-selector-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background: var(--bg-secondary);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
-    padding: var(--space-lg);
     margin-bottom: var(--space-lg);
 }
 
-.model-carousel-title {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--space-md);
-}
-
-.model-carousel-title .material-icons {
-    color: var(--accent);
-}
-
-.model-carousel {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    position: relative;
-}
-
-.carousel-nav {
-    width: 40px;
-    height: 40px;
+.model-nav {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: var(--bg-primary);
     border: 1px solid var(--border-medium);
@@ -1090,194 +1073,74 @@
     cursor: pointer;
     transition: all var(--transition-fast);
     flex-shrink: 0;
-    z-index: 2;
+    color: var(--text-secondary);
 }
 
-.carousel-nav:hover {
+.model-nav:hover {
     background: var(--accent);
     color: white;
     border-color: var(--accent);
+    transform: scale(1.05);
 }
 
-.carousel-nav:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+.model-nav .material-icons {
+    font-size: 20px;
 }
 
-.model-carousel-track {
+.model-display {
+    min-width: 280px;
+    max-width: 320px;
+    text-align: center;
+}
+
+.model-display-inner {
     display: flex;
+    align-items: center;
+    justify-content: center;
     gap: var(--space-md);
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    flex: 1;
-    padding: var(--space-sm) 0;
-}
-
-.model-carousel-track::-webkit-scrollbar {
-    display: none;
-}
-
-.model-card {
-    min-width: 260px;
-    max-width: 280px;
-    flex-shrink: 0;
+    padding: var(--space-sm) var(--space-lg);
     background: var(--bg-primary);
-    border: 2px solid var(--border-light);
+    border: 2px solid var(--accent);
     border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    cursor: pointer;
     transition: all var(--transition-normal);
-    position: relative;
 }
 
-.model-card:hover {
-    border-color: var(--accent);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+.model-icon-sm {
+    font-size: 28px;
+    color: var(--accent);
 }
 
-.model-card.active {
-    border-color: var(--accent);
-    background: var(--accent-subtle);
-    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
-}
-
-.model-card.active::after {
-    content: '';
-    position: absolute;
-    top: var(--space-sm);
-    right: var(--space-sm);
-    width: 20px;
-    height: 20px;
-    background: var(--accent);
-    border-radius: 50%;
+.model-info {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
 }
 
-.model-card.active::before {
-    content: '✓';
-    position: absolute;
-    top: calc(var(--space-sm) + 2px);
-    right: calc(var(--space-sm) + 5px);
-    color: white;
-    font-size: 12px;
-    font-weight: bold;
-    z-index: 1;
-}
-
-.model-card-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: var(--space-md);
-}
-
-.model-card-icon .material-icons {
-    font-size: 24px;
-    color: white;
-}
-
-.model-card-name {
-    font-size: 1.25rem;
+.model-name-sm {
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: var(--space-xs);
 }
 
-.model-card-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 12px;
-    font-size: 0.7rem;
+.model-accuracy-sm {
+    font-size: 0.85rem;
     font-weight: 600;
+    color: var(--success);
+}
+
+.model-type-badge {
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: var(--space-sm);
-}
-
-.model-card-badge.flagship {
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: white;
 }
 
-.model-card-badge.perplexity {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    color: white;
-}
-
-.model-card-badge.balanced {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-}
-
-.model-card-badge.legacy {
-    background: var(--bg-tertiary);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-medium);
-}
-
-.model-card-accuracy {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--accent);
-    margin-bottom: var(--space-md);
-}
-
-.model-card-features {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.model-card-features li {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin-bottom: var(--space-xs);
-}
-
-.model-card-features li .material-icons {
-    font-size: 14px;
-    color: var(--success);
-}
-
-.model-carousel-dots {
-    display: flex;
-    justify-content: center;
-    gap: var(--space-sm);
-    margin-top: var(--space-md);
-}
-
-.model-carousel-dots .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border-medium);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.model-carousel-dots .dot:hover {
-    background: var(--text-muted);
-}
-
-.model-carousel-dots .dot.active {
-    background: var(--accent);
-    width: 24px;
-    border-radius: 4px;
-}
-
-/* Model indicator in results */
+/* Model indicator in results - Enhanced */
 .model-indicator {
     display: inline-flex;
     align-items: center;

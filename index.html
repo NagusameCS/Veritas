@@ -46,96 +46,28 @@
                 <div class="analyze-container">
                     <!-- Input Panel -->
                     <div class="panel input-panel">
-                        <!-- Model Carousel Selector - Above Input -->
-                        <div class="model-carousel-container">
-                            <h3 class="model-carousel-title">
-                                <span class="material-icons">wb_sunny</span>
-                                Select Detection Model
-                            </h3>
-                            <div class="model-carousel">
-                                <button class="carousel-nav carousel-prev" id="modelPrev" aria-label="Previous model">
-                                    <span class="material-icons">chevron_left</span>
-                                </button>
-                                <div class="model-carousel-track" id="modelCarouselTrack">
-                                    <div class="model-card active" data-model="helios">
-                                        <input type="radio" name="model" value="helios" id="model-helios" checked hidden>
-                                        <div class="model-card-icon">
-                                            <span class="material-icons">flare</span>
-                                        </div>
-                                        <div class="model-card-content">
-                                            <h4 class="model-card-name">Helios</h4>
-                                            <span class="model-card-badge flagship">Flagship</span>
-                                            <div class="model-card-accuracy">99.24% Accuracy</div>
-                                            <ul class="model-card-features">
-                                                <li><span class="material-icons">check</span> 45 linguistic features</li>
-                                                <li><span class="material-icons">check</span> Tone + hedging analysis</li>
-                                                <li><span class="material-icons">check</span> ROC-AUC: 99.98%</li>
-                                                <li><span class="material-icons">check</span> Best overall performance</li>
-                                            </ul>
-                                        </div>
+                        <!-- Model Selector - Compact Horizontal -->
+                        <div class="model-selector-compact">
+                            <button class="model-nav model-prev" id="modelPrev" aria-label="Previous model">
+                                <span class="material-icons">chevron_left</span>
+                            </button>
+                            <div class="model-display" id="modelDisplay">
+                                <div class="model-display-inner" data-model="helios">
+                                    <span class="material-icons model-icon-sm">flare</span>
+                                    <div class="model-info">
+                                        <span class="model-name-sm">Helios</span>
+                                        <span class="model-accuracy-sm">99.24%</span>
                                     </div>
-                                    <div class="model-card" data-model="zenith">
-                                        <input type="radio" name="model" value="zenith" id="model-zenith" hidden>
-                                        <div class="model-card-icon">
-                                            <span class="material-icons">brightness_high</span>
-                                        </div>
-                                        <div class="model-card-content">
-                                            <h4 class="model-card-name">Zenith</h4>
-                                            <span class="model-card-badge perplexity">Perplexity-Based</span>
-                                            <div class="model-card-accuracy">99.57% Accuracy</div>
-                                            <ul class="model-card-features">
-                                                <li><span class="material-icons">check</span> Entropy analysis</li>
-                                                <li><span class="material-icons">check</span> Burstiness detection</li>
-                                                <li><span class="material-icons">check</span> 86.7% humanized detection</li>
-                                                <li><span class="material-icons">check</span> Best for bypass tools</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="model-card" data-model="sunrise">
-                                        <input type="radio" name="model" value="sunrise" id="model-sunrise" hidden>
-                                        <div class="model-card-icon">
-                                            <span class="material-icons">wb_sunny</span>
-                                        </div>
-                                        <div class="model-card-content">
-                                            <h4 class="model-card-name">Sunrise</h4>
-                                            <span class="model-card-badge balanced">Balanced</span>
-                                            <div class="model-card-accuracy">98.08% Accuracy</div>
-                                            <ul class="model-card-features">
-                                                <li><span class="material-icons">check</span> Statistical variance</li>
-                                                <li><span class="material-icons">check</span> F1: 98.09%</li>
-                                                <li><span class="material-icons">check</span> Fast processing</li>
-                                                <li><span class="material-icons">check</span> Well-rounded</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="model-card" data-model="dawn">
-                                        <input type="radio" name="model" value="dawn" id="model-dawn" hidden>
-                                        <div class="model-card-icon">
-                                            <span class="material-icons">wb_twilight</span>
-                                        </div>
-                                        <div class="model-card-content">
-                                            <h4 class="model-card-name">Dawn</h4>
-                                            <span class="model-card-badge legacy">Legacy</span>
-                                            <div class="model-card-accuracy">84.9% Accuracy</div>
-                                            <ul class="model-card-features">
-                                                <li><span class="material-icons">check</span> Rule-based heuristics</li>
-                                                <li><span class="material-icons">check</span> Low resource usage</li>
-                                                <li><span class="material-icons">check</span> Lightweight</li>
-                                                <li><span class="material-icons">check</span> Baseline detector</li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <span class="model-type-badge">Flagship</span>
                                 </div>
-                                <button class="carousel-nav carousel-next" id="modelNext" aria-label="Next model">
-                                    <span class="material-icons">chevron_right</span>
-                                </button>
                             </div>
-                            <div class="model-carousel-dots" id="modelCarouselDots">
-                                <span class="dot active" data-model="helios"></span>
-                                <span class="dot" data-model="zenith"></span>
-                                <span class="dot" data-model="sunrise"></span>
-                                <span class="dot" data-model="dawn"></span>
-                            </div>
+                            <button class="model-nav model-next" id="modelNext" aria-label="Next model">
+                                <span class="material-icons">chevron_right</span>
+                            </button>
+                            <input type="radio" name="model" value="helios" id="model-helios" checked hidden>
+                            <input type="radio" name="model" value="zenith" id="model-zenith" hidden>
+                            <input type="radio" name="model" value="sunrise" id="model-sunrise" hidden>
+                            <input type="radio" name="model" value="dawn" id="model-dawn" hidden>
                         </div>
 
                         <div class="panel-header">
@@ -207,28 +139,32 @@
 
                         <!-- Results Content -->
                         <div class="results-content">
+                            <!-- Model Transparency Header -->
+                            <div class="model-transparency-header" id="modelTransparencyHeader">
+                                <!-- Will be populated by JS -->
+                            </div>
+                            
                             <!-- Overall Score -->
                             <div class="score-card">
                                 <div class="score-header">
                                     <h3>Detection Result</h3>
-                                    <span class="model-indicator" id="resultModelIndicator"></span>
                                     <div class="text-stats"></div>
                                 </div>
-                                <div class="score-display">
-                                    <div class="overall-score">
+                                <div class="score-display-clean">
+                                    <div class="primary-result">
                                         <div class="score-ring-container"></div>
-                                        <div class="verdict">
+                                        <div class="result-text">
                                             <span class="verdict-label"></span>
                                             <span class="verdict-description"></span>
-                                        </div>
-                                        <div class="confidence">
-                                            <span class="confidence-label">Confidence:</span>
-                                            <span class="confidence-value">-</span>
+                                            <div class="confidence-inline">
+                                                <span class="confidence-label">Confidence:</span>
+                                                <span class="confidence-value">-</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Certainty Curve -->
-                                <div class="certainty-curve-container" id="certaintyCurve"></div>
+                                <!-- Simplified Probability Bar -->
+                                <div class="probability-bar-container" id="probabilityBar"></div>
                                 <!-- Verbose Conclusion -->
                                 <div class="verbose-conclusion" id="verboseConclusion"></div>
                                 <!-- Humanization Advisory -->

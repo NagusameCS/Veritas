@@ -219,71 +219,85 @@ const App = {
      * Bind model selector events - Carousel version
      */
     bindModelSelectorEvents() {
-        // Carousel card clicks
-        const modelCards = document.querySelectorAll('.model-card');
-        modelCards.forEach(card => {
-            card.addEventListener('click', () => {
-                const model = card.dataset.model;
-                this.selectModel(model);
-            });
-        });
+        // Model data for the compact selector
+        this.models = [
+            { id: 'helios', name: 'Helios', accuracy: '99.24%', badge: 'Flagship', icon: 'flare', badgeClass: 'flagship' },
+            { id: 'zenith', name: 'Zenith', accuracy: '99.57%', badge: 'Perplexity', icon: 'brightness_high', badgeClass: 'perplexity' },
+            { id: 'sunrise', name: 'Sunrise', accuracy: '98.08%', badge: 'Balanced', icon: 'wb_sunny', badgeClass: 'balanced' },
+            { id: 'dawn', name: 'Dawn', accuracy: '84.9%', badge: 'Legacy', icon: 'wb_twilight', badgeClass: 'legacy' }
+        ];
         
-        // Carousel navigation
+        // Load saved model or default to helios
+        const savedModel = localStorage.getItem('veritas-model') || 'helios';
+        this.currentModelIndex = this.models.findIndex(m => m.id === savedModel);
+        if (this.currentModelIndex === -1) this.currentModelIndex = 0;
+        
+        // Navigation buttons
         const prevBtn = document.getElementById('modelPrev');
         const nextBtn = document.getElementById('modelNext');
-        const track = document.getElementById('modelCarouselTrack');
         
-        if (prevBtn && track) {
+        if (prevBtn) {
             prevBtn.addEventListener('click', () => {
-                track.scrollBy({ left: -280, behavior: 'smooth' });
+                this.currentModelIndex = (this.currentModelIndex - 1 + this.models.length) % this.models.length;
+                this.updateModelDisplay(true);
             });
         }
         
-        if (nextBtn && track) {
+        if (nextBtn) {
             nextBtn.addEventListener('click', () => {
-                track.scrollBy({ left: 280, behavior: 'smooth' });
+                this.currentModelIndex = (this.currentModelIndex + 1) % this.models.length;
+                this.updateModelDisplay(true);
             });
         }
         
-        // Dot navigation
-        const dots = document.querySelectorAll('.model-carousel-dots .dot');
-        dots.forEach(dot => {
-            dot.addEventListener('click', () => {
-                const model = dot.dataset.model;
-                this.selectModel(model);
-                // Scroll to the card
-                const card = document.querySelector(`.model-card[data-model="${model}"]`);
-                if (card && track) {
-                    card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                }
-            });
-        });
-        
-        // Load saved preference (default to helios as the best model)
-        const savedModel = localStorage.getItem('veritas-model') || 'helios';
-        this.selectModel(savedModel, false); // false = don't show toast on initial load
+        // Initial display
+        this.updateModelDisplay(false);
     },
     
     /**
-     * Select a model (carousel version)
+     * Update the model display to show current selection
      */
-    selectModel(modelType, showToast = true) {
-        // Update radio input
-        const radio = document.getElementById(`model-${modelType}`);
+    updateModelDisplay(showToast = true) {
+        const model = this.models[this.currentModelIndex];
+        const display = document.getElementById('modelDisplay');
+        
+        if (display) {
+            const badgeColors = {
+                flagship: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                perplexity: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                balanced: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                legacy: 'var(--bg-tertiary)'
+            };
+            
+            display.innerHTML = `
+                <div class="model-display-inner" data-model="${model.id}">
+                    <span class="material-icons model-icon-sm">${model.icon}</span>
+                    <div class="model-info">
+                        <span class="model-name-sm">${model.name}</span>
+                        <span class="model-accuracy-sm">${model.accuracy}</span>
+                    </div>
+                    <span class="model-type-badge" style="background: ${badgeColors[model.badgeClass]}; ${model.badgeClass === 'legacy' ? 'color: var(--text-secondary); border: 1px solid var(--border-medium);' : 'color: white;'}">${model.badge}</span>
+                </div>
+            `;
+        }
+        
+        // Update hidden radio
+        const radio = document.getElementById(`model-${model.id}`);
         if (radio) radio.checked = true;
         
-        // Update card active states
-        document.querySelectorAll('.model-card').forEach(card => {
-            card.classList.toggle('active', card.dataset.model === modelType);
-        });
-        
-        // Update dot active states
-        document.querySelectorAll('.model-carousel-dots .dot').forEach(dot => {
-            dot.classList.toggle('active', dot.dataset.model === modelType);
-        });
-        
-        // Save and notify
-        this.handleModelChange(modelType, showToast);
+        // Handle the change
+        this.handleModelChange(model.id, showToast);
+    },
+    
+    /**
+     * Select a model by ID
+     */
+    selectModel(modelType, showToast = true) {
+        const index = this.models.findIndex(m => m.id === modelType);
+        if (index !== -1) {
+            this.currentModelIndex = index;
+            this.updateModelDisplay(showToast);
+        }
     },
     
     /**
@@ -708,18 +722,18 @@ const App = {
      * Hide loading state / clear skeletons
      */
     hideLoadingState() {
-        // Restore the overall-score structure if it was replaced
-        const overallScore = document.querySelector('.overall-score');
-        if (overallScore && overallScore.querySelector('.skeleton')) {
-            overallScore.innerHTML = `
+        // Restore the primary-result structure if it was replaced
+        const primaryResult = document.querySelector('.primary-result');
+        if (primaryResult && primaryResult.querySelector('.skeleton')) {
+            primaryResult.innerHTML = `
                 <div class="score-ring-container"></div>
-                <div class="verdict">
+                <div class="result-text">
                     <span class="verdict-label"></span>
                     <span class="verdict-description"></span>
-                </div>
-                <div class="confidence">
-                    <span class="confidence-label">Confidence:</span>
-                    <span class="confidence-value">-</span>
+                    <div class="confidence-inline">
+                        <span class="confidence-label">Confidence:</span>
+                        <span class="confidence-value">-</span>
+                    </div>
                 </div>
             `;
         }
@@ -727,6 +741,12 @@ const App = {
         const findingsContainer = document.getElementById('findingsList');
         if (findingsContainer) {
             findingsContainer.innerHTML = '<p class="no-findings">No findings available</p>';
+        }
+        
+        // Clear transparency header
+        const transparencyHeader = document.getElementById('modelTransparencyHeader');
+        if (transparencyHeader) {
+            transparencyHeader.innerHTML = '';
         }
     },
 
@@ -786,11 +806,14 @@ const App = {
         resultsPanel.classList.add('has-results');
         
         // Show skeleton loaders
-        const scoreCard = document.querySelector('.overall-score');
-        if (scoreCard) {
-            scoreCard.innerHTML = `
-                <div class="skeleton skeleton-circle" style="width: 150px; height: 150px; margin: 0 auto;"></div>
-                <div class="skeleton skeleton-text" style="width: 60%; margin: 1rem auto;"></div>
+        const primaryResult = document.querySelector('.primary-result');
+        if (primaryResult) {
+            primaryResult.innerHTML = `
+                <div class="skeleton skeleton-circle" style="width: 120px; height: 120px;"></div>
+                <div class="result-text">
+                    <div class="skeleton skeleton-text" style="width: 150px; height: 24px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 200px; height: 16px;"></div>
+                </div>
             `;
         }
 
@@ -802,24 +825,35 @@ const App = {
                 <div class="skeleton skeleton-text"></div>
             `;
         }
+        
+        // Clear model transparency header during loading
+        const transparencyHeader = document.getElementById('modelTransparencyHeader');
+        if (transparencyHeader) {
+            transparencyHeader.innerHTML = `
+                <div class="skeleton skeleton-text" style="width: 100%; height: 60px;"></div>
+            `;
+        }
     },
 
     /**
      * Display analysis results
      */
     displayResults(result) {
-        // Restore overall-score structure if it was replaced by skeleton
-        const overallScore = document.querySelector('.overall-score');
-        if (overallScore && (overallScore.querySelector('.skeleton') || !overallScore.querySelector('.score-ring-container'))) {
-            overallScore.innerHTML = `
+        // Render model transparency header first
+        this.renderModelTransparencyHeader();
+        
+        // Restore primary-result structure if it was replaced by skeleton
+        const primaryResult = document.querySelector('.primary-result');
+        if (primaryResult && (primaryResult.querySelector('.skeleton') || !primaryResult.querySelector('.score-ring-container'))) {
+            primaryResult.innerHTML = `
                 <div class="score-ring-container"></div>
-                <div class="verdict">
+                <div class="result-text">
                     <span class="verdict-label"></span>
                     <span class="verdict-description"></span>
-                </div>
-                <div class="confidence">
-                    <span class="confidence-label">Confidence:</span>
-                    <span class="confidence-value">-</span>
+                    <div class="confidence-inline">
+                        <span class="confidence-label">Confidence:</span>
+                        <span class="confidence-value">-</span>
+                    </div>
                 </div>
             `;
         }
@@ -828,14 +862,6 @@ const App = {
         const scoreContainer = document.querySelector('.score-ring-container');
         if (scoreContainer) {
             Visualizations.createScoreRing(scoreContainer, result.aiProbability, result.confidence);
-        }
-        
-        // Update model indicator
-        const modelIndicator = document.getElementById('resultModelIndicator');
-        if (modelIndicator) {
-            const modelName = this.getCurrentModel();
-            const modelLabels = { helios: 'Helios', zenith: 'Zenith', sunrise: 'Sunrise', dawn: 'Dawn' };
-            modelIndicator.textContent = modelLabels[modelName] || modelName;
         }
         
         // Verdict - use the verdict from analyzer engine directly (don't override)
@@ -860,15 +886,15 @@ const App = {
                 confidenceEl.textContent = Math.round(result.confidence * 100) + '%';
             }
         }
+        
+        // Render simplified probability bar
+        this.renderProbabilityBar(result);
 
         // Render confidence interval bar
         this.renderConfidenceInterval(result);
 
         // Render false positive warnings
         this.renderFalsePositiveWarnings(result);
-
-        // Render certainty curve
-        this.renderCertaintyCurve(result);
 
         // Render verbose conclusion
         this.renderVerboseConclusion(result);
@@ -1822,9 +1848,116 @@ const App = {
         `;
         container.insertAdjacentHTML('beforeend', noteHtml);
     },
+    
+    /**
+     * Render model transparency header - shows which model is being used and how it works
+     */
+    renderModelTransparencyHeader() {
+        const container = document.getElementById('modelTransparencyHeader');
+        if (!container) return;
+        
+        const currentModel = this.getCurrentModel();
+        
+        const modelInfo = {
+            helios: {
+                name: 'Helios',
+                icon: 'flare',
+                version: 'v2.1 Flagship',
+                accuracy: '99.24%',
+                rocAuc: '99.98%',
+                method: 'Comprehensive multi-analyzer fusion with 45 linguistic features. Combines lexical, syntactic, semantic, and statistical analysis using weighted Bayesian inference. Includes tone analysis, hedging detection, and second-order pattern recognition for humanized text detection.'
+            },
+            zenith: {
+                name: 'Zenith',
+                icon: 'brightness_high',
+                version: 'v2.0 Perplexity-Based',
+                accuracy: '99.57%',
+                rocAuc: '99.72%',
+                method: 'Entropy and perplexity-focused detection emphasizing burstiness patterns and information-theoretic measures. Optimized for detecting AI text that has been processed through humanization tools. Achieves 86.7% detection rate on bypassed content.'
+            },
+            sunrise: {
+                name: 'Sunrise',
+                icon: 'wb_sunny',
+                version: 'v1.5 Balanced',
+                accuracy: '98.08%',
+                rocAuc: '98.45%',
+                method: 'Balanced statistical variance analysis combining sentence structure patterns with vocabulary distribution metrics. Fast processing with well-rounded detection across multiple writing domains. F1 score: 98.09%.'
+            },
+            dawn: {
+                name: 'Dawn',
+                icon: 'wb_twilight',
+                version: 'v1.0 Legacy',
+                accuracy: '84.9%',
+                rocAuc: '87.2%',
+                method: 'Rule-based heuristic detection using foundational linguistic patterns. Lightweight and resource-efficient. Serves as a baseline detector and is useful for quick initial screening of content.'
+            }
+        };
+        
+        const info = modelInfo[currentModel] || modelInfo.helios;
+        
+        container.innerHTML = `
+            <div class="model-transparency-content">
+                <div class="model-identity">
+                    <div class="model-identity-icon">
+                        <span class="material-icons">${info.icon}</span>
+                    </div>
+                    <div class="model-identity-info">
+                        <h4>${info.name}</h4>
+                        <span class="model-version">${info.version}</span>
+                    </div>
+                </div>
+                <div class="model-methodology">
+                    <strong>Detection Method:</strong> ${info.method}
+                </div>
+                <div class="model-stats">
+                    <div class="model-stat">
+                        <div class="model-stat-value">${info.accuracy}</div>
+                        <div class="model-stat-label">Accuracy</div>
+                    </div>
+                    <div class="model-stat">
+                        <div class="model-stat-value">${info.rocAuc}</div>
+                        <div class="model-stat-label">ROC-AUC</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    /**
+     * Render simplified probability bar - cleaner than certainty curve
+     */
+    renderProbabilityBar(result) {
+        const container = document.getElementById('probabilityBar');
+        if (!container) return;
+        
+        const prob = result.aiProbability;
+        const ci = result.confidenceInterval || { lower: Math.max(0, prob - 0.1), upper: Math.min(1, prob + 0.1) };
+        
+        const humanPercent = Math.round((1 - prob) * 100);
+        const aiPercent = Math.round(prob * 100);
+        
+        container.innerHTML = `
+            <div class="probability-bar">
+                <div class="probability-bar-header">
+                    <span>Probability Spectrum</span>
+                </div>
+                <div class="probability-track">
+                    <div class="probability-interval" style="left: ${ci.lower * 100}%; width: ${(ci.upper - ci.lower) * 100}%;"></div>
+                    <div class="probability-marker" style="left: ${prob * 100}%;"></div>
+                </div>
+                <div class="probability-labels">
+                    <span class="probability-label human">${humanPercent}% Human</span>
+                    <span class="probability-label ai">${aiPercent}% AI</span>
+                </div>
+                <div class="probability-percentage">
+                    Confidence interval: ${Math.round(ci.lower * 100)}% — ${Math.round(ci.upper * 100)}%
+                </div>
+            </div>
+        `;
+    },
 
     /**
-     * Render certainty curve visualization
+     * Render certainty curve visualization (legacy - kept for reference)
      * Shows where the detection result falls on a probability spectrum
      */
     renderCertaintyCurve(result) {

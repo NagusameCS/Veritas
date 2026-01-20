@@ -2347,9 +2347,226 @@ body {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Certainty Curve
+   Model Transparency Header
+   ───────────────────────────────────────────────────────────────────────────── */
+.model-transparency-header {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+.model-transparency-content {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-lg);
+}
+
+.model-identity {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    flex-shrink: 0;
+}
+
+.model-identity-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.model-identity-icon .material-icons {
+    font-size: 24px;
+    color: white;
+}
+
+.model-identity-info h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 2px 0;
+}
+
+.model-identity-info .model-version {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+.model-methodology {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.model-methodology strong {
+    color: var(--text-primary);
+}
+
+.model-stats {
+    display: flex;
+    gap: var(--space-lg);
+    flex-shrink: 0;
+}
+
+.model-stat {
+    text-align: center;
+}
+
+.model-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--success);
+}
+
+.model-stat-label {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Clean Score Display
+   ───────────────────────────────────────────────────────────────────────────── */
+.score-display-clean {
+    padding: var(--space-lg);
+}
+
+.primary-result {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    justify-content: center;
+}
+
+.primary-result .score-ring-container {
+    flex-shrink: 0;
+}
+
+.result-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.result-text .verdict-label {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.result-text .verdict-description {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    max-width: 300px;
+}
+
+.confidence-inline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+    font-size: 0.875rem;
+}
+
+.confidence-inline .confidence-label {
+    color: var(--text-tertiary);
+}
+
+.confidence-inline .confidence-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.confidence-range {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Simplified Probability Bar
+   ───────────────────────────────────────────────────────────────────────────── */
+.probability-bar-container {
+    padding: var(--space-md) var(--space-lg);
+    border-top: 1px solid var(--border-light);
+}
+
+.probability-bar {
+    position: relative;
+}
+
+.probability-bar-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-sm);
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.probability-track {
+    position: relative;
+    height: 12px;
+    background: linear-gradient(to right, var(--human-color) 0%, var(--gray-400) 50%, var(--ai-color) 100%);
+    border-radius: 6px;
+    overflow: visible;
+}
+
+.probability-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: var(--bg-primary);
+    border: 3px solid var(--text-primary);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 2;
+}
+
+.probability-interval {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 6px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 3px;
+    z-index: 1;
+}
+
+.probability-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-sm);
+}
+
+.probability-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.probability-label.human { color: var(--human-color); }
+.probability-label.ai { color: var(--ai-color); }
+
+.probability-percentage {
+    text-align: center;
+    margin-top: var(--space-sm);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Legacy Certainty Curve (hidden by default now)
    ───────────────────────────────────────────────────────────────────────────── */
 .certainty-curve-container {
+    display: none; /* Replaced by probability bar */
     padding: var(--space-md);
     border-top: 1px solid var(--border-light);
 }
@@ -4044,4 +4261,72 @@ body {
 ::selection {
     background: var(--accent);
     color: var(--bg-primary);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Responsive Styles for New Components
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+    .model-transparency-content {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .model-methodology {
+        text-align: center;
+    }
+    
+    .model-stats {
+        justify-content: center;
+    }
+    
+    .primary-result {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .result-text {
+        align-items: center;
+    }
+    
+    .result-text .verdict-description {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .model-selector-compact {
+        padding: var(--space-sm);
+    }
+    
+    .model-display {
+        min-width: 200px;
+    }
+    
+    .model-display-inner {
+        padding: var(--space-xs) var(--space-sm);
+        gap: var(--space-sm);
+    }
+    
+    .model-name-sm {
+        font-size: 0.95rem;
+    }
+    
+    .model-icon-sm {
+        font-size: 22px;
+    }
+    
+    .model-identity {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .model-identity-info {
+        text-align: center;
+    }
+    
+    .model-stats {
+        flex-wrap: wrap;
+        gap: var(--space-md);
+    }
 }
