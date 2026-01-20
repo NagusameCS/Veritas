@@ -1269,11 +1269,18 @@ const ReportExporter = {
         for (const finding of actualAiFindings.slice(0, 8)) {
             const text = finding.text || finding.value || finding.label || 'AI pattern detected';
             const hasExcerpt = finding.excerpts && finding.excerpts.length > 0;
-            const firstExcerpt = hasExcerpt ? (finding.excerpts[0].text || finding.excerpts[0]) : null;
+            let firstExcerpt = null;
+            if (hasExcerpt) {
+                const raw = finding.excerpts[0];
+                if (typeof raw === 'string') firstExcerpt = raw;
+                else if (raw && typeof raw.text === 'string') firstExcerpt = raw.text;
+                else if (raw && raw.text) firstExcerpt = String(raw.text);
+            }
+            const excerptHtml = firstExcerpt ? `<div style="font-size:7pt;font-style:italic;color:#991b1b;margin-top:2px;padding-left:6px;border-left:2px solid #fecaca;">"${this.escapeHtml(firstExcerpt.substring(0, 80))}${firstExcerpt.length > 80 ? '...' : ''}"</div>` : '';
             html += `
             <div class="signal-item ai-signal">
                 <div class="signal-label">${this.escapeHtml(text)}</div>
-                ${firstExcerpt ? `<div style="font-size:7pt;font-style:italic;color:#991b1b;margin-top:2px;padding-left:6px;border-left:2px solid #fecaca;">"${this.escapeHtml(firstExcerpt.substring(0, 80))}${firstExcerpt.length > 80 ? '...' : ''}"</div>` : ''}
+                ${excerptHtml}
             </div>`;
         }
         
@@ -1301,11 +1308,18 @@ const ReportExporter = {
         for (const finding of actualHumanFindings.slice(0, 8)) {
             const text = finding.text || finding.value || finding.label || 'Human pattern detected';
             const hasExcerpt = finding.excerpts && finding.excerpts.length > 0;
-            const firstExcerpt = hasExcerpt ? (finding.excerpts[0].text || finding.excerpts[0]) : null;
+            let firstExcerpt = null;
+            if (hasExcerpt) {
+                const raw = finding.excerpts[0];
+                if (typeof raw === 'string') firstExcerpt = raw;
+                else if (raw && typeof raw.text === 'string') firstExcerpt = raw.text;
+                else if (raw && raw.text) firstExcerpt = String(raw.text);
+            }
+            const excerptHtml = firstExcerpt ? `<div style="font-size:7pt;font-style:italic;color:#047857;margin-top:2px;padding-left:6px;border-left:2px solid #a7f3d0;">"${this.escapeHtml(firstExcerpt.substring(0, 80))}${firstExcerpt.length > 80 ? '...' : ''}"</div>` : '';
             html += `
             <div class="signal-item human-signal">
                 <div class="signal-label">${this.escapeHtml(text)}</div>
-                ${firstExcerpt ? `<div style="font-size:7pt;font-style:italic;color:#047857;margin-top:2px;padding-left:6px;border-left:2px solid #a7f3d0;">"${this.escapeHtml(firstExcerpt.substring(0, 80))}${firstExcerpt.length > 80 ? '...' : ''}"</div>` : ''}
+                ${excerptHtml}
             </div>`;
         }
         
