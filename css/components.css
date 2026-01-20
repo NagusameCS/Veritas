@@ -1096,12 +1096,12 @@
 
 /* Hover hint for model card */
 .model-card-inner::after {
-    content: 'View benchmarks →';
+    content: 'View benchmarks';
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
     color: white;
     font-size: 0.7rem;
     font-weight: 600;
@@ -1149,22 +1149,22 @@
 }
 
 .model-card-badge.flagship {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
     color: white;
 }
 
 .model-card-badge.perplexity {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
     color: white;
 }
 
 .model-card-badge.anti-humanizer {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
     color: white;
 }
 
 .model-card-badge.balanced {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
     color: white;
 }
 
@@ -1638,7 +1638,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
     color: white;
     display: flex;
     align-items: center;

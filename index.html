@@ -156,6 +156,10 @@
                                 <span id="wordCount">0 words</span>
                                 <span id="sentenceCount">0 sentences</span>
                             </div>
+                            <div class="input-disclaimer" style="font-size: 0.75rem; color: var(--text-muted); padding: 8px 12px; background: var(--bg-secondary); border-top: 1px solid var(--border-light); display: flex; align-items: center; gap: 6px;">
+                                <span class="material-icons" style="font-size: 14px; color: var(--warning);">info</span>
+                                <span>Best results with 200+ words of coherent English prose. Nonsense or random input will produce unreliable results.</span>
+                            </div>
                         </div>
                     </div>
 
@@ -564,6 +568,31 @@
                         <div class="about-section disclaimer">
                             <h3>Important Disclaimer</h3>
                             <p><strong>No AI detection system is 100% accurate.</strong> Veritas provides probabilistic assessment, not definitive proof. Results should be used as one of multiple factors in evaluation—never as the sole basis for academic misconduct accusations or employment decisions. False positives can occur with formal academic writing, non-native English speakers, or heavily edited content. Human judgment remains essential.</p>
+                        </div>
+                        
+                        <div class="about-section disclaimer" style="background: var(--bg-tertiary); border: 1px solid var(--border-medium);">
+                            <h3>Input Requirements & Accuracy Factors</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 12px;">
+                                <div>
+                                    <h4 style="font-size: 0.9rem; margin-bottom: 8px; color: var(--success);">Optimal Input</h4>
+                                    <ul style="font-size: 0.85rem; line-height: 1.6; padding-left: 20px;">
+                                        <li>200+ words of continuous English prose</li>
+                                        <li>Coherent, meaningful content</li>
+                                        <li>Standard formatting</li>
+                                        <li>Single-author writing samples</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 style="font-size: 0.9rem; margin-bottom: 8px; color: var(--warning);">May Reduce Accuracy</h4>
+                                    <ul style="font-size: 0.85rem; line-height: 1.6; padding-left: 20px;">
+                                        <li>Very short texts (under 100 words)</li>
+                                        <li>Non-English or translated content</li>
+                                        <li>Highly templated legal/medical text</li>
+                                        <li>Code or data mixed with prose</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-muted); font-style: italic;"><strong>Note:</strong> Nonsense input, random characters, or gibberish will produce unreliable results. This system is designed for analyzing genuine written content only.</p>
                         </div>
                     </div>
                 </div>
@@ -1183,7 +1212,7 @@
                             <h2>8.5 Benchmark Verification & Training Receipts</h2>
                             
                             <div class="verification-box" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #10b981;border-radius:8px;padding:20px;margin:15px 0;">
-                                <h3 style="color:#059669;margin-bottom:12px;">✓ Verified Training Results</h3>
+                                <h3 style="color:#059669;margin-bottom:12px;"><span class="material-icons" style="font-size:16px;vertical-align:middle;margin-right:4px;">verified</span> Verified Training Results</h3>
                                 <p style="font-size:9pt;color:#166534;margin-bottom:15px;">All accuracy claims are backed by reproducible training runs with stored model artifacts. Below are the official training receipts for each model.</p>
                                 
                                 <div class="receipt-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;">

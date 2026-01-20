@@ -424,26 +424,48 @@ const FileParser = {
     },
 
     /**
-     * Extract text from DOCX XML
+     * Extract text from DOCX XML with improved structure preservation
      */
     extractTextFromDocxXml(xml) {
         const paragraphs = [];
         
-        // Parse paragraphs
+        // Parse paragraphs - handle nested structure
         const paraMatches = xml.match(/<w:p[^>]*>[\s\S]*?<\/w:p>/g) || [];
         
         for (const para of paraMatches) {
+            // Check for list items
+            const isListItem = para.includes('<w:numPr>') || para.includes('<w:ilvl');
+            
+            // Extract all text runs in order
             const textMatches = para.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
-            const paraText = textMatches
-                .map(m => m.replace(/<[^>]+>/g, ''))
+            let paraText = textMatches
+                .map(m => {
+                    // Extract content, handling xml:space="preserve"
+                    const content = m.replace(/<[^>]+>/g, '');
+                    return content;
+                })
                 .join('');
             
-            if (paraText.trim()) {
-                paragraphs.push(paraText);
+            // Handle tabs and breaks within paragraph
+            paraText = paraText
+                .replace(/\t/g, ' ')
+                .trim();
+            
+            if (paraText) {
+                // Prefix list items for context
+                if (isListItem) {
+                    paragraphs.push('- ' + paraText);
+                } else {
+                    paragraphs.push(paraText);
+                }
             }
         }
 
-        return paragraphs.join('\n\n');
+        // Join and clean
+        let fullText = paragraphs.join('\n\n');
+        fullText = this.cleanExtractedText ? this.cleanExtractedText(fullText) : fullText;
+        
+        return fullText;
     },
 
     /**
@@ -509,30 +531,112 @@ const FileParser = {
     },
 
     /**
-     * Extract PDF content using pdf.js
+     * Extract PDF content using pdf.js with improved text reconstruction
      */
     async extractPdfContent(arrayBuffer) {
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const metadata = await pdf.getMetadata().catch(() => ({}));
         
         const textParts = [];
+        let totalChars = 0;
         
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const textContent = await page.getTextContent();
-            const pageText = textContent.items
-                .map(item => item.str)
-                .join(' ');
-            textParts.push(pageText);
+            
+            // Sort items by position (top to bottom, left to right) for proper reading order
+            const sortedItems = textContent.items.sort((a, b) => {
+                // First sort by vertical position (y descending since PDF coordinates start from bottom)
+                const yDiff = b.transform[5] - a.transform[5];
+                if (Math.abs(yDiff) > 5) return yDiff; // Different lines
+                // Same line, sort by horizontal position
+                return a.transform[4] - b.transform[4];
+            });
+            
+            // Reconstruct text with proper spacing and line breaks
+            let pageText = '';
+            let lastY = null;
+            let lastX = null;
+            
+            for (const item of sortedItems) {
+                const text = item.str;
+                if (!text || text.trim() === '') continue;
+                
+                const y = item.transform[5];
+                const x = item.transform[4];
+                const width = item.width || 0;
+                
+                // Detect line breaks (significant Y change)
+                if (lastY !== null && Math.abs(y - lastY) > 10) {
+                    // Check if this looks like a paragraph break (larger gap)
+                    if (Math.abs(y - lastY) > 20) {
+                        pageText += '\n\n';
+                    } else {
+                        pageText += '\n';
+                    }
+                    lastX = null;
+                }
+                
+                // Add space between words on same line
+                if (lastX !== null && lastY !== null && Math.abs(y - lastY) <= 10) {
+                    const gap = x - lastX;
+                    if (gap > 3) { // Significant horizontal gap = space
+                        pageText += ' ';
+                    }
+                }
+                
+                pageText += text;
+                lastY = y;
+                lastX = x + width;
+                totalChars += text.length;
+            }
+            
+            // Clean up the page text
+            pageText = pageText
+                .replace(/\s+\n/g, '\n')           // Remove trailing spaces before newlines
+                .replace(/\n\s+/g, '\n')           // Remove leading spaces after newlines
+                .replace(/\n{3,}/g, '\n\n')        // Max 2 consecutive newlines
+                .replace(/([a-z])-\n([a-z])/gi, '$1$2') // Join hyphenated words across lines
+                .trim();
+            
+            if (pageText) {
+                textParts.push(pageText);
+            }
         }
 
+        // Final cleanup of full text
+        let fullText = textParts.join('\n\n');
+        fullText = this.cleanExtractedText(fullText);
+
         return {
-            text: textParts.join('\n\n'),
+            text: fullText,
             metadata: {
                 pageCount: pdf.numPages,
-                info: metadata.info || {}
+                characterCount: totalChars,
+                info: metadata.info || {},
+                extractionMethod: 'pdf.js-enhanced'
             }
         };
+    },
+
+    /**
+     * Clean extracted text from PDF/DOCX
+     */
+    cleanExtractedText(text) {
+        return text
+            // Remove common PDF artifacts
+            .replace(/\f/g, '\n\n')                    // Form feeds to paragraph breaks
+            .replace(/\u00AD/g, '')                     // Soft hyphens
+            .replace(/[\u2018\u2019]/g, "'")           // Smart quotes to regular
+            .replace(/[\u201C\u201D]/g, '"')           // Smart double quotes
+            .replace(/\u2026/g, '...')                  // Ellipsis
+            .replace(/\u2014/g, '--')                   // Em dash
+            .replace(/\u2013/g, '-')                    // En dash
+            .replace(/\s*\n\s*\n\s*/g, '\n\n')         // Normalize paragraph breaks
+            .replace(/[ \t]+/g, ' ')                    // Normalize spaces
+            .replace(/^\s+|\s+$/gm, '')                // Trim lines
+            .replace(/\n{3,}/g, '\n\n')                // Max 2 newlines
+            .trim();
     },
 
     /**

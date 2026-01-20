@@ -23,6 +23,90 @@ const ReportExporter = {
         14: { name: 'Part of Speech Patterns', weight: 0.01, description: 'Low ML weight. Examines verb/adverb patterns derived from other features.' }
     },
 
+    // Human-readable explanation templates for category results
+    categoryExplanations: {
+        1: { // Grammar & Error Patterns
+            high: 'The text exhibits unusually consistent grammar with minimal errors. This mechanical perfection is characteristic of AI-generated content, which rarely makes the inconsistent mistakes typical of human writing.',
+            moderate: 'The text shows moderately consistent grammar. While some natural variation exists, the overall pattern leans toward AI-like consistency.',
+            low: 'The text contains natural grammatical variations and occasional errors consistent with human authorship. These imperfections are typical of genuine human writing.'
+        },
+        2: { // Sentence Structure & Syntax
+            high: 'Sentence lengths are unusually uniform throughout the text. AI systems tend to produce sentences within a narrow length range, while humans naturally vary their sentence structure.',
+            moderate: 'Sentence structure shows some uniformity but also includes natural variation. The pattern is inconclusive between AI and human authorship.',
+            low: 'Sentence lengths vary naturally throughout the text, showing the "burstiness" typical of human writing — mixing short punchy sentences with longer, more complex ones.'
+        },
+        3: { // Lexical Choice & Vocabulary
+            high: 'Vocabulary patterns suggest AI authorship. The text shows lower lexical diversity (fewer unique words relative to total words) and predictable word choices that are characteristic of language models.',
+            moderate: 'Vocabulary diversity falls in an intermediate range. While not definitively AI-like, the lexical patterns warrant attention.',
+            low: 'The text demonstrates rich vocabulary diversity with many unique words (high hapax legomena ratio). This lexical variety is characteristic of human authorship.'
+        },
+        4: { // Dialect & Regional Consistency
+            high: 'Regional language patterns are suspiciously uniform. AI often maintains perfect dialect consistency that humans rarely achieve.',
+            moderate: 'Dialect patterns are moderately consistent, which could indicate either careful human editing or AI generation.',
+            low: 'Natural dialect variations detected, consistent with genuine human authorship. Minor inconsistencies in regional language use are normal for human writers.'
+        },
+        5: { // Archaic / Historical Grammar
+            high: 'Detected anachronistic or inconsistent use of archaic language, which can indicate AI attempting historical or formal styles without authentic understanding.',
+            moderate: 'Some historical or formal language patterns detected that may not be entirely consistent with the overall text style.',
+            low: 'Archaic language use, if present, appears authentic and consistent with the text genre and authorial voice.'
+        },
+        6: { // Discourse & Coherence
+            high: 'Sentence-to-sentence transitions are unusually smooth and uniform. AI tends to produce mechanically coherent text that lacks the natural topic shifts humans make.',
+            moderate: 'Discourse coherence is moderately uniform, showing some AI-like characteristics but not conclusively.',
+            low: 'Natural variation in coherence detected, with organic topic transitions typical of human thought processes.'
+        },
+        7: { // Semantic & Pragmatic Features
+            high: 'Semantic patterns suggest AI generation. The text may lack depth of meaning or show surface-level treatment of complex topics typical of language models.',
+            moderate: 'Semantic analysis shows mixed signals that do not clearly indicate either AI or human authorship.',
+            low: 'Rich semantic depth and contextually appropriate pragmatic features consistent with human understanding and genuine knowledge.'
+        },
+        8: { // Statistical Language Model Indicators
+            high: 'Word frequency distribution deviates significantly from natural language patterns (Zipf\'s Law). AI-generated text often shows statistical regularities that differ from human writing.',
+            moderate: 'Statistical patterns show some deviation from expected distributions but remain within uncertain territory.',
+            low: 'Word frequency distribution follows natural language patterns (Zipf\'s Law), indicating authentic human language production.'
+        },
+        9: { // Authorship Consistency
+            high: 'The authorial voice remains suspiciously consistent throughout. Human writers naturally drift in style; AI maintains mechanical uniformity.',
+            moderate: 'Stylistic consistency is moderate, not clearly indicating either AI uniformity or human variation.',
+            low: 'Natural stylistic drift detected throughout the text, consistent with a single human author whose voice evolves organically.'
+        },
+        10: { // Meta-Patterns Unique to AI
+            high: 'Detected AI-specific patterns including excessive hedging phrases, artificially balanced arguments, and formulaic structures commonly produced by language models.',
+            moderate: 'Some AI meta-patterns detected, but not conclusively. The text may simply employ careful, balanced writing.',
+            low: 'No significant AI meta-patterns detected. The text shows natural argumentative structure and personal voice.'
+        },
+        11: { // Metadata & Formatting
+            high: 'Structural formatting shows AI-characteristic patterns: uniform paragraph lengths, consistent section structures, and mechanical organization that differs from natural human document creation.',
+            moderate: 'Document structure shows some uniform characteristics that could indicate either AI generation or careful human editing.',
+            low: 'Document structure exhibits natural variation in paragraph lengths and organization typical of human-authored content.'
+        },
+        12: { // Repetition Patterns
+            high: 'Phrase repetition patterns are characteristic of AI text. Language models often reuse specific phrases and structures in ways that differ from human repetition.',
+            moderate: 'Repetition patterns are inconclusive, showing characteristics of both AI and human writing.',
+            low: 'Repetition patterns appear natural, with varied phrasing and organic emphasis typical of human authorship.'
+        },
+        13: { // Tone Stability
+            high: 'Emotional tone remains unusually stable throughout. Human writing naturally fluctuates in tone; AI maintains mechanical consistency.',
+            moderate: 'Tone stability is moderate, not clearly distinguishing between AI uniformity and focused human writing.',
+            low: 'Natural tonal variation detected, with authentic emotional fluctuation consistent with human authorship.'
+        },
+        14: { // Part of Speech Patterns
+            high: 'Part-of-speech distribution shows AI-characteristic patterns, with unusual verb/adverb usage or overly consistent grammatical structures.',
+            moderate: 'POS patterns show some uniformity but remain inconclusive for determining authorship.',
+            low: 'Part-of-speech patterns appear natural, with varied grammatical structures typical of human writing.'
+        }
+    },
+
+    // Get human-readable explanation for a category result
+    getCategoryExplanation(categoryNum, aiProbability) {
+        const explanations = this.categoryExplanations[categoryNum];
+        if (!explanations) return '';
+        
+        if (aiProbability >= 60) return explanations.high;
+        if (aiProbability >= 40) return explanations.moderate;
+        return explanations.low;
+    },
+
     /**
      * Generate and download DOCX report
      */
@@ -129,7 +213,7 @@ const ReportExporter = {
      * Generate HTML report for PDF export
      */
     generateHtmlReport(report, analysisResult, modelData = null) {
-        const probability = report.summary.probability;
+        const rawAiProbability = report.summary.probability; // Raw AI probability (without humanization)
         
         // Check for humanized AI signals
         const humanizerSignals = analysisResult.humanizerSignals || {};
@@ -140,13 +224,25 @@ const ReportExporter = {
         const humanizerProbability = humanizerSignals.probability || humanizerSignals.humanizerProbability || 0;
         const effectiveHumanizerProb = Math.round(humanizerProbability * 100);
         
+        // COMBINED AI-ORIGIN PROBABILITY
+        // This represents: "What's the chance this text is AI-generated (either raw or humanized)?"
+        // Formula: P(AI-origin) = P(Raw AI) + P(Human wrote but it's actually humanized AI)
+        // Simplified: The humanization % applies to what we thought was "human" - some of that may be humanized AI
+        // Combined = Raw AI + (Humanization% * (1 - Raw AI%)) 
+        // This accounts for humanized AI that slipped through raw detection
+        const humanizedContribution = (effectiveHumanizerProb / 100) * (100 - rawAiProbability);
+        const combinedAiOriginProbability = Math.min(99, Math.round(rawAiProbability + humanizedContribution * 0.8)); // 80% weight for humanized
+        const pureHumanProbability = 100 - combinedAiOriginProbability;
+        
+        // Use combined probability for display
+        const probability = combinedAiOriginProbability;
+        
         // Only consider it "humanized" if there's actual evidence (probability > 30% OR explicit flag with signals)
-        // Disagreement alone is not enough - it could just mean uncertain/mixed content
         const hasActualHumanizationEvidence = effectiveHumanizerProb >= 30 || 
             (humanizerSignals.isLikelyHumanized && (humanizerSignals.flagCount || 0) >= 2);
         
         // For display: is this likely humanized AI vs raw AI vs human?
-        const isLikelyHumanized = hasActualHumanizationEvidence && probability >= 40;
+        const isLikelyHumanized = hasActualHumanizationEvidence && rawAiProbability >= 25;
         
         // Uncertain state: high disagreement but low humanization signals could mean genuinely mixed/uncertain
         const isUncertain = hasHighDisagreement && !hasActualHumanizationEvidence && probability >= 30 && probability <= 70;
@@ -206,12 +302,12 @@ const ReportExporter = {
         
         /* === VERDICT DISPLAY === */
         .verdict-container { display: flex; align-items: flex-start; gap: 15px; margin: 10px 0; }
-        .verdict-gauge { width: 80px; height: 80px; position: relative; flex-shrink: 0; }
-        .verdict-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-        .verdict-gauge-bg { fill: none; stroke: #e5e7eb; stroke-width: 6; }
-        .verdict-gauge-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
-        .verdict-gauge-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
-        .verdict-gauge-value { font-size: 16pt; font-weight: bold; line-height: 1; }
+        .verdict-gauge { width: 100px; height: 100px; position: relative; flex-shrink: 0; }
+        .verdict-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+        .verdict-gauge-bg { fill: none; stroke: #e5e7eb; stroke-width: 4; }
+        .verdict-gauge-fill { fill: none; stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+        .verdict-gauge-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; width: 70px; }
+        .verdict-gauge-value { font-size: 18pt; font-weight: bold; line-height: 1; }
         .verdict-gauge-label { font-size: 6pt; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
         .verdict-info { flex: 1; }
         .verdict-badge { display: inline-block; padding: 4px 12px; border: 2px solid; font-weight: bold; font-size: 9pt; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -309,34 +405,12 @@ const ReportExporter = {
             margin: 15mm;
         }
         
-        /* Homepage link styling */
-        .homepage-link {
-            position: fixed;
-            top: 60px;
-            right: 15mm;
-            background: #3b82f6;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 11px;
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            z-index: 1000;
-            transition: background 0.2s;
-        }
-        .homepage-link:hover {
-            background: #2563eb;
-        }
-        @media print {
-            .homepage-link { display: none !important; }
-        }
+        /* Section page breaks */
+        .section-break { page-break-before: always; margin-top: 0; padding-top: 0; }
     </style>
 </head>
 <body>
-    <a href="https://veritas-ai.app" target="_blank" class="homepage-link" title="Visit VERITAS Homepage">🏠 Open VERITAS</a>
-    
-    <div class="header" style="cursor:pointer;" onclick="window.open('https://veritas-ai.app', '_blank')">
+    <div class="header">
         <h1>VERITAS</h1>
         <p class="meta">AI Text Detection Analysis Report</p>
         <p class="meta">Powered by ${report.modelInfo.name} Model v${report.modelInfo.version} | ${(report.modelInfo.accuracy * 100).toFixed(1)}% Accuracy | ${report.modelInfo.trainingSamples.toLocaleString()} Training Samples</p>
@@ -349,16 +423,16 @@ const ReportExporter = {
         
         <div class="verdict-container">
         <div class="verdict-gauge">
-                <svg viewBox="0 0 36 36">
-                    <circle class="verdict-gauge-bg" cx="18" cy="18" r="15.9"></circle>
-                    <circle class="verdict-gauge-fill" cx="18" cy="18" r="15.9" 
+                <svg viewBox="0 0 40 40">
+                    <circle class="verdict-gauge-bg" cx="20" cy="20" r="16"></circle>
+                    <circle class="verdict-gauge-fill" cx="20" cy="20" r="16" 
                         stroke="${barColor}"
                         stroke-dasharray="${probability}, 100"
                         stroke-dashoffset="0"></circle>
                 </svg>
                 <div class="verdict-gauge-inner">
                     <span class="verdict-gauge-value" style="color:${barColor}">${probability}%</span>
-                    <span class="verdict-gauge-label">${isLikelyHumanized ? 'Modified' : 'AI Prob'}</span>
+                    <span class="verdict-gauge-label">AI Origin</span>
                 </div>
             </div>
             <div class="verdict-info">
@@ -378,45 +452,47 @@ const ReportExporter = {
         <!-- Detection Breakdown -->
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:12px 0;">
             <div style="font-size:8pt;color:#475569;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #e2e8f0;">
-                <strong>Primary Classification:</strong> AI vs Human (must total 100%)
+                <strong>AI-Origin Probability:</strong> Combined analysis (Raw AI + Humanized AI detection)
             </div>
             <div style="display:flex;justify-content:space-between;align-items:stretch;gap:15px;flex-wrap:wrap;">
-                <div style="flex:1;min-width:140px;background:#fff;padding:12px;border-radius:4px;border:1px solid #e2e8f0;">
-                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">AI-Generated</div>
-                    <div style="font-size:20pt;font-weight:bold;color:${probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#64748b')};">${probability}%</div>
-                    <div style="font-size:8pt;color:#94a3b8;">Probability content is AI-written</div>
+                <div style="flex:1;min-width:140px;background:#fff;padding:12px;border-radius:4px;border:2px solid ${probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981')};">
+                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">AI-Origin (Combined)</div>
+                    <div style="font-size:24pt;font-weight:bold;color:${probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#64748b')};">${probability}%</div>
+                    <div style="font-size:8pt;color:#64748b;">Raw AI (${rawAiProbability}%) + Humanized AI contribution</div>
                 </div>
                 <div style="flex:1;min-width:140px;background:#fff;padding:12px;border-radius:4px;border:1px solid #e2e8f0;">
-                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Human-Written</div>
-                    <div style="font-size:20pt;font-weight:bold;color:${100 - probability >= 60 ? '#10b981' : (100 - probability >= 40 ? '#f59e0b' : '#64748b')};">${100 - probability}%</div>
-                    <div style="font-size:8pt;color:#94a3b8;">Probability content is human-authored</div>
+                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Pure Human</div>
+                    <div style="font-size:24pt;font-weight:bold;color:${pureHumanProbability >= 60 ? '#10b981' : (pureHumanProbability >= 40 ? '#f59e0b' : '#64748b')};">${pureHumanProbability}%</div>
+                    <div style="font-size:8pt;color:#94a3b8;">Probability of genuine human authorship</div>
                 </div>
             </div>
             
             <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #cbd5e1;">
                 <div style="font-size:8pt;color:#475569;margin-bottom:8px;">
-                    <strong>Secondary Analysis:</strong> Humanization Detection (separate metric — applies if AI is detected)
+                    <strong>Breakdown:</strong> How the AI-origin probability was calculated
                 </div>
-                <div style="background:${effectiveHumanizerProb >= 30 ? '#faf5ff' : '#f8fafc'};padding:10px;border-radius:4px;border:1px solid ${effectiveHumanizerProb >= 30 ? '#d8b4fe' : '#e2e8f0'};">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <div>
-                            <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Humanization Likelihood</div>
-                            <div style="font-size:16pt;font-weight:bold;color:${effectiveHumanizerProb >= 40 ? '#9333ea' : (effectiveHumanizerProb >= 20 ? '#a855f7' : '#64748b')};">${effectiveHumanizerProb}%</div>
-                        </div>
-                        <div style="text-align:right;font-size:8pt;color:#64748b;max-width:200px;">
-                            ${effectiveHumanizerProb >= 40 ? 'AI text appears modified by humanization tools' : (effectiveHumanizerProb >= 20 ? 'Some post-processing signals detected' : 'No humanization artifacts found')}
-                        </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div style="background:#fef2f2;padding:10px;border-radius:4px;border:1px solid #fecaca;">
+                        <div style="font-size:7pt;text-transform:uppercase;color:#991b1b;letter-spacing:0.5px;">Raw AI Detection</div>
+                        <div style="font-size:16pt;font-weight:bold;color:#dc2626;">${rawAiProbability}%</div>
+                        <div style="font-size:7pt;color:#b91c1c;">Direct AI-generated patterns</div>
                     </div>
-                    <div style="font-size:7pt;color:#94a3b8;margin-top:6px;font-style:italic;">
-                        This is NOT added to the percentages above — it measures whether AI content was post-processed to appear human.
+                    <div style="background:${effectiveHumanizerProb >= 30 ? '#faf5ff' : '#f8fafc'};padding:10px;border-radius:4px;border:1px solid ${effectiveHumanizerProb >= 30 ? '#d8b4fe' : '#e2e8f0'};">
+                        <div style="font-size:7pt;text-transform:uppercase;color:#7c3aed;letter-spacing:0.5px;">Humanized AI Detection</div>
+                        <div style="font-size:16pt;font-weight:bold;color:${effectiveHumanizerProb >= 40 ? '#9333ea' : (effectiveHumanizerProb >= 20 ? '#a855f7' : '#64748b')};">${effectiveHumanizerProb}%</div>
+                        <div style="font-size:7pt;color:#7c3aed;">${effectiveHumanizerProb >= 40 ? 'AI text modified by humanization tools' : (effectiveHumanizerProb >= 20 ? 'Some post-processing detected' : 'No humanization artifacts')}</div>
                     </div>
+                </div>
+                <div style="font-size:7pt;color:#64748b;margin-top:8px;padding:6px;background:#f1f5f9;border-radius:3px;">
+                    <strong>Formula:</strong> AI-Origin = Raw AI + (Humanized% × Remaining%) × 0.8<br>
+                    This accounts for AI text that evaded raw detection but shows humanization patterns.
                 </div>
             </div>
             ${report.modelId === 'zenith' || report.modelId === 'flare' ? `<div style="margin-top:10px;padding:8px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:4px;font-size:8pt;color:#0369a1;"><strong>${report.modelId === 'flare' ? 'Flare' : 'Zenith'} Model:</strong> ${report.modelId === 'flare' ? 'Specialized humanization detection with 99.84% accuracy on detecting AI text modified by bypass tools.' : 'Specialized entropy/perplexity analysis with 86.7% humanized detection accuracy.'}</div>` : ''}
         </div>
         
         ${isLikelyHumanized ? `<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:6px;padding:10px 14px;margin:10px 0;">
-            <h4 style="margin:0 0 6px 0;color:#7c3aed;font-size:10pt;">⚠ Humanization Detected</h4>
+            <h4 style="margin:0 0 6px 0;color:#7c3aed;font-size:10pt;"><span style="font-weight:bold;color:#9333ea;">[!]</span> Humanization Detected</h4>
             <p style="font-size:9pt;color:#6b21a8;margin:0 0 8px 0;">This text exhibits patterns consistent with AI-generated content that has been modified to appear more human-like. This could indicate:</p>
             <ul style="font-size:8pt;color:#7c3aed;margin:0 0 0 16px;padding:0;">
                 <li>Use of "humanizer" tools that paraphrase AI output</li>
@@ -426,7 +502,7 @@ const ReportExporter = {
             </ul>
             <p style="font-size:8pt;color:#9333ea;margin:8px 0 0 0;font-style:italic;">Note: Detection is based on ${humanizerSignals.flagCount || 0} humanization signals (${effectiveHumanizerProb}% humanization likelihood).</p>
         </div>` : (isUncertain ? `<div style="background:#eef2ff;border:1px solid #a5b4fc;border-radius:6px;padding:10px 14px;margin:10px 0;">
-            <h4 style="margin:0 0 6px 0;color:#4f46e5;font-size:10pt;">ℹ Uncertain Classification</h4>
+            <h4 style="margin:0 0 6px 0;color:#4f46e5;font-size:10pt;"><span style="font-weight:bold;color:#6366f1;">[i]</span> Uncertain Classification</h4>
             <p style="font-size:9pt;color:#3730a3;margin:0 0 8px 0;">Detection methods show significant disagreement on this text. This is not the same as humanization — it indicates genuine uncertainty. Possible explanations:</p>
             <ul style="font-size:8pt;color:#4f46e5;margin:0 0 0 16px;padding:0;">
                 <li>Text contains a genuine mix of human and AI-written sections</li>
@@ -447,6 +523,32 @@ const ReportExporter = {
         <div class="stat-item"><div class="stat-label">Sentences</div><div class="stat-value">${report.statistics.sentenceCount.toLocaleString()}</div></div>
         <div class="stat-item"><div class="stat-label">Paragraphs</div><div class="stat-value">${report.statistics.paragraphCount.toLocaleString()}</div></div>
         <div class="stat-item"><div class="stat-label">Analysis Time</div><div class="stat-value">${report.statistics.analysisTime}</div></div>
+    </div>
+    
+    <!-- Input Requirements Notice -->
+    <div style="background:#f0f9ff;border:1px solid #0284c7;border-radius:6px;padding:12px 15px;margin:12px 0;">
+        <h4 style="margin:0 0 8px 0;color:#0369a1;font-size:10pt;">[i] Analysis Requirements & Accuracy Factors</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:8pt;">
+            <div>
+                <p style="color:#0c4a6e;margin:0 0 6px 0;font-weight:600;">Optimal Input Characteristics:</p>
+                <ul style="margin:0;padding-left:16px;color:#075985;">
+                    <li>200+ words of continuous English prose</li>
+                    <li>Coherent, meaningful content (not random text)</li>
+                    <li>Standard formatting without excessive code/tables</li>
+                    <li>Single-author, consistent writing sample</li>
+                </ul>
+            </div>
+            <div>
+                <p style="color:#0c4a6e;margin:0 0 6px 0;font-weight:600;">May Reduce Accuracy:</p>
+                <ul style="margin:0;padding-left:16px;color:#075985;">
+                    <li>Very short texts (under 100 words)</li>
+                    <li>Non-English or machine-translated content</li>
+                    <li>Highly templated or legal/medical text</li>
+                    <li>Code snippets or data tables mixed with prose</li>
+                </ul>
+            </div>
+        </div>
+        <p style="font-size:7pt;color:#0369a1;margin:8px 0 0 0;font-style:italic;">Note: Nonsense input, random characters, or gibberish will produce unreliable results. This system is designed for analyzing genuine written content.</p>
     </div>`;
 
         // Collect high-severity findings for prominent display
@@ -477,7 +579,7 @@ const ReportExporter = {
             html += `
     <div style="background:linear-gradient(135deg, rgba(234, 88, 12, 0.1) 0%, rgba(220, 38, 38, 0.08) 100%);border:2px solid #ea580c;border-radius:8px;padding:15px;margin:15px 0;page-break-inside:avoid;">
         <h3 style="margin:0 0 10px 0;color:#c2410c;font-size:11pt;display:flex;align-items:center;gap:6px;">
-            ⚠ Critical Findings (${highSeverityFindings.length})
+            <span style="font-weight:bold;color:#dc2626;">[!]</span> Critical Findings (${highSeverityFindings.length})
         </h3>
         <p style="font-size:8pt;color:#9a3412;margin:0 0 12px 0;">These high-priority patterns require attention and significantly impact the analysis.</p>`;
             
@@ -491,7 +593,7 @@ const ReportExporter = {
                 <span class="${indicatorClass}" style="font-size:7pt;">${indicatorLabel}</span>
             </div>
             <p style="font-size:8pt;color:#4b5563;margin:0 0 6px 0;">${finding.value || finding.note || 'High severity pattern detected'}</p>
-            ${finding.suggestsHumanized ? '<p style="font-size:7pt;color:#7c3aed;margin:0;font-style:italic;">⟐ This pattern is commonly associated with humanized AI text</p>' : ''}
+            ${finding.suggestsHumanized ? '<p style="font-size:7pt;color:#7c3aed;margin:0;font-style:italic;">[H] This pattern is commonly associated with humanized AI text</p>' : ''}
             ${finding.benchmark ? `<p style="font-size:7pt;color:#6b7280;margin:4px 0 0 0;">Expected: Human ${finding.benchmark.humanRange || 'varies'} | AI ${finding.benchmark.aiRange || 'varies'}</p>` : ''}
         </div>`;
             }
@@ -723,17 +825,22 @@ const ReportExporter = {
         html += `
     </div>
 
-    <h2>Detailed Category Analysis</h2>`;
+    <h2 class="section-break">Detailed Category Analysis</h2>
+    <p style="font-size:9pt;color:#666;margin-bottom:15px;">Each category is analyzed independently. Categories with higher ML weights (shown in parentheses) have more influence on the final AI probability score.</p>`;
 
         // All categories with full details
+        let categoryIndex = 0;
         for (const cat of report.categoryAnalyses) {
             const weightInfo = this.categoryWeightInfo[cat.category] || { weight: 0.05, description: 'Analyzes various text characteristics.' };
             const weightPct = Math.round(weightInfo.weight * 100);
             const scoreClass = cat.aiProbability >= 60 ? 'score-high' : (cat.aiProbability >= 40 ? 'score-moderate' : 'score-low');
             const fillColor = cat.aiProbability >= 60 ? '#ef4444' : (cat.aiProbability >= 40 ? '#f59e0b' : '#10b981');
             
+            // Add page break every 4 categories to avoid clutter
+            const pageBreakClass = categoryIndex > 0 && categoryIndex % 4 === 0 ? 'page-break' : '';
+            
             html += `
-    <div class="category-card">
+    <div class="category-card ${pageBreakClass}">
         <div class="category-header">
             <span class="category-name">${cat.category}. ${cat.name}</span>
             <span class="category-score ${scoreClass}">${cat.aiProbability}% AI</span>
@@ -742,15 +849,59 @@ const ReportExporter = {
             <div class="category-fill" style="width: ${cat.aiProbability}%; background: ${fillColor};"></div>
         </div>
         <p><strong>Confidence:</strong> ${cat.confidence}%</p>
-        <p>${cat.description}</p>`;
+        
+        <!-- Human-readable interpretation -->
+        <div style="background:${cat.aiProbability >= 60 ? '#fef2f2' : (cat.aiProbability >= 40 ? '#fffbeb' : '#f0fdf4')};border:1px solid ${cat.aiProbability >= 60 ? '#fecaca' : (cat.aiProbability >= 40 ? '#fde68a' : '#bbf7d0')};border-radius:4px;padding:10px;margin:8px 0;">
+            <p style="font-size:8pt;font-weight:600;color:${cat.aiProbability >= 60 ? '#991b1b' : (cat.aiProbability >= 40 ? '#92400e' : '#166534')};margin:0 0 4px 0;">Interpretation:</p>
+            <p style="font-size:8pt;color:#374151;margin:0;line-height:1.5;">${this.getCategoryExplanation(cat.category, cat.aiProbability)}</p>
+        </div>
+        
+        <p style="font-size:8pt;color:#666;margin-top:8px;">${cat.description}</p>`;
 
+            // Collect all excerpts from findings
+            const allExcerpts = [];
+            
             if (cat.findings && cat.findings.length > 0) {
                 html += `<h4>Key Findings:</h4>`;
                 for (const f of cat.findings.slice(0, 5)) {
                     const findingText = f.text || f.value || f.label || 'Unknown finding';
                     const indicator = f.indicator || 'neutral';
-                    html += `<div class="finding ${indicator}">${findingText}</div>`;
+                    html += `<div class="finding ${indicator}">${this.escapeHtml(findingText)}</div>`;
+                    
+                    // Collect excerpts from each finding
+                    if (f.excerpts && Array.isArray(f.excerpts)) {
+                        for (const ex of f.excerpts) {
+                            allExcerpts.push({
+                                text: ex.text || ex,
+                                type: f.indicator === 'ai' ? 'ai' : (f.indicator === 'human' ? 'human' : 'neutral'),
+                                finding: findingText.substring(0, 50)
+                            });
+                        }
+                    }
                 }
+            }
+            
+            // Also check for category-level excerpts
+            if (cat.excerpts && Array.isArray(cat.excerpts)) {
+                for (const ex of cat.excerpts) {
+                    allExcerpts.push({
+                        text: ex.text || ex,
+                        type: ex.type || 'neutral'
+                    });
+                }
+            }
+            
+            // Display excerpts if we have any
+            if (allExcerpts.length > 0) {
+                html += `<h4 style="margin-top:8px;">Text Evidence:</h4>
+                <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;padding:8px;margin-top:4px;">`;
+                for (const excerpt of allExcerpts.slice(0, 4)) {
+                    const excerptText = typeof excerpt === 'string' ? excerpt : (excerpt.text || '');
+                    const excerptType = excerpt.type || 'neutral';
+                    const borderColor = excerptType === 'ai' ? '#ef4444' : (excerptType === 'human' ? '#10b981' : '#9ca3af');
+                    html += `<div style="border-left:3px solid ${borderColor};padding:4px 8px;margin:4px 0;font-size:8pt;font-style:italic;color:#4b5563;">"${this.escapeHtml(excerptText.substring(0, 150))}${excerptText.length > 150 ? '...' : ''}"</div>`;
+                }
+                html += `</div>`;
             }
 
             html += `
@@ -758,12 +909,14 @@ const ReportExporter = {
             <strong>Category Weight:</strong> ${weightPct}% of total score | ${weightInfo.description}
         </div>
     </div>`;
+            categoryIndex++;
         }
 
-        // Add verbose signal summary
+        // Add verbose signal summary with page break
+        html += `<div class="section-break"></div>`;
         html += this.generateSignalSummaryHtml(analysisResult, verboseEvidence);
 
-        // Add the original analyzed text
+        // Add the original analyzed text with page break
         html += `
     <h2 class="page-break">Analyzed Text</h2>
     <div style="background:#fafafa;border:1px solid #e5e5e5;border-radius:6px;padding:12px;margin:10px 0;max-height:none;">
@@ -1112,9 +1265,12 @@ const ReportExporter = {
         // Show actual findings first
         for (const finding of actualAiFindings.slice(0, 8)) {
             const text = finding.text || finding.value || finding.label || 'AI pattern detected';
+            const hasExcerpt = finding.excerpts && finding.excerpts.length > 0;
+            const firstExcerpt = hasExcerpt ? (finding.excerpts[0].text || finding.excerpts[0]) : null;
             html += `
             <div class="signal-item ai-signal">
                 <div class="signal-label">${this.escapeHtml(text)}</div>
+                ${firstExcerpt ? `<div style="font-size:7pt;font-style:italic;color:#991b1b;margin-top:2px;padding-left:6px;border-left:2px solid #fecaca;">"${this.escapeHtml(firstExcerpt.substring(0, 80))}${firstExcerpt.length > 80 ? '...' : ''}"</div>` : ''}
             </div>`;
         }
         
@@ -1141,9 +1297,12 @@ const ReportExporter = {
         // Show actual findings first
         for (const finding of actualHumanFindings.slice(0, 8)) {
             const text = finding.text || finding.value || finding.label || 'Human pattern detected';
+            const hasExcerpt = finding.excerpts && finding.excerpts.length > 0;
+            const firstExcerpt = hasExcerpt ? (finding.excerpts[0].text || finding.excerpts[0]) : null;
             html += `
             <div class="signal-item human-signal">
                 <div class="signal-label">${this.escapeHtml(text)}</div>
+                ${firstExcerpt ? `<div style="font-size:7pt;font-style:italic;color:#047857;margin-top:2px;padding-left:6px;border-left:2px solid #a7f3d0;">"${this.escapeHtml(firstExcerpt.substring(0, 80))}${firstExcerpt.length > 80 ? '...' : ''}"</div>` : ''}
             </div>`;
         }
         
@@ -1518,16 +1677,33 @@ const ReportExporter = {
      */
     generateDisclaimer() {
         return {
-            title: 'Important Disclaimer',
+            title: 'Important Disclaimer & Usage Guidelines',
             content: `This analysis is provided for informational purposes only and should not be considered definitive proof ` +
                 `of AI generation or human authorship.\n\n` +
-                `• No AI detection system is 100% accurate\n` +
-                `• False positives and false negatives can occur\n` +
-                `• Technical, academic, or formal writing may trigger false positives\n` +
-                `• Human-edited AI content may not be detected\n` +
-                `• Results should be considered alongside other evidence\n\n` +
-                `This report should be used as one factor among many in evaluating text authenticity. ` +
-                `Human judgment remains essential in all final determinations.`
+                `ACCURACY LIMITATIONS:\n` +
+                `• No AI detection system is 100% accurate — VERITAS achieves 98-99% accuracy on validated test sets\n` +
+                `• False positives and false negatives can occur in any statistical detection system\n` +
+                `• Results should be considered alongside other evidence and human judgment\n\n` +
+                `WRITING STYLES THAT MAY AFFECT ACCURACY:\n` +
+                `The following content types may produce less reliable results:\n` +
+                `• Highly formal or academic writing (may appear AI-like due to structure)\n` +
+                `• Technical documentation with standardized formatting\n` +
+                `• Legal or medical content with specialized terminology\n` +
+                `• Non-native English writing (linguistic patterns may differ)\n` +
+                `• Heavily templated business communications\n` +
+                `• Creative fiction with intentionally uniform prose style\n` +
+                `• Machine-translated content (shows AI-like statistical patterns)\n` +
+                `• Very short texts under 100 words (insufficient statistical signal)\n\n` +
+                `CONTENT REQUIREMENTS:\n` +
+                `• This system is designed for coherent, meaningful English prose\n` +
+                `• Nonsense input, random characters, or gibberish will produce unreliable results\n` +
+                `• Code, data tables, or heavily formatted content should be excluded\n` +
+                `• Best results are achieved with 200+ words of continuous prose\n\n` +
+                `ETHICAL USE:\n` +
+                `• Never use this report as sole evidence for academic misconduct allegations\n` +
+                `• Human review and context are essential for any consequential decisions\n` +
+                `• AI-assisted writing is not inherently problematic — context matters\n` +
+                `• This tool cannot determine intent or detect all forms of assistance`
         };
     },
 
