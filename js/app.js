@@ -2375,15 +2375,6 @@ const App = {
                     <span class="material-icons advisory-icon" style="color: ${advisoryColor}">${advisoryIcon}</span>
                     Humanization Advisory
                 </h4>
-                <div class="advisory-meter">
-                    <div class="meter-track">
-                        <div class="meter-fill" style="width: ${(effectiveFlagCount / 5) * 100}%; background: ${advisoryColor}"></div>
-                    </div>
-                    <div class="meter-labels">
-                        <span>Authentic</span>
-                        <span>Humanized</span>
-                    </div>
-                </div>
                 <p class="advisory-text" style="border-left-color: ${advisoryColor}">${advisoryText}</p>
                 ${signalDetailsHtml}
                 <p class="advisory-disclaimer">
