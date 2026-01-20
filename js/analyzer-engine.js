@@ -152,7 +152,61 @@ const AnalyzerEngine = {
         // Humanization detection (Category 15)
         if (typeof HumanizationAnalyzer !== 'undefined') all.push(HumanizationAnalyzer);
         
+        // Research-backed analyzers (Categories 15-17)
+        // Per DetectGPT (Mitchell 2023) - Contrastive instability
+        if (typeof StabilityAnalyzer !== 'undefined') all.push(StabilityAnalyzer);
+        // Per Ippolito et al. (2023) - Intra-document inconsistency
+        if (typeof InconsistencyAnalyzer !== 'undefined') all.push(InconsistencyAnalyzer);
+        // Multi-head ensemble (Gehrmann et al.) - Meta-analyzer
+        if (typeof EnsembleAnalyzer !== 'undefined') all.push(EnsembleAnalyzer);
+        
         return all;
+    },
+    
+    /**
+     * Deprecated/weak signal configuration
+     * Per Krishna et al. (2024), Liang et al. (2024)
+     * These signals overlap with modern models or cause false positives
+     */
+    weakSignals: {
+        raw_perplexity: {
+            reason: 'Modern LLMs match human perplexity distributions',
+            downweight: 0.3  // Reduce impact by 70%
+        },
+        burstiness_alone: {
+            reason: 'Easily calibrated by anti-detection fine-tuning',
+            downweight: 0.4
+        },
+        repetition_counts: {
+            reason: 'Simple repetition is not discriminative',
+            downweight: 0.5
+        },
+        vocabulary_richness: {
+            reason: 'ESL writers and technical docs get false flagged',
+            downweight: 0.4
+        },
+        grammar_perfection: {
+            reason: 'Academic writers and professionals get false flagged',
+            downweight: 0.3
+        }
+    },
+    
+    /**
+     * Check if a signal is marked as weak
+     */
+    isWeakSignal(signalName) {
+        return this.weakSignals.hasOwnProperty(signalName.toLowerCase().replace(/[^a-z_]/g, '_'));
+    },
+    
+    /**
+     * Get downweight factor for a signal
+     */
+    getSignalWeight(signalName) {
+        const normalized = signalName.toLowerCase().replace(/[^a-z_]/g, '_');
+        if (this.weakSignals[normalized]) {
+            return this.weakSignals[normalized].downweight;
+        }
+        return 1.0;  // Full weight for non-weak signals
     },
 
     // Fallback for missing analyzers (graceful degradation)
@@ -1264,11 +1318,21 @@ const AnalyzerEngine = {
         let humanWeightedSum = 0;
         let totalAiWeight = 0;
         let totalHumanWeight = 0;
+        
+        // Track deprecated weak signals
+        let weakSignalCount = 0;
 
         for (const result of validResults) {
             // Map categories to weight keys
             const weightKey = this.getCategoryWeightKey(result.category, result.name);
-            const baseWeight = this.categoryWeights[weightKey] || 0.1;
+            let baseWeight = this.categoryWeights[weightKey] || 0.1;
+            
+            // Apply weak signal downweighting per Krishna et al. (2024)
+            const signalDownweight = this.getSignalWeight(result.name || weightKey);
+            if (signalDownweight < 1.0) {
+                baseWeight *= signalDownweight;
+                weakSignalCount++;
+            }
             
             // Apply confidence as a weight multiplier
             const effectiveWeight = baseWeight * result.confidence;
