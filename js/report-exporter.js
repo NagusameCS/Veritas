@@ -164,9 +164,14 @@ const ReportExporter = {
 <head>
     <meta charset="UTF-8">
     <title>VERITAS AI Detection Report</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         /* === BASE STYLES === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        /* Material Icons inline support */
+        .material-icons { font-family: 'Material Icons'; font-size: 14px; vertical-align: middle; }
+        
         body { 
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif; 
             font-size: 10pt; 
@@ -201,10 +206,12 @@ const ReportExporter = {
         
         /* === VERDICT DISPLAY === */
         .verdict-container { display: flex; align-items: flex-start; gap: 15px; margin: 10px 0; }
-        .verdict-gauge { width: 70px; height: 70px; position: relative; flex-shrink: 0; border: 3px solid #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-        .verdict-gauge-circle { display: none; }
-        .verdict-gauge-inner { display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .verdict-gauge-value { font-size: 18pt; font-weight: bold; color: ${barColor}; line-height: 1; }
+        .verdict-gauge { width: 80px; height: 80px; position: relative; flex-shrink: 0; }
+        .verdict-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .verdict-gauge-bg { fill: none; stroke: #e5e7eb; stroke-width: 6; }
+        .verdict-gauge-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+        .verdict-gauge-inner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+        .verdict-gauge-value { font-size: 16pt; font-weight: bold; line-height: 1; }
         .verdict-gauge-label { font-size: 6pt; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
         .verdict-info { flex: 1; }
         .verdict-badge { display: inline-block; padding: 4px 12px; border: 2px solid; font-weight: bold; font-size: 9pt; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -301,10 +308,35 @@ const ReportExporter = {
             size: A4;
             margin: 15mm;
         }
+        
+        /* Homepage link styling */
+        .homepage-link {
+            position: fixed;
+            top: 60px;
+            right: 15mm;
+            background: #3b82f6;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transition: background 0.2s;
+        }
+        .homepage-link:hover {
+            background: #2563eb;
+        }
+        @media print {
+            .homepage-link { display: none !important; }
+        }
     </style>
 </head>
 <body>
-    <div class="header">
+    <a href="https://veritas-ai.app" target="_blank" class="homepage-link" title="Visit VERITAS Homepage">🏠 Open VERITAS</a>
+    
+    <div class="header" style="cursor:pointer;" onclick="window.open('https://veritas-ai.app', '_blank')">
         <h1>VERITAS</h1>
         <p class="meta">AI Text Detection Analysis Report</p>
         <p class="meta">Powered by ${report.modelInfo.name} Model v${report.modelInfo.version} | ${(report.modelInfo.accuracy * 100).toFixed(1)}% Accuracy | ${report.modelInfo.trainingSamples.toLocaleString()} Training Samples</p>
@@ -316,12 +348,17 @@ const ReportExporter = {
         <h2 style="margin-top:0;border:none;font-size:13pt;margin-bottom:12px;">Executive Summary</h2>
         
         <div class="verdict-container">
-            <div class="verdict-gauge">
-                <div class="verdict-gauge-circle">
-                    <div class="verdict-gauge-inner">
-                        <span class="verdict-gauge-value">${probability}%</span>
-                        <span class="verdict-gauge-label">Raw AI</span>
-                    </div>
+        <div class="verdict-gauge">
+                <svg viewBox="0 0 36 36">
+                    <circle class="verdict-gauge-bg" cx="18" cy="18" r="15.9"></circle>
+                    <circle class="verdict-gauge-fill" cx="18" cy="18" r="15.9" 
+                        stroke="${barColor}"
+                        stroke-dasharray="${probability}, 100"
+                        stroke-dashoffset="0"></circle>
+                </svg>
+                <div class="verdict-gauge-inner">
+                    <span class="verdict-gauge-value" style="color:${barColor}">${probability}%</span>
+                    <span class="verdict-gauge-label">${isLikelyHumanized ? 'Modified' : 'AI Prob'}</span>
                 </div>
             </div>
             <div class="verdict-info">
@@ -338,26 +375,44 @@ const ReportExporter = {
             </div>
         </div>
         
-        <!-- Raw AI vs Humanized Breakdown -->
+        <!-- Detection Breakdown -->
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin:12px 0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;">
-                <div style="flex:1;min-width:140px;">
-                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Raw Generated Content</div>
-                    <div style="font-size:16pt;font-weight:bold;color:${probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#10b981')};">${probability}%</div>
-                    <div style="font-size:8pt;color:#94a3b8;">Probability of unmodified AI output</div>
+            <div style="font-size:8pt;color:#475569;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #e2e8f0;">
+                <strong>Primary Classification:</strong> AI vs Human (must total 100%)
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:stretch;gap:15px;flex-wrap:wrap;">
+                <div style="flex:1;min-width:140px;background:#fff;padding:12px;border-radius:4px;border:1px solid #e2e8f0;">
+                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">AI-Generated</div>
+                    <div style="font-size:20pt;font-weight:bold;color:${probability >= 60 ? '#ef4444' : (probability >= 40 ? '#f59e0b' : '#64748b')};">${probability}%</div>
+                    <div style="font-size:8pt;color:#94a3b8;">Probability content is AI-written</div>
                 </div>
-                <div style="flex:1;min-width:140px;">
-                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Humanization Likelihood${report.modelId === 'zenith' ? ' (Zenith)' : ''}</div>
-                    <div style="font-size:16pt;font-weight:bold;color:${effectiveHumanizerProb >= 40 ? '#9333ea' : (effectiveHumanizerProb >= 20 ? '#a855f7' : '#64748b')};">${effectiveHumanizerProb}%</div>
-                    <div style="font-size:8pt;color:#94a3b8;">${effectiveHumanizerProb >= 40 ? 'Strong post-processing signals' : (effectiveHumanizerProb >= 20 ? 'Some post-processing signals' : 'No post-processing detected')}</div>
-                </div>
-                <div style="flex:1;min-width:140px;">
-                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Authentic Human</div>
-                    <div style="font-size:16pt;font-weight:bold;color:${100 - probability <= 40 ? '#10b981' : '#64748b'};">${100 - probability}%</div>
-                    <div style="font-size:8pt;color:#94a3b8;">Genuinely human-authored</div>
+                <div style="flex:1;min-width:140px;background:#fff;padding:12px;border-radius:4px;border:1px solid #e2e8f0;">
+                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Human-Written</div>
+                    <div style="font-size:20pt;font-weight:bold;color:${100 - probability >= 60 ? '#10b981' : (100 - probability >= 40 ? '#f59e0b' : '#64748b')};">${100 - probability}%</div>
+                    <div style="font-size:8pt;color:#94a3b8;">Probability content is human-authored</div>
                 </div>
             </div>
-            ${report.modelId === 'zenith' ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:8pt;color:#64748b;"><strong>Zenith Model:</strong> Specialized entropy/perplexity analysis with 86.7% humanized detection accuracy. ${effectiveHumanizerProb < 20 ? 'Zenith\'s analysis indicates low probability of AI-to-human post-processing.' : (effectiveHumanizerProb >= 40 ? 'Zenith\'s entropy patterns suggest this text has been processed to mask AI signatures.' : 'Zenith detects some patterns that may indicate light editing or hybrid authorship.')}</div>` : ''}
+            
+            <div style="margin-top:12px;padding-top:12px;border-top:1px dashed #cbd5e1;">
+                <div style="font-size:8pt;color:#475569;margin-bottom:8px;">
+                    <strong>Secondary Analysis:</strong> Humanization Detection (separate metric — applies if AI is detected)
+                </div>
+                <div style="background:${effectiveHumanizerProb >= 30 ? '#faf5ff' : '#f8fafc'};padding:10px;border-radius:4px;border:1px solid ${effectiveHumanizerProb >= 30 ? '#d8b4fe' : '#e2e8f0'};">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Humanization Likelihood</div>
+                            <div style="font-size:16pt;font-weight:bold;color:${effectiveHumanizerProb >= 40 ? '#9333ea' : (effectiveHumanizerProb >= 20 ? '#a855f7' : '#64748b')};">${effectiveHumanizerProb}%</div>
+                        </div>
+                        <div style="text-align:right;font-size:8pt;color:#64748b;max-width:200px;">
+                            ${effectiveHumanizerProb >= 40 ? 'AI text appears modified by humanization tools' : (effectiveHumanizerProb >= 20 ? 'Some post-processing signals detected' : 'No humanization artifacts found')}
+                        </div>
+                    </div>
+                    <div style="font-size:7pt;color:#94a3b8;margin-top:6px;font-style:italic;">
+                        This is NOT added to the percentages above — it measures whether AI content was post-processed to appear human.
+                    </div>
+                </div>
+            </div>
+            ${report.modelId === 'zenith' || report.modelId === 'flare' ? `<div style="margin-top:10px;padding:8px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:4px;font-size:8pt;color:#0369a1;"><strong>${report.modelId === 'flare' ? 'Flare' : 'Zenith'} Model:</strong> ${report.modelId === 'flare' ? 'Specialized humanization detection with 99.84% accuracy on detecting AI text modified by bypass tools.' : 'Specialized entropy/perplexity analysis with 86.7% humanized detection accuracy.'}</div>` : ''}
         </div>
         
         ${isLikelyHumanized ? `<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:6px;padding:10px 14px;margin:10px 0;">

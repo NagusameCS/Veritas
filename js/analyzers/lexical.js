@@ -87,7 +87,7 @@ const LexicalAnalyzer = {
                 aiVocabAnalysis,
                 registerAnalysis
             },
-            findings: this.generateFindings(diversityMetrics, frequencyAnalysis, aiVocabAnalysis, registerAnalysis),
+            findings: this.generateFindings(text, diversityMetrics, frequencyAnalysis, aiVocabAnalysis, registerAnalysis),
             scores
         };
     },
@@ -326,8 +326,33 @@ const LexicalAnalyzer = {
     /**
      * Generate findings with detailed statistics
      */
-    generateFindings(diversityMetrics, frequencyAnalysis, aiVocabAnalysis, registerAnalysis) {
+    generateFindings(text, diversityMetrics, frequencyAnalysis, aiVocabAnalysis, registerAnalysis) {
         const findings = [];
+        
+        // Helper to extract excerpts around a word
+        const extractExcerpts = (searchWords, maxExcerpts = 5) => {
+            const excerpts = [];
+            let instanceNum = 0;
+            
+            for (const word of searchWords) {
+                if (typeof word !== 'string') continue;
+                const regex = new RegExp(`([^.!?]*\\b${word}\\b[^.!?]*[.!?]?)`, 'gi');
+                let match;
+                while ((match = regex.exec(text)) !== null && excerpts.length < maxExcerpts) {
+                    instanceNum++;
+                    const sentence = match[1].trim();
+                    if (sentence.length > 10) {
+                        excerpts.push({
+                            word: word,
+                            context: sentence.length > 100 ? sentence.substring(0, 100) + '...' : sentence,
+                            explanation: `Usage of "${word}"`,
+                            instance: instanceNum
+                        });
+                    }
+                }
+            }
+            return excerpts;
+        };
 
         // Lexical diversity
         const ttr = parseFloat(diversityMetrics.ttr);
@@ -395,6 +420,7 @@ const LexicalAnalyzer = {
         // AI vocabulary
         if (aiVocabAnalysis.aiVocabScore > 0.4 && aiVocabAnalysis.foundAIWords.length > 0) {
             const topAI = aiVocabAnalysis.foundAIWords.slice(0, 5);
+            const excerptWords = topAI.map(w => w.word);
             findings.push({
                 label: 'AI-Typical Vocabulary',
                 value: `${aiVocabAnalysis.aiWordCount} AI-associated terms detected`,
@@ -411,7 +437,8 @@ const LexicalAnalyzer = {
                     humanRange: '0%–2% AI-typical words',
                     aiRange: '3%–8% AI-typical words',
                     note: 'Based on 50+ known AI-overused terms'
-                }
+                },
+                excerpts: extractExcerpts(excerptWords)
             });
         }
 
@@ -458,6 +485,7 @@ const LexicalAnalyzer = {
 
         // Conversational elements (human indicator)
         if (registerAnalysis.conversationalCount > 3) {
+            const convWords = registerAnalysis.conversationalFound ? registerAnalysis.conversationalFound.slice(0, 5) : [];
             findings.push({
                 label: 'Conversational Elements',
                 value: 'Contains informal language markers',
@@ -471,7 +499,8 @@ const LexicalAnalyzer = {
                 benchmark: {
                     humanRange: '2+ conversational markers per 100 words',
                     aiRange: '0–1 conversational markers per 100 words'
-                }
+                },
+                excerpts: extractExcerpts(convWords)
             });
         }
 

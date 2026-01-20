@@ -12,6 +12,10 @@ const AnalyzerEngine = {
     // Current model type (default: helios)
     currentModel: 'helios',
     
+    // Flare integration settings
+    flareEnabled: true,  // Whether to run Flare alongside other models
+    flareThreshold: 0.40, // Minimum humanization probability to report
+    
     /**
      * Set the active model
      */
@@ -21,6 +25,14 @@ const AnalyzerEngine = {
             this.currentModel = modelType;
             console.log(`AnalyzerEngine: Model set to ${modelType}`);
         }
+    },
+    
+    /**
+     * Enable/disable Flare integration for humanization detection
+     */
+    setFlareEnabled(enabled) {
+        this.flareEnabled = enabled;
+        console.log(`AnalyzerEngine: Flare integration ${enabled ? 'enabled' : 'disabled'}`);
     },
     
     /**
@@ -205,6 +217,54 @@ const AnalyzerEngine = {
         
         // Run humanizer detection (second-order analysis for AI-written, human-modified text)
         const humanizerSignals = this.detectHumanizerSignalsWithCategories(text, sentences, advancedStats, categoryResults);
+        
+        // Run Flare analysis if enabled (enhanced humanization detection)
+        let flareResult = null;
+        if (this.flareEnabled && typeof FlareAnalyzer !== 'undefined') {
+            try {
+                const flareAnalyzer = new FlareAnalyzer();
+                if (typeof FlareConfig !== 'undefined') {
+                    flareAnalyzer.loadConfig(FlareConfig);
+                }
+                flareResult = flareAnalyzer.analyze(text);
+                
+                // Integrate Flare results with humanizer signals
+                if (flareResult && flareResult.humanizedProbability) {
+                    // Blend Flare's ML-based detection with existing heuristics
+                    const flareWeight = 0.6; // Flare is more accurate (99.84%)
+                    const heuristicWeight = 0.4;
+                    
+                    const blendedProbability = 
+                        (flareResult.humanizedProbability * flareWeight) + 
+                        (humanizerSignals.probability * heuristicWeight);
+                    
+                    // Update humanizer signals with Flare data
+                    humanizerSignals.flareResult = flareResult;
+                    humanizerSignals.flareEnabled = true;
+                    humanizerSignals.originalProbability = humanizerSignals.probability;
+                    humanizerSignals.probability = blendedProbability;
+                    
+                    // Merge flags from Flare
+                    if (flareResult.flags && flareResult.flags.length > 0) {
+                        humanizerSignals.flags = humanizerSignals.flags || [];
+                        humanizerSignals.flags.push(...flareResult.flags.map(f => ({
+                            ...f,
+                            source: 'flare'
+                        })));
+                        humanizerSignals.flagCount = (humanizerSignals.flagCount || 0) + flareResult.flags.length;
+                    }
+                    
+                    // Update isLikelyHumanized based on blended probability
+                    humanizerSignals.isLikelyHumanized = blendedProbability >= this.flareThreshold;
+                }
+            } catch (e) {
+                console.error('Flare analysis error:', e);
+                humanizerSignals.flareEnabled = false;
+                humanizerSignals.flareError = e.message;
+            }
+        } else {
+            humanizerSignals.flareEnabled = false;
+        }
         
         // Generate sentence-level scores for highlighting
         const sentenceScores = this.scoreSentences(text, sentences, categoryResults);

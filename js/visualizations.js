@@ -731,7 +731,7 @@ const Visualizations = {
         }
         
         const severityClass = f.severity ? `severity-${f.severity}` : '';
-        const hasDetails = f.stats || f.benchmark;
+        const hasDetails = f.stats || f.benchmark || f.excerpts;
         
         // Build stats HTML if available
         let statsHtml = '';
@@ -770,6 +770,39 @@ const Visualizations = {
             }
         }
         
+        // Build excerpts HTML if available - showing highlighted examples from the text
+        let excerptsHtml = '';
+        if (f.excerpts && Array.isArray(f.excerpts) && f.excerpts.length > 0) {
+            const excerptItems = f.excerpts.slice(0, 5).map((ex, idx) => {
+                const word = ex.word || ex.text || ex;
+                const context = ex.context || '';
+                const explanation = ex.explanation || ex.note || '';
+                const instance = idx + 1;
+                
+                return `
+                    <div class="excerpt-item" data-instance="${instance}">
+                        <span class="excerpt-highlight" 
+                              style="background: ${this.getHighlightColor(f.indicator)}; color: #fff; padding: 2px 6px; border-radius: 3px; cursor: help;"
+                              title="Instance #${instance}: ${this.escapeHtml(explanation || mainText)}">
+                            ${this.escapeHtml(typeof word === 'string' ? word : String(word))}
+                        </span>
+                        ${context ? `<span class="excerpt-context" style="color:#666;font-size:0.85em;margin-left:4px;">${this.escapeHtml(context)}</span>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            excerptsHtml = `
+                <div class="finding-excerpts" style="margin-top:8px;padding:8px;background:#f8f9fa;border-radius:4px;border-left:3px solid ${this.getHighlightColor(f.indicator)};">
+                    <div class="excerpts-header" style="font-size:0.8em;color:#666;margin-bottom:6px;font-weight:600;">
+                        Examples from text (${f.excerpts.length} found):
+                    </div>
+                    <div class="excerpts-list" style="display:flex;flex-wrap:wrap;gap:6px;">
+                        ${excerptItems}
+                    </div>
+                </div>
+            `;
+        }
+        
         const labelText = f.label && f.label !== 'undefined' && f.label !== mainText ? f.label : '';
         
         return `
@@ -789,10 +822,23 @@ const Visualizations = {
                 <div class="finding-details">
                     ${statsHtml}
                     ${benchmarkHtml}
+                    ${excerptsHtml}
                 </div>
                 ` : ''}
             </div>
         `;
+    },
+    
+    /**
+     * Get highlight color based on indicator
+     */
+    getHighlightColor(indicator) {
+        switch(indicator) {
+            case 'ai': return '#ef4444';
+            case 'human': return '#10b981';
+            case 'mixed': return '#f59e0b';
+            default: return '#6b7280';
+        }
     },
 
     /**

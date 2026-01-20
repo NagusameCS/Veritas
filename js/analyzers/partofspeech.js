@@ -121,7 +121,7 @@ const PartOfSpeechAnalyzer = {
         }
 
         const confidence = this.calculateConfidence(text, sentences, adverbAnalysis);
-        const findings = this.generateFindings(adverbAnalysis, verbAnalysis, patternAnalysis, positionAnalysis, tenseAnalysis);
+        const findings = this.generateFindings(text, sentences, adverbAnalysis, verbAnalysis, patternAnalysis, positionAnalysis, tenseAnalysis);
 
         return {
             name: this.name,
@@ -384,10 +384,36 @@ const PartOfSpeechAnalyzer = {
     },
 
     /**
-     * Generate findings
+     * Generate findings with excerpts
      */
-    generateFindings(adverbs, verbs, phrases, positions, tense) {
+    generateFindings(text, sentences, adverbs, verbs, phrases, positions, tense) {
         const findings = [];
+
+        // Helper to extract excerpts around a word/phrase
+        const extractExcerpts = (searchTerms, maxExcerpts = 5) => {
+            const excerpts = [];
+            let instanceNum = 0;
+            
+            for (const term of searchTerms) {
+                const regex = new RegExp(`([^.!?]*\\b${term.replace(/\s+/g, '\\s+')}\\b[^.!?]*[.!?])`, 'gi');
+                let match;
+                while ((match = regex.exec(text)) !== null && excerpts.length < maxExcerpts) {
+                    instanceNum++;
+                    const sentence = match[1].trim();
+                    // Find the actual word in the sentence for highlighting
+                    const wordMatch = new RegExp(`\\b(${term.replace(/\s+/g, '\\s+')})\\b`, 'gi').exec(sentence);
+                    if (wordMatch) {
+                        excerpts.push({
+                            word: wordMatch[1],
+                            context: sentence.length > 120 ? sentence.substring(0, 120) + '...' : sentence,
+                            explanation: `Instance of "${term}"`,
+                            instance: instanceNum
+                        });
+                    }
+                }
+            }
+            return excerpts;
+        };
 
         // AI adverb overuse
         const topAiAdverbs = Object.entries(adverbs.foundAiAdverbs)
@@ -396,11 +422,13 @@ const PartOfSpeechAnalyzer = {
         
         if (topAiAdverbs.length > 0 && adverbs.aiAdverbCount > 3) {
             const adverbList = topAiAdverbs.map(([word, count]) => `"${word}" (${count}×)`).join(', ');
+            const adverbWords = topAiAdverbs.map(([word]) => word);
             findings.push({
                 text: `High frequency of AI-typical adverbs: ${adverbList}`,
                 category: this.name,
                 indicator: 'ai',
-                severity: adverbs.aiAdverbCount > 6 ? 'high' : 'medium'
+                severity: adverbs.aiAdverbCount > 6 ? 'high' : 'medium',
+                excerpts: extractExcerpts(adverbWords)
             });
         }
 
@@ -408,44 +436,66 @@ const PartOfSpeechAnalyzer = {
         if (phrases.aiPhraseCount > 2) {
             const topPhrases = Object.entries(phrases.foundPhrases)
                 .sort((a, b) => b[1] - a[1])
-                .slice(0, 2)
-                .map(([phrase]) => `"${phrase}"`)
-                .join(', ');
+                .slice(0, 2);
+            const phraseList = topPhrases.map(([phrase]) => `"${phrase}"`).join(', ');
+            const phraseWords = topPhrases.map(([phrase]) => phrase);
             findings.push({
-                text: `AI-typical verb phrases detected: ${topPhrases} (${phrases.aiPhraseCount} total instances)`,
+                text: `AI-typical verb phrases detected: ${phraseList} (${phrases.aiPhraseCount} total instances)`,
                 category: this.name,
                 indicator: 'ai',
-                severity: phrases.aiPhraseCount > 5 ? 'high' : 'medium'
+                severity: phrases.aiPhraseCount > 5 ? 'high' : 'medium',
+                excerpts: extractExcerpts(phraseWords)
             });
         }
 
         // Human patterns detected
         if (verbs.humanPatternCount > 0) {
+            const humanPatternWords = Object.keys(verbs.foundHumanPatterns || {}).slice(0, 5);
             findings.push({
                 text: `Human-like verb patterns detected (${verbs.humanPatternCount} instances) - suggests authentic human writing`,
                 category: this.name,
                 indicator: 'human',
-                severity: 'medium'
+                severity: 'medium',
+                excerpts: extractExcerpts(humanPatternWords)
             });
         }
 
         // Hedging overuse
         if (verbs.hedgingRatio > 0.15) {
+            const hedgingWords = Object.keys(verbs.foundHedging || {}).slice(0, 5);
             findings.push({
                 text: `High hedging verb frequency (${Math.round(verbs.hedgingRatio * 100)}%) - common in AI-generated text`,
                 category: this.name,
                 indicator: 'ai',
-                severity: 'medium'
+                severity: 'medium',
+                excerpts: extractExcerpts(hedgingWords)
             });
         }
 
         // Adverb front-loading
         if (positions.frontLoadingRatio > 0.6 && positions.totalPositioned > 3) {
+            // Find sentences that start with adverbs
+            const frontLoadedExcerpts = [];
+            let instanceNum = 0;
+            for (const sentence of sentences) {
+                if (instanceNum >= 5) break;
+                const adverbMatch = sentence.match(/^(\w+ly)\b/i);
+                if (adverbMatch) {
+                    instanceNum++;
+                    frontLoadedExcerpts.push({
+                        word: adverbMatch[1],
+                        context: sentence.length > 120 ? sentence.substring(0, 120) + '...' : sentence,
+                        explanation: `Sentence starting with adverb`,
+                        instance: instanceNum
+                    });
+                }
+            }
             findings.push({
                 text: `Adverbs concentrated at sentence beginnings (${Math.round(positions.frontLoadingRatio * 100)}%) - AI writing pattern`,
                 category: this.name,
                 indicator: 'ai',
-                severity: 'medium'
+                severity: 'medium',
+                excerpts: frontLoadedExcerpts
             });
         }
 

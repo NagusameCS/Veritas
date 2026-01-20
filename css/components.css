@@ -1161,6 +1161,90 @@
     margin: 0;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Flare Toggle (Humanization Detection)
+   ───────────────────────────────────────────────────────────────────────────── */
+.flare-toggle-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--space-md);
+}
+
+.flare-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.8rem;
+}
+
+.flare-toggle:hover {
+    border-color: #f97316;
+    background: var(--bg-tertiary);
+}
+
+.flare-toggle input[type="checkbox"] {
+    display: none;
+}
+
+.flare-toggle-slider {
+    width: 36px;
+    height: 20px;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    position: relative;
+    transition: background var(--transition-fast);
+}
+
+.flare-toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: transform var(--transition-fast);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.flare-toggle input:checked + .flare-toggle-slider {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.flare-toggle input:checked + .flare-toggle-slider::before {
+    transform: translateX(16px);
+}
+
+.flare-toggle-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.flare-toggle input:checked ~ .flare-toggle-label {
+    color: #f97316;
+}
+
+.flare-toggle-info {
+    font-size: 0.7rem;
+    color: var(--success);
+    font-weight: 600;
+    padding: 2px 6px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: var(--radius-sm);
+}
+
+/* Hide flare toggle when Flare model is selected */
+.flare-toggle-container.hidden {
+    display: none;
+}
+
 /* Model indicator in results - Enhanced */
 .model-indicator {
     display: inline-flex;

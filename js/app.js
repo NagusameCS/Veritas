@@ -17,7 +17,53 @@ const App = {
         this.loadHistory();
         this.initTheme();
         this.initTabs();
+        this.initFlareToggle();
         console.log('VERITAS v3.0 (Sunrise) initialized');
+    },
+    
+    /**
+     * Initialize Flare toggle for humanization detection
+     */
+    initFlareToggle() {
+        const toggle = document.getElementById('flareToggle');
+        const container = document.getElementById('flareToggleContainer');
+        
+        if (toggle) {
+            // Load saved preference
+            const savedState = localStorage.getItem('veritas-flare-enabled');
+            toggle.checked = savedState !== 'false'; // Default to true
+            
+            // Update engine state
+            if (typeof AnalyzerEngine !== 'undefined') {
+                AnalyzerEngine.setFlareEnabled(toggle.checked);
+            }
+            
+            // Handle toggle changes
+            toggle.addEventListener('change', () => {
+                localStorage.setItem('veritas-flare-enabled', toggle.checked);
+                if (typeof AnalyzerEngine !== 'undefined') {
+                    AnalyzerEngine.setFlareEnabled(toggle.checked);
+                }
+                this.showToast(
+                    toggle.checked ? 'Flare humanization detection enabled' : 'Flare detection disabled',
+                    'info'
+                );
+            });
+        }
+        
+        // Hide toggle when Flare model is selected (it would be redundant)
+        this.updateFlareToggleVisibility();
+    },
+    
+    /**
+     * Update Flare toggle visibility based on selected model
+     */
+    updateFlareToggleVisibility() {
+        const container = document.getElementById('flareToggleContainer');
+        if (container) {
+            const currentModel = this.getCurrentModel();
+            container.classList.toggle('hidden', currentModel === 'flare');
+        }
     },
 
     /**
@@ -327,6 +373,9 @@ const App = {
         if (typeof AnalyzerEngine !== 'undefined') {
             AnalyzerEngine.setModel(modelType);
         }
+        
+        // Update Flare toggle visibility (hide when Flare is selected)
+        this.updateFlareToggleVisibility();
         
         // Update any result displays to indicate current model
         const resultModelIndicator = document.getElementById('resultModelIndicator');
@@ -2272,10 +2321,25 @@ const App = {
         const flagCount = humanizerSignals.flagCount || 0;
         const prob = result.aiProbability;
         
+        // Get current model
+        const currentModel = this.models[this.currentModelIndex]?.id || 'helios';
+        
+        // Check if Flare model was used - it has specialized humanization data
+        const isFlareModel = currentModel === 'flare';
+        const flareResult = result.flareResult || null;
+        const humanizationFlags = result.humanizationFlags || [];
+        
         // Check if analyzer disagreement suggests humanization
         const analyzerDisagreement = result.falsePositiveRisk?.risks?.some(r => r.suggestsHumanized) || false;
         
-        // Calculate humanization likelihood
+        // Calculate humanization likelihood - use Flare's probability if available
+        let humanizedProbability = 0;
+        if (isFlareModel && flareResult) {
+            humanizedProbability = flareResult.humanizedProbability || result.humanizedProbability || 0;
+        } else {
+            humanizedProbability = humanizerSignals.probability || 0;
+        }
+        
         const signals = {
             stableVariance: humanizerSignals.stableVarianceFlag,
             flatAutocorrelation: humanizerSignals.flatAutocorrelationFlag,
@@ -2286,8 +2350,11 @@ const App = {
         
         const activeSignals = Object.entries(signals).filter(([k, v]) => v);
         
-        // Effective flag count includes analyzer disagreement as an additional signal
-        const effectiveFlagCount = analyzerDisagreement ? Math.max(flagCount, 2) : flagCount;
+        // Effective flag count includes analyzer disagreement and Flare flags
+        let effectiveFlagCount = analyzerDisagreement ? Math.max(flagCount, 2) : flagCount;
+        if (isFlareModel && humanizationFlags.length > 0) {
+            effectiveFlagCount = Math.max(effectiveFlagCount, humanizationFlags.length);
+        }
         
         // Determine advisory level
         let advisoryLevel = 'none';
@@ -2295,7 +2362,30 @@ const App = {
         let advisoryText = '';
         let advisoryIcon = 'check';
         
-        if (effectiveFlagCount === 0 && prob < 0.4) {
+        // Flare model specific handling
+        if (isFlareModel) {
+            if (humanizedProbability >= 0.75) {
+                advisoryLevel = 'confident';
+                advisoryIcon = 'flare';
+                advisoryColor = '#ef4444';
+                advisoryText = `Flare Detection: ${Math.round(humanizedProbability * 100)}% confidence of humanized AI. This text shows clear patterns of AI content processed through humanization tools.`;
+            } else if (humanizedProbability >= 0.5) {
+                advisoryLevel = 'likely';
+                advisoryIcon = 'flare';
+                advisoryColor = '#f59e0b';
+                advisoryText = `Flare Detection: ${Math.round(humanizedProbability * 100)}% likely humanized AI. Patterns suggest AI origin with post-processing to appear human.`;
+            } else if (humanizedProbability >= 0.3) {
+                advisoryLevel = 'possible';
+                advisoryIcon = 'flare';
+                advisoryColor = '#a855f7';
+                advisoryText = `Flare Detection: ${Math.round(humanizedProbability * 100)}% possible humanization. Some signals detected but inconclusive.`;
+            } else {
+                advisoryLevel = 'none';
+                advisoryIcon = 'verified_user';
+                advisoryColor = 'var(--human-color)';
+                advisoryText = `Flare Detection: ${Math.round((1 - humanizedProbability) * 100)}% genuine human writing. No significant humanization artifacts detected.`;
+            }
+        } else if (effectiveFlagCount === 0 && prob < 0.4) {
             advisoryLevel = 'none';
             advisoryIcon = 'verified_user';
             advisoryColor = 'var(--human-color)';
@@ -2884,7 +2974,7 @@ These findings have important implications for urban planning and public health 
                     infoBar.className = 'print-info-bar';
                     infoBar.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#3b82f6;color:white;padding:10px 20px;font-family:system-ui,sans-serif;font-size:14px;display:flex;justify-content:space-between;align-items:center;z-index:9999;box-shadow:0 2px 10px rgba(0,0,0,0.2);';
                     infoBar.innerHTML = `
-                        <span><span class="material-icons" style="font-size:14px;vertical-align:middle">description</span> VERITAS Analysis Report — Use <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">Ctrl+P</kbd> / <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">⌘P</kbd> to save as PDF or print</span>
+                        <span>📄 VERITAS Analysis Report — Use <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">Ctrl+P</kbd> / <kbd style="background:#2563eb;padding:2px 6px;border-radius:3px;margin:0 3px;">⌘P</kbd> to save as PDF or print</span>
                         <button onclick="this.parentElement.remove()" style="background:#2563eb;border:none;color:white;padding:5px 15px;border-radius:4px;cursor:pointer;font-size:12px;">Dismiss</button>
                     `;
                     reportWindow.document.body.insertBefore(infoBar, reportWindow.document.body.firstChild);
