@@ -1077,7 +1077,8 @@
 
 .model-card-display {
     flex: 1;
-    max-width: 400px;
+    max-width: 480px;
+    min-width: 320px;
 }
 
 .model-card-inner {
