@@ -308,6 +308,7 @@ const ReportExporter = {
         <h1>VERITAS</h1>
         <p class="meta">AI Text Detection Analysis Report</p>
         <p class="meta">Powered by ${report.modelInfo.name} Model v${report.modelInfo.version} | ${(report.modelInfo.accuracy * 100).toFixed(1)}% Accuracy | ${report.modelInfo.trainingSamples.toLocaleString()} Training Samples</p>
+        <p class="meta" style="font-style:italic;color:#666;">${report.modelInfo.specialty || ''}</p>
         <p class="meta">Generated: ${new Date(report.generatedAt).toLocaleString()}</p>
     </div>
 
@@ -346,9 +347,9 @@ const ReportExporter = {
                     <div style="font-size:8pt;color:#94a3b8;">Probability of unmodified AI output</div>
                 </div>
                 <div style="flex:1;min-width:140px;">
-                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Humanization Likelihood</div>
-                    <div style="font-size:16pt;font-weight:bold;color:${effectiveHumanizerProb >= 40 ? '#9333ea' : '#64748b'};">${effectiveHumanizerProb}%</div>
-                    <div style="font-size:8pt;color:#94a3b8;">Signs of post-processing detected</div>
+                    <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Humanization Likelihood${report.modelId === 'zenith' ? ' (Zenith)' : ''}</div>
+                    <div style="font-size:16pt;font-weight:bold;color:${effectiveHumanizerProb >= 40 ? '#9333ea' : (effectiveHumanizerProb >= 20 ? '#a855f7' : '#64748b')};">${effectiveHumanizerProb}%</div>
+                    <div style="font-size:8pt;color:#94a3b8;">${effectiveHumanizerProb >= 40 ? 'Strong post-processing signals' : (effectiveHumanizerProb >= 20 ? 'Some post-processing signals' : 'No post-processing detected')}</div>
                 </div>
                 <div style="flex:1;min-width:140px;">
                     <div style="font-size:7pt;text-transform:uppercase;color:#64748b;letter-spacing:0.5px;">Authentic Human</div>
@@ -356,6 +357,7 @@ const ReportExporter = {
                     <div style="font-size:8pt;color:#94a3b8;">Genuinely human-authored</div>
                 </div>
             </div>
+            ${report.modelId === 'zenith' ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;font-size:8pt;color:#64748b;"><strong>Zenith Model:</strong> Specialized entropy/perplexity analysis with 86.7% humanized detection accuracy. ${effectiveHumanizerProb < 20 ? 'Zenith\'s analysis indicates low probability of AI-to-human post-processing.' : (effectiveHumanizerProb >= 40 ? 'Zenith\'s entropy patterns suggest this text has been processed to mask AI signatures.' : 'Zenith detects some patterns that may indicate light editing or hybrid authorship.')}</div>` : ''}
         </div>
         
         ${isLikelyHumanized ? `<div style="background:#faf5ff;border:1px solid #d8b4fe;border-radius:6px;padding:10px 14px;margin:10px 0;">
@@ -377,7 +379,7 @@ const ReportExporter = {
                 <li>Technical or formal content that mimics AI uniformity</li>
                 <li>Collaborative human-AI writing process</li>
             </ul>
-            <p style="font-size:8pt;color:#6366f1;margin:8px 0 0 0;font-style:italic;">Humanization likelihood: ${effectiveHumanizerProb}% — insufficient evidence to conclude post-processing occurred.</p>
+            <p style="font-size:8pt;color:#6366f1;margin:8px 0 0 0;font-style:italic;">Humanization likelihood: ${effectiveHumanizerProb}% — no evidence of AI-to-human post-processing tools detected.</p>
         </div>` : (probability >= 40 && effectiveHumanizerProb < 30 ? `<div style="background:#fefce8;border:1px solid #fde047;border-radius:6px;padding:8px 12px;margin:10px 0;">
             <p style="font-size:8pt;color:#854d0e;margin:0;"><strong>Note:</strong> While some AI patterns were detected, no significant humanization signals were found. This suggests either raw AI output or naturally formal human writing.</p>
         </div>` : ''))}
@@ -1120,10 +1122,10 @@ const ReportExporter = {
     generateReportContent(result, originalText, modelData = null) {
         // Model info from passed data or defaults
         const modelStats = {
-            helios: { name: 'Helios', version: '1.0', accuracy: 0.9924, f1Score: 0.9920, trainingSamples: 45000, features: 45 },
-            zenith: { name: 'Zenith', version: '1.0', accuracy: 0.9957, f1Score: 0.9955, trainingSamples: 42000, features: 38 },
-            sunrise: { name: 'Sunrise', version: '3.0', accuracy: 0.9808, f1Score: 0.9809, trainingSamples: 29976, features: 32 },
-            dawn: { name: 'Dawn', version: '1.0', accuracy: 0.849, f1Score: 0.845, trainingSamples: 15000, features: 18 }
+            helios: { name: 'Helios', version: '1.0', accuracy: 0.9924, f1Score: 0.9920, trainingSamples: 45000, features: 45, specialty: 'Comprehensive 45-feature analysis with tone detection' },
+            zenith: { name: 'Zenith', version: '1.0', accuracy: 0.9957, f1Score: 0.9955, trainingSamples: 42000, features: 38, specialty: 'Entropy/perplexity analysis · 86.7% humanized detection accuracy', humanizedDetectionAccuracy: 0.867 },
+            sunrise: { name: 'Sunrise', version: '3.0', accuracy: 0.9808, f1Score: 0.9809, trainingSamples: 29976, features: 32, specialty: 'Balanced statistical variance analysis' },
+            dawn: { name: 'Dawn', version: '1.0', accuracy: 0.849, f1Score: 0.845, trainingSamples: 15000, features: 18, specialty: 'Lightweight rule-based heuristics' }
         };
         
         const modelId = modelData?.id || 'helios';
@@ -1132,13 +1134,16 @@ const ReportExporter = {
         const report = {
             title: 'VERITAS AI Detection Analysis Report',
             generatedAt: new Date().toISOString(),
+            modelId: modelId,
             modelInfo: {
                 name: modelInfo.name,
                 version: modelInfo.version,
                 accuracy: modelInfo.accuracy,
                 f1Score: modelInfo.f1Score,
                 trainingSamples: modelInfo.trainingSamples,
-                features: modelInfo.features
+                features: modelInfo.features,
+                specialty: modelInfo.specialty,
+                humanizedDetectionAccuracy: modelInfo.humanizedDetectionAccuracy
             },
             summary: this.generateExecutiveSummary(result),
             verdict: this.generateVerdictSection(result),

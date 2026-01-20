@@ -930,7 +930,7 @@ const App = {
         this.renderTabContent(result);
 
         // First tab active by default
-        const firstTab = document.querySelector('.tab-btn[data-tab="tab-highlighted"]');
+        const firstTab = document.querySelector('.tab-btn[data-tab="tab-features"]');
         if (firstTab) firstTab.click();
     },
 
