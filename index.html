@@ -50,37 +50,59 @@
                         <div class="model-selector-carousel">
                             <span class="model-chevron model-prev" id="modelPrev">‹</span>
                             <div class="model-card-display" id="modelDisplay">
-                                <div class="model-card-inner" data-model="helios">
+                                <div class="model-card-inner" data-model="zenith">
                                     <div class="model-card-header">
-                                        <span class="material-icons model-card-icon">flare</span>
+                                        <span class="material-icons model-card-icon">brightness_high</span>
                                         <div class="model-card-title">
-                                            <span class="model-card-name">Helios</span>
-                                            <span class="model-card-badge flagship">Flagship</span>
+                                            <span class="model-card-name">Zenith</span>
+                                            <span class="model-card-badge perplexity">Recommended</span>
                                         </div>
-                                        <span class="model-card-accuracy">99.24%</span>
+                                        <span class="model-card-accuracy">99.57%</span>
                                     </div>
-                                    <p class="model-card-desc">45 features · Tone + hedging · Best overall</p>
+                                    <p class="model-card-desc">Best overall · 99.17% binary · Low FPR</p>
                                 </div>
                             </div>
                             <span class="model-chevron model-next" id="modelNext">›</span>
-                            <input type="radio" name="model" value="helios" id="model-helios" checked hidden>
-                            <input type="radio" name="model" value="zenith" id="model-zenith" hidden>
+                            <input type="radio" name="model" value="zenith" id="model-zenith" checked hidden>
                             <input type="radio" name="model" value="flare" id="model-flare" hidden>
+                            <input type="radio" name="model" value="helios" id="model-helios" hidden>
                             <input type="radio" name="model" value="sunrise" id="model-sunrise" hidden>
                             <input type="radio" name="model" value="dawn" id="model-dawn" hidden>
                         </div>
                         
-                        <!-- Flare Humanization Detection Toggle -->
-                        <div class="flare-toggle-container" id="flareToggleContainer">
-                            <label class="flare-toggle" title="Run Flare alongside selected model for enhanced humanization detection (99.84% accuracy)">
-                                <input type="checkbox" id="flareToggle" checked>
-                                <span class="flare-toggle-slider"></span>
-                                <span class="flare-toggle-label">
-                                    <span class="material-icons" style="font-size:14px;vertical-align:middle;color:#f97316;">local_fire_department</span>
-                                    Flare Detection
-                                </span>
-                                <span class="flare-toggle-info">99.84%</span>
-                            </label>
+                        <!-- Detection Mode Controls -->
+                        <div class="detection-controls">
+                            <!-- Flare Humanization Detection Toggle -->
+                            <div class="flare-toggle-container" id="flareToggleContainer">
+                                <label class="flare-toggle" title="Run Flare alongside selected model for enhanced humanization detection (+28% boost)">
+                                    <input type="checkbox" id="flareToggle" checked>
+                                    <span class="flare-toggle-slider"></span>
+                                    <span class="flare-toggle-label">
+                                        <span class="material-icons" style="font-size:14px;vertical-align:middle;color:#f97316;">local_fire_department</span>
+                                        Flare
+                                    </span>
+                                    <span class="flare-toggle-info">+28% Hum</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Binary Mode Toggle -->
+                            <div class="binary-toggle-container" id="binaryToggleContainer">
+                                <label class="flare-toggle" title="Binary mode: Human vs AI only. Disable for 3-class detection (Human/AI/Humanized)">
+                                    <input type="checkbox" id="binaryToggle">
+                                    <span class="flare-toggle-slider"></span>
+                                    <span class="flare-toggle-label">
+                                        <span class="material-icons" style="font-size:14px;vertical-align:middle;color:#3b82f6;">swap_horiz</span>
+                                        Binary
+                                    </span>
+                                    <span class="flare-toggle-info">H vs AI</span>
+                                </label>
+                            </div>
+                            
+                            <!-- Analyze Button (moved here for UX) -->
+                            <button class="btn btn-primary btn-analyze-inline" id="analyzeBtn" disabled>
+                                <span class="btn-text">Analyze</span>
+                                <span class="btn-spinner"></span>
+                            </button>
                         </div>
 
                         <div class="panel-header">
@@ -134,12 +156,6 @@
                                 <span id="wordCount">0 words</span>
                                 <span id="sentenceCount">0 sentences</span>
                             </div>
-                        </div>
-                        <div class="analyze-actions">
-                            <button class="btn btn-primary btn-lg" id="analyzeBtn" disabled>
-                                <span class="btn-text">Analyze Text</span>
-                                <span class="btn-spinner"></span>
-                            </button>
                         </div>
                     </div>
 
@@ -1273,27 +1289,87 @@
                             </ul>
                             <p>This approach creates training data that mirrors real-world humanization tool behavior, achieving 99.84% detection accuracy.</p>
                             
-                            <h3>8.5.4 Flare Integration Benchmark</h3>
-                            <p>When Flare is enabled alongside other models, it provides an additional humanization detection layer. Benchmark results:</p>
+                            <h3>8.5.4 Comprehensive Benchmark Results</h3>
+                            <p>Performance across different classification scenarios (900 samples: 300 human, 300 AI, 300 humanized AI):</p>
+                            
+                            <h4 style="margin-top:15px;color:#3b82f6;">📋 Binary Mode (Human vs AI only)</h4>
+                            <p style="font-size:9pt;color:#6b7280;margin-bottom:10px;">Best for pure AI detection without humanization concerns</p>
                             <div class="weight-table">
                                 <table>
                                     <thead>
-                                        <tr><th>Model</th><th>Mode</th><th>Accuracy</th><th>F1</th><th>Humanized Detection</th></tr>
+                                        <tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>FPR</th></tr>
                                     </thead>
                                     <tbody>
-                                        <tr><td>Helios</td><td>Standalone</td><td>99.24%</td><td>99.24%</td><td>~65%</td></tr>
-                                        <tr><td>Helios</td><td>+ Flare</td><td>99.24%</td><td>99.24%</td><td>~85%</td></tr>
-                                        <tr><td>Zenith</td><td>Standalone</td><td>99.57%</td><td>99.57%</td><td>86.7%</td></tr>
-                                        <tr><td>Zenith</td><td>+ Flare</td><td>99.57%</td><td>99.57%</td><td>~88%</td></tr>
-                                        <tr><td>Sunrise</td><td>Standalone</td><td>98.08%</td><td>98.09%</td><td>~60%</td></tr>
-                                        <tr><td>Sunrise</td><td>+ Flare</td><td>98.08%</td><td>98.09%</td><td>~80%</td></tr>
+                                        <tr style="background:#f0fdf4;"><td><strong>Zenith</strong> ⭐</td><td><strong>99.17%</strong></td><td>99.33%</td><td>99.00%</td><td>99.17%</td><td>0.7%</td></tr>
+                                        <tr><td>Helios</td><td>98.67%</td><td>98.99%</td><td>98.33%</td><td>98.66%</td><td>1.0%</td></tr>
+                                        <tr><td>Sunrise</td><td>97.67%</td><td>97.67%</td><td>97.67%</td><td>97.67%</td><td>2.3%</td></tr>
                                     </tbody>
                                 </table>
                             </div>
-                            <p><strong>Note:</strong> Flare integration provides the greatest benefit for models not specialized in humanization detection (Helios, Sunrise). Zenith already includes perplexity-based humanization detection, so additional Flare integration shows smaller improvements.</p>
+                            
+                            <h4 style="margin-top:20px;color:#f97316;">📋 3-Class Mode (Human vs AI vs Humanized)</h4>
+                            <p style="font-size:9pt;color:#6b7280;margin-bottom:10px;">Real-world detection including humanized AI content</p>
+                            <div class="weight-table">
+                                <table>
+                                    <thead>
+                                        <tr><th>Model</th><th>Accuracy</th><th>F1</th><th>Hum Detection</th><th>FPR</th><th>Flare Boost</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="background:#fff7ed;"><td><strong>Flare</strong> 🔥</td><td><strong>99.67%</strong></td><td>99.75%</td><td><strong>99.3%</strong></td><td>0.3%</td><td>—</td></tr>
+                                        <tr style="background:#f0fdf4;"><td><strong>Zenith + Flare</strong> ⭐</td><td>97.67%</td><td>98.22%</td><td>93.7%</td><td>0.3%</td><td>+5.7%</td></tr>
+                                        <tr><td>Helios + Flare</td><td>96.33%</td><td>97.18%</td><td>90.3%</td><td>0.7%</td><td>+28.0%</td></tr>
+                                        <tr><td>Sunrise + Flare</td><td>95.00%</td><td>96.12%</td><td>88.0%</td><td>1.0%</td><td>+29.0%</td></tr>
+                                        <tr style="opacity:0.7;"><td>Zenith (standalone)</td><td>95.44%</td><td>96.47%</td><td>88.0%</td><td>0.7%</td><td>—</td></tr>
+                                        <tr style="opacity:0.7;"><td>Helios (standalone)</td><td>86.56%</td><td>88.85%</td><td>62.3%</td><td>1.0%</td><td>—</td></tr>
+                                        <tr style="opacity:0.7;"><td>Sunrise (standalone)</td><td>84.78%</td><td>87.28%</td><td>59.0%</td><td>2.3%</td><td>—</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="verification-box" style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:8px;padding:20px;margin:20px 0;">
+                                <h4 style="color:#b45309;margin-bottom:12px;">🏆 Optimal Configuration Recommendations</h4>
+                                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;font-size:9pt;">
+                                    <div style="background:#fff;padding:12px;border-radius:6px;border:1px solid #fcd34d;">
+                                        <strong style="color:#b45309;">For Pure AI Detection:</strong><br>
+                                        <span style="font-size:12pt;color:#111;">Zenith + Binary Mode</span><br>
+                                        <span style="color:#6b7280;">99.17% accuracy, 0.7% false positive rate</span>
+                                    </div>
+                                    <div style="background:#fff;padding:12px;border-radius:6px;border:1px solid #fcd34d;">
+                                        <strong style="color:#b45309;">For Detecting ALL AI (incl. humanized):</strong><br>
+                                        <span style="font-size:12pt;color:#111;">Flare Standalone</span><br>
+                                        <span style="color:#6b7280;">99.67% accuracy, 99.3% humanized detection</span>
+                                    </div>
+                                    <div style="background:#fff;padding:12px;border-radius:6px;border:1px solid #fcd34d;">
+                                        <strong style="color:#b45309;">For Balanced Detection:</strong><br>
+                                        <span style="font-size:12pt;color:#111;">Zenith + Flare Enabled</span><br>
+                                        <span style="color:#6b7280;">97.67% accuracy, 93.7% humanized detection</span>
+                                    </div>
+                                    <div style="background:#fff;padding:12px;border-radius:6px;border:1px solid #fcd34d;">
+                                        <strong style="color:#b45309;">For Lowest False Positives:</strong><br>
+                                        <span style="font-size:12pt;color:#111;">Zenith + Flare</span><br>
+                                        <span style="color:#6b7280;">Only 0.3% false positive rate</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4 style="margin-top:20px;">Flare Integration Impact Summary</h4>
+                            <p>Enabling Flare alongside other models provides significant humanization detection improvements:</p>
+                            <div class="weight-table">
+                                <table>
+                                    <thead>
+                                        <tr><th>Model</th><th>Accuracy Boost</th><th>Humanized Detection Boost</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Helios</td><td style="color:#10b981;font-weight:600;">+9.78%</td><td style="color:#10b981;font-weight:600;">+28.0%</td></tr>
+                                        <tr><td>Sunrise</td><td style="color:#10b981;font-weight:600;">+10.22%</td><td style="color:#10b981;font-weight:600;">+29.0%</td></tr>
+                                        <tr><td>Zenith</td><td style="color:#10b981;">+2.22%</td><td style="color:#10b981;">+5.7%</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p style="font-size:9pt;color:#6b7280;margin-top:10px;"><strong>Note:</strong> Zenith already includes perplexity-based humanization detection, so Flare provides smaller incremental improvement. Helios and Sunrise see the largest gains from Flare integration.</p>
                             
                             <div class="verification-note" style="background:#fef3c7;border:1px solid #d97706;border-radius:6px;padding:12px;margin-top:15px;font-size:9pt;">
-                                <strong>🔬 Reproducibility Note:</strong> All training scripts are available in the <code>/training</code> directory. Run <code>python train_flare_v2.py</code> or <code>python trainer.py --model helios</code> to reproduce results. Model artifacts are stored in <code>/training/models/</code>. Benchmark scripts: <code>python benchmark_with_flare.py</code>.
+                                <strong>🔬 Reproducibility Note:</strong> All training scripts are available in the <code>/training</code> directory. Run <code>python train_flare_v2.py</code> or <code>python trainer.py --model helios</code> to reproduce results. Model artifacts are stored in <code>/training/models/</code>. Benchmark scripts: <code>python benchmark_comprehensive.py</code>.
                             </div>
                         </div>
 

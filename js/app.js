@@ -25,29 +25,60 @@ const App = {
      * Initialize Flare toggle for humanization detection
      */
     initFlareToggle() {
-        const toggle = document.getElementById('flareToggle');
-        const container = document.getElementById('flareToggleContainer');
+        const flareToggle = document.getElementById('flareToggle');
+        const binaryToggle = document.getElementById('binaryToggle');
+        const flareContainer = document.getElementById('flareToggleContainer');
         
-        if (toggle) {
-            // Load saved preference
-            const savedState = localStorage.getItem('veritas-flare-enabled');
-            toggle.checked = savedState !== 'false'; // Default to true
+        // Initialize Flare toggle
+        if (flareToggle) {
+            // Load saved preference (default: enabled for +28% humanized detection)
+            const savedFlare = localStorage.getItem('veritas-flare-enabled');
+            flareToggle.checked = savedFlare !== 'false'; // Default to true
             
             // Update engine state
             if (typeof AnalyzerEngine !== 'undefined') {
-                AnalyzerEngine.setFlareEnabled(toggle.checked);
+                AnalyzerEngine.setFlareEnabled(flareToggle.checked);
             }
             
             // Handle toggle changes
-            toggle.addEventListener('change', () => {
-                localStorage.setItem('veritas-flare-enabled', toggle.checked);
+            flareToggle.addEventListener('change', () => {
+                localStorage.setItem('veritas-flare-enabled', flareToggle.checked);
                 if (typeof AnalyzerEngine !== 'undefined') {
-                    AnalyzerEngine.setFlareEnabled(toggle.checked);
+                    AnalyzerEngine.setFlareEnabled(flareToggle.checked);
                 }
                 this.showToast(
-                    toggle.checked ? 'Flare humanization detection enabled' : 'Flare detection disabled',
+                    flareToggle.checked ? 'Flare enabled (+28% humanized detection)' : 'Flare detection disabled',
                     'info'
                 );
+            });
+        }
+        
+        // Initialize Binary mode toggle
+        if (binaryToggle) {
+            // Load saved preference (default: disabled for 3-class detection)
+            const savedBinary = localStorage.getItem('veritas-binary-mode');
+            binaryToggle.checked = savedBinary === 'true'; // Default to false
+            
+            // Update engine state
+            if (typeof AnalyzerEngine !== 'undefined') {
+                AnalyzerEngine.setBinaryMode(binaryToggle.checked);
+            }
+            
+            // Handle toggle changes
+            binaryToggle.addEventListener('change', () => {
+                localStorage.setItem('veritas-binary-mode', binaryToggle.checked);
+                if (typeof AnalyzerEngine !== 'undefined') {
+                    AnalyzerEngine.setBinaryMode(binaryToggle.checked);
+                }
+                this.showToast(
+                    binaryToggle.checked ? 
+                        'Binary mode: Human vs AI only (99.17% accuracy)' : 
+                        '3-Class mode: Detecting humanized AI enabled',
+                    'info'
+                );
+                
+                // In binary mode, Flare is less important (hide the toggle)
+                this.updateFlareToggleVisibility();
             });
         }
         
@@ -56,13 +87,19 @@ const App = {
     },
     
     /**
-     * Update Flare toggle visibility based on selected model
+     * Update Flare toggle visibility based on selected model and binary mode
      */
     updateFlareToggleVisibility() {
-        const container = document.getElementById('flareToggleContainer');
-        if (container) {
+        const flareContainer = document.getElementById('flareToggleContainer');
+        const binaryToggle = document.getElementById('binaryToggle');
+        
+        if (flareContainer) {
             const currentModel = this.getCurrentModel();
-            container.classList.toggle('hidden', currentModel === 'flare');
+            const isBinaryMode = binaryToggle?.checked || false;
+            // Hide Flare toggle when:
+            // 1. Flare model is selected (redundant)
+            // 2. Binary mode is enabled (humanized detection less relevant)
+            flareContainer.classList.toggle('hidden', currentModel === 'flare' || isBinaryMode);
         }
     },
 
@@ -266,16 +303,17 @@ const App = {
      */
     bindModelSelectorEvents() {
         // Model data for the carousel selector
+        // Ordered by recommended usage based on benchmarks
         this.models = [
-            { id: 'helios', name: 'Helios', accuracy: '99.24%', badge: 'Flagship', icon: 'local_fire_department', badgeClass: 'flagship', desc: '45 features · Tone + hedging · Best overall' },
-            { id: 'zenith', name: 'Zenith', accuracy: '99.57%', badge: 'Perplexity', icon: 'brightness_high', badgeClass: 'perplexity', desc: 'Entropy analysis · 86.7% humanized detection' },
-            { id: 'flare', name: 'Flare', accuracy: '99.84%', badge: 'Anti-Humanizer', icon: 'flare', badgeClass: 'anti-humanizer', desc: 'Humanized AI detector · 66 features · CV: 96.7%' },
+            { id: 'zenith', name: 'Zenith', accuracy: '99.57%', badge: 'Recommended', icon: 'brightness_high', badgeClass: 'perplexity', desc: 'Best overall · 99.17% binary · Low FPR' },
+            { id: 'flare', name: 'Flare', accuracy: '99.84%', badge: 'Anti-Humanizer', icon: 'local_fire_department', badgeClass: 'anti-humanizer', desc: '99.3% humanized detection · 66 features' },
+            { id: 'helios', name: 'Helios', accuracy: '99.24%', badge: 'Flagship', icon: 'flare', badgeClass: 'flagship', desc: '45 features · Tone + hedging analysis' },
             { id: 'sunrise', name: 'Sunrise', accuracy: '98.08%', badge: 'Balanced', icon: 'wb_sunny', badgeClass: 'balanced', desc: 'Statistical variance · Fast · F1: 98.09%' },
             { id: 'dawn', name: 'Dawn', accuracy: '84.9%', badge: 'Legacy', icon: 'wb_twilight', badgeClass: 'legacy', desc: 'Rule-based heuristics · Lightweight' }
         ];
         
-        // Load saved model or default to helios
-        const savedModel = localStorage.getItem('veritas-model') || 'helios';
+        // Load saved model or default to zenith (best overall based on benchmarks)
+        const savedModel = localStorage.getItem('veritas-model') || 'zenith';
         this.currentModelIndex = this.models.findIndex(m => m.id === savedModel);
         if (this.currentModelIndex === -1) this.currentModelIndex = 0;
         

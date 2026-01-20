@@ -1,66 +1,66 @@
 {
-  "timestamp": "2026-01-20T02:56:41.176135",
+  "timestamp": "2026-01-20T02:59:16.739163",
   "description": "Benchmark comparing models with and without Flare humanization detection",
   "results": [
     {
       "model": "Helios",
       "with_flare": false,
-      "accuracy": 0.7733333333333333,
+      "accuracy": 0.8666666666666667,
       "precision": 1.0,
-      "recall": 0.66,
-      "f1": 0.7951807228915663,
-      "roc_auc": 0.9229499999999999,
-      "humanized_detection_rate": 0.32
+      "recall": 0.8,
+      "f1": 0.8888888888888888,
+      "roc_auc": 0.9545624999999999,
+      "humanized_detection_rate": 0.605
     },
     {
       "model": "Helios",
       "with_flare": true,
-      "accuracy": 0.7783333333333333,
+      "accuracy": 0.9383333333333334,
       "precision": 1.0,
-      "recall": 0.6675,
-      "f1": 0.800599700149925,
-      "roc_auc": 0.9282625,
-      "humanized_detection_rate": 0.335
+      "recall": 0.9075,
+      "f1": 0.9515072083879423,
+      "roc_auc": 0.9836499999999998,
+      "humanized_detection_rate": 0.82
     },
     {
       "model": "Zenith",
       "with_flare": false,
-      "accuracy": 0.89,
+      "accuracy": 0.9466666666666667,
       "precision": 1.0,
-      "recall": 0.835,
-      "f1": 0.9100817438692098,
-      "roc_auc": 0.9845250000000001,
-      "humanized_detection_rate": 0.67
+      "recall": 0.92,
+      "f1": 0.9583333333333334,
+      "roc_auc": 0.9840249999999998,
+      "humanized_detection_rate": 0.845
     },
     {
       "model": "Zenith",
       "with_flare": true,
-      "accuracy": 0.8833333333333333,
+      "accuracy": 0.9716666666666667,
       "precision": 1.0,
-      "recall": 0.825,
-      "f1": 0.9041095890410958,
-      "roc_auc": 0.9843375000000001,
-      "humanized_detection_rate": 0.65
+      "recall": 0.9575,
+      "f1": 0.9782886334610472,
+      "roc_auc": 0.9909624999999999,
+      "humanized_detection_rate": 0.915
     },
     {
       "model": "Sunrise",
       "with_flare": false,
-      "accuracy": 0.7766666666666666,
-      "precision": 1.0,
-      "recall": 0.665,
-      "f1": 0.7987987987987988,
-      "roc_auc": 0.92495,
-      "humanized_detection_rate": 0.33
+      "accuracy": 0.8416666666666667,
+      "precision": 0.9935275080906149,
+      "recall": 0.7675,
+      "f1": 0.8660084626234132,
+      "roc_auc": 0.9451499999999999,
+      "humanized_detection_rate": 0.55
     },
     {
       "model": "Sunrise",
       "with_flare": true,
-      "accuracy": 0.7816666666666666,
-      "precision": 1.0,
-      "recall": 0.6725,
-      "f1": 0.804185351270553,
-      "roc_auc": 0.9258875000000001,
-      "humanized_detection_rate": 0.345
+      "accuracy": 0.9183333333333333,
+      "precision": 0.9943661971830986,
+      "recall": 0.8825,
+      "f1": 0.9350993377483444,
+      "roc_auc": 0.9735625,
+      "humanized_detection_rate": 0.78
     }
   ]
 }

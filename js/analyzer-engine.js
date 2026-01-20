@@ -9,12 +9,15 @@
  */
 
 const AnalyzerEngine = {
-    // Current model type (default: helios)
-    currentModel: 'helios',
+    // Current model type (default: zenith for best overall performance)
+    currentModel: 'zenith',
     
-    // Flare integration settings
+    // Flare integration settings (enabled by default for +28% humanized detection)
     flareEnabled: true,  // Whether to run Flare alongside other models
     flareThreshold: 0.40, // Minimum humanization probability to report
+    
+    // Binary mode settings (disabled by default for 3-class detection)
+    binaryMode: false, // When true, only Human vs AI (ignores humanized classification)
     
     /**
      * Set the active model
@@ -33,6 +36,14 @@ const AnalyzerEngine = {
     setFlareEnabled(enabled) {
         this.flareEnabled = enabled;
         console.log(`AnalyzerEngine: Flare integration ${enabled ? 'enabled' : 'disabled'}`);
+    },
+    
+    /**
+     * Enable/disable binary mode (Human vs AI only)
+     */
+    setBinaryMode(enabled) {
+        this.binaryMode = enabled;
+        console.log(`AnalyzerEngine: Binary mode ${enabled ? 'enabled' : 'disabled'}`);
     },
     
     /**

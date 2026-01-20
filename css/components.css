@@ -1162,12 +1162,21 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Flare Toggle (Humanization Detection)
+   Detection Controls (Flare Toggle, Binary Mode, Inline Analyze)
    ───────────────────────────────────────────────────────────────────────────── */
-.flare-toggle-container {
+.detection-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.flare-toggle-container,
+.binary-toggle-container {
     display: flex;
     justify-content: center;
-    margin-bottom: var(--space-md);
 }
 
 .flare-toggle {
@@ -1186,6 +1195,10 @@
 .flare-toggle:hover {
     border-color: #f97316;
     background: var(--bg-tertiary);
+}
+
+.binary-toggle-container .flare-toggle:hover {
+    border-color: #3b82f6;
 }
 
 .flare-toggle input[type="checkbox"] {
@@ -1218,6 +1231,10 @@
     background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
 }
 
+.binary-toggle-container .flare-toggle input:checked + .flare-toggle-slider {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
 .flare-toggle input:checked + .flare-toggle-slider::before {
     transform: translateX(16px);
 }
@@ -1229,6 +1246,10 @@
 
 .flare-toggle input:checked ~ .flare-toggle-label {
     color: #f97316;
+}
+
+.binary-toggle-container .flare-toggle input:checked ~ .flare-toggle-label {
+    color: #3b82f6;
 }
 
 .flare-toggle-info {
@@ -1243,6 +1264,18 @@
 /* Hide flare toggle when Flare model is selected */
 .flare-toggle-container.hidden {
     display: none;
+}
+
+/* Inline analyze button next to toggles */
+.btn-analyze-inline {
+    padding: var(--space-xs) var(--space-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.btn-analyze-inline:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Model indicator in results - Enhanced */
