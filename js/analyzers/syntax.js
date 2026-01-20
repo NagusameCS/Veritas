@@ -107,9 +107,9 @@ const SyntaxAnalyzer = {
         const longSentences = lengths.filter(l => l >= 25).length;
 
         return {
-            mean: mean.toFixed(1),
-            variance: variance.toFixed(1),
-            stdDev: stdDev.toFixed(1),
+            mean: mean,
+            variance: variance,
+            stdDev: stdDev,
             coefficientOfVariation,
             burstiness: normalizedBurstiness,
             min: Math.min(...lengths),

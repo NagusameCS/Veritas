@@ -892,8 +892,16 @@ const ReportExporter = {
                 html += `<h4 style="margin-top:8px;">Text Evidence:</h4>
                 <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:4px;padding:8px;margin-top:4px;">`;
                 for (const excerpt of allExcerpts.slice(0, 4)) {
-                    const excerptText = typeof excerpt === 'string' ? excerpt : (excerpt.text || '');
-                    const excerptType = excerpt.type || 'neutral';
+                    let excerptText = '';
+                    if (typeof excerpt === 'string') {
+                        excerptText = excerpt;
+                    } else if (excerpt && typeof excerpt.text === 'string') {
+                        excerptText = excerpt.text;
+                    } else if (excerpt && excerpt.text) {
+                        excerptText = String(excerpt.text);
+                    }
+                    if (!excerptText) continue;
+                    const excerptType = (excerpt && excerpt.type) || 'neutral';
                     const borderColor = excerptType === 'ai' ? '#ef4444' : (excerptType === 'human' ? '#10b981' : '#9ca3af');
                     html += `<div style="border-left:3px solid ${borderColor};padding:4px 8px;margin:4px 0;font-size:8pt;font-style:italic;color:#4b5563;">"${this.escapeHtml(excerptText.substring(0, 150))}${excerptText.length > 150 ? '...' : ''}"</div>`;
                 }
