@@ -8,7 +8,7 @@ const MetaPatternsAnalyzer = {
     category: 10,
     weight: 1.2,
 
-    // Hedging phrases
+    // Hedging phrases (expanded for newer models)
     hedgingPhrases: [
         'it could be argued', 'one might suggest', 'it is possible that',
         'there is potential for', 'in some cases', 'under certain circumstances',
@@ -16,7 +16,13 @@ const MetaPatternsAnalyzer = {
         'it seems that', 'it appears that', 'it would seem', 'it may be',
         'this suggests that', 'this indicates that', 'this implies that',
         'generally speaking', 'broadly speaking', 'for the most part',
-        'with that said', 'that being said', 'having said that'
+        'with that said', 'that being said', 'having said that',
+        // Gemini/newer model hedging
+        'it is worth noting', 'it is important to note', 'it should be noted',
+        'it is essential to understand', 'it is crucial to recognize',
+        'while there are', 'there are several', 'there are many',
+        'it is widely recognized', 'it is generally accepted',
+        'can potentially', 'may potentially', 'could potentially'
     ],
 
     // Strong stance markers (absence indicates hedging)
@@ -25,6 +31,19 @@ const MetaPatternsAnalyzer = {
         'certainly', 'undeniably', 'unquestionably', 'clearly', 'obviously',
         'it is clear that', 'there is no doubt', 'the fact is',
         'i am convinced', 'i firmly believe', 'make no mistake'
+    ],
+
+    // Gemini-specific structural patterns
+    geminiStructuralPatterns: [
+        /here('s| is) (a |the )?(breakdown|overview|summary|look)/gi,
+        /let('s| us) (delve|explore|examine|consider|take a look)/gi,
+        /(first|1\.|•)\s*(and |then )?(second|2\.|•)/gi,
+        /key (takeaways?|points?|considerations?|factors?)/gi,
+        /in (essence|summary|conclusion|short)/gi,
+        /the (bottom line|key point|main takeaway)/gi,
+        /what (this|that) means is/gi,
+        /when it comes to/gi,
+        /in terms of/gi
     ],
 
     // Balanced argument templates
@@ -82,6 +101,9 @@ const MetaPatternsAnalyzer = {
         
         // Analyze rhetorical arc predictability
         const rhetoricalAnalysis = this.analyzeRhetoricalArc(text, paragraphs);
+        
+        // Analyze Gemini-specific structural patterns
+        const geminiAnalysis = this.analyzeGeminiPatterns(text);
 
         // Calculate AI probability
         // All these patterns are strong AI indicators
@@ -90,12 +112,13 @@ const MetaPatternsAnalyzer = {
             overBalanced: balanceAnalysis.balanceScore,
             excessiveHedging: hedgingAnalysis.hedgingScore,
             formattingSymmetry: formattingAnalysis.symmetryScore,
-            predictableArc: rhetoricalAnalysis.predictabilityScore
+            predictableArc: rhetoricalAnalysis.predictabilityScore,
+            geminiPatterns: geminiAnalysis.geminiScore
         };
 
         const aiProbability = Utils.weightedAverage(
-            [scores.overBalanced, scores.excessiveHedging, scores.formattingSymmetry, scores.predictableArc],
-            [0.25, 0.25, 0.2, 0.3]
+            [scores.overBalanced, scores.excessiveHedging, scores.formattingSymmetry, scores.predictableArc, scores.geminiPatterns],
+            [0.2, 0.2, 0.15, 0.25, 0.2]
         );
 
         return {
@@ -107,10 +130,56 @@ const MetaPatternsAnalyzer = {
                 balanceAnalysis,
                 hedgingAnalysis,
                 formattingAnalysis,
-                rhetoricalAnalysis
+                rhetoricalAnalysis,
+                geminiAnalysis
             },
-            findings: this.generateFindings(balanceAnalysis, hedgingAnalysis, formattingAnalysis, rhetoricalAnalysis),
+            findings: this.generateFindings(balanceAnalysis, hedgingAnalysis, formattingAnalysis, rhetoricalAnalysis, geminiAnalysis),
             scores
+        };
+    },
+
+    /**
+     * Analyze Gemini-specific structural patterns
+     */
+    analyzeGeminiPatterns(text) {
+        let patternCount = 0;
+        const patternsFound = [];
+        
+        for (const pattern of this.geminiStructuralPatterns) {
+            const matches = text.match(pattern);
+            if (matches) {
+                patternCount += matches.length;
+                patternsFound.push(matches[0].toLowerCase().trim());
+            }
+        }
+        
+        // Check for characteristic openings
+        const lowerText = text.toLowerCase();
+        const geminiOpenings = [
+            'here is', 'here are', 'here\'s',
+            'let me', 'let\'s',
+            'i\'d be happy to',
+            'absolutely!', 'great question!', 'that\'s a great',
+            'i can help',
+            'sure!', 'of course!'
+        ];
+        
+        let openingMatches = 0;
+        for (const opening of geminiOpenings) {
+            if (lowerText.startsWith(opening) || lowerText.includes('\n' + opening)) {
+                openingMatches++;
+                patternsFound.push('characteristic opening: ' + opening);
+            }
+        }
+        
+        // Gemini score based on pattern density
+        const geminiScore = Utils.normalize(patternCount + openingMatches, 0, 5);
+        
+        return {
+            patternCount,
+            openingMatches,
+            patternsFound: [...new Set(patternsFound)].slice(0, 5),
+            geminiScore
         };
     },
 
@@ -344,8 +413,19 @@ const MetaPatternsAnalyzer = {
     /**
      * Generate findings
      */
-    generateFindings(balanceAnalysis, hedgingAnalysis, formattingAnalysis, rhetoricalAnalysis) {
+    generateFindings(balanceAnalysis, hedgingAnalysis, formattingAnalysis, rhetoricalAnalysis, geminiAnalysis) {
         const findings = [];
+
+        // Gemini-specific patterns (new)
+        if (geminiAnalysis && geminiAnalysis.geminiScore > 0.3) {
+            const total = geminiAnalysis.patternCount + geminiAnalysis.openingMatches;
+            findings.push({
+                text: `Detected ${total} Gemini/modern AI structural patterns. Examples: "${geminiAnalysis.patternsFound.slice(0, 3).join('", "')}". These patterns are characteristic of newer AI models like Gemini, Claude 3, and GPT-4.`,
+                label: 'Modern AI Patterns',
+                indicator: 'ai',
+                severity: total >= 4 ? 'high' : 'medium'
+            });
+        }
 
         // Over-balanced arguments with specifics
         if (balanceAnalysis.isOverBalanced) {

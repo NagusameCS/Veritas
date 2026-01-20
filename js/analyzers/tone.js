@@ -52,8 +52,29 @@ const ToneAnalyzer = {
             'like', 'just', 'really', 'pretty', 'kind of', 'sort of', 'stuff', 'things',
             'gonna', 'wanna', 'gotta', 'yeah', 'okay', 'ok', 'cool', 'awesome', 'basically',
             'actually', 'literally', 'totally', 'super', 'kinda', 'anyways', 'btw', 'tbh'
+        ],
+        
+        // Gemini/Claude/newer AI enthusiastic helper tone
+        aiHelpfulTone: [
+            'happy to help', 'glad to assist', 'here to help', 'let me help',
+            'i can help', 'i\'d be happy', 'absolutely', 'great question',
+            'excellent question', 'that\'s a great', 'wonderful question',
+            'certainly', 'of course', 'sure thing', 'no problem',
+            'hope this helps', 'feel free', 'don\'t hesitate', 'let me know',
+            'happy to clarify', 'hope that helps', 'glad to help'
         ]
     },
+
+    // Gemini-specific enthusiastic patterns (phrase-level)
+    geminiEnthusiasticPatterns: [
+        /absolutely!|great question!|excellent!|perfect!|wonderful!/gi,
+        /i('d| would) be happy to/gi,
+        /that's a (great|wonderful|excellent|fantastic) (question|point|idea)/gi,
+        /i (hope|trust) (this|that) helps/gi,
+        /(feel free|don't hesitate) to (ask|reach out|let me know)/gi,
+        /let me (help|assist|explain|break (it |this )?down)/gi,
+        /here('s| is) (a |the )?(quick |brief )?(summary|overview|breakdown)/gi
+    ],
 
     /**
      * Main analysis function
@@ -79,20 +100,24 @@ const ToneAnalyzer = {
         const toneShifts = this.detectToneShifts(sentenceTones);
         const hedgingPattern = this.analyzeHedgingPattern(sentenceTones);
         const emotionalProfile = this.analyzeEmotionalVariance(sentenceTones);
+        
+        // Detect AI helper tone (Gemini, Claude, etc.)
+        const aiHelperTone = this.detectAIHelperTone(text);
 
         // Calculate scores
         const scores = {
             overallStability: stability.overall,
             hedgingConsistency: hedgingPattern.consistency,
             emotionalFlatness: emotionalProfile.flatness,
-            registerStability: stability.register
+            registerStability: stability.register,
+            aiHelperTone: aiHelperTone.score
         };
 
         // AI probability based on excessive stability
-        const aiProbability = this.calculateAIProbability(scores, stability, toneShifts);
+        const aiProbability = this.calculateAIProbability(scores, stability, toneShifts, aiHelperTone);
         
         const confidence = this.calculateConfidence(sentences.length);
-        const findings = this.generateFindings(stability, drift, toneShifts, hedgingPattern, emotionalProfile);
+        const findings = this.generateFindings(stability, drift, toneShifts, hedgingPattern, emotionalProfile, aiHelperTone);
 
         return {
             name: this.name,
@@ -106,6 +131,7 @@ const ToneAnalyzer = {
                 toneShifts,
                 hedgingPattern,
                 emotionalProfile,
+                aiHelperTone,
                 sentenceTones
             },
             findings,
@@ -362,20 +388,86 @@ const ToneAnalyzer = {
     },
 
     /**
+     * Detect AI helper/assistant tone (Gemini, Claude, ChatGPT characteristic)
+     */
+    detectAIHelperTone(text) {
+        const lower = text.toLowerCase();
+        let patternMatches = 0;
+        const patternsFound = [];
+        
+        // Check enthusiastic patterns
+        for (const pattern of this.geminiEnthusiasticPatterns) {
+            const matches = text.match(pattern);
+            if (matches) {
+                patternMatches += matches.length;
+                patternsFound.push(matches[0].toLowerCase());
+            }
+        }
+        
+        // Check helper tone words
+        const tokens = Utils.tokenize(lower);
+        let helperWordCount = 0;
+        for (const phrase of this.lexicons.aiHelpfulTone) {
+            if (lower.includes(phrase)) {
+                helperWordCount++;
+                if (!patternsFound.includes(phrase)) {
+                    patternsFound.push(phrase);
+                }
+            }
+        }
+        
+        // Check for characteristic openings
+        const aiOpenings = [
+            'here is', 'here are', 'here\'s a',
+            'let me', 'i\'d be happy', 'i can help',
+            'absolutely', 'certainly', 'of course',
+            'great question', 'that\'s a great'
+        ];
+        
+        let openingScore = 0;
+        for (const opening of aiOpenings) {
+            if (lower.startsWith(opening) || lower.slice(0, 100).includes(opening)) {
+                openingScore++;
+                if (!patternsFound.includes(opening)) {
+                    patternsFound.push('opening: ' + opening);
+                }
+            }
+        }
+        
+        // Calculate overall helper tone score
+        const totalSignals = patternMatches + helperWordCount + openingScore;
+        const score = Utils.normalize(totalSignals, 0, 6);
+        
+        return {
+            patternMatches,
+            helperWordCount,
+            openingScore,
+            totalSignals,
+            patternsFound: [...new Set(patternsFound)].slice(0, 5),
+            score,
+            isHelperTone: totalSignals >= 2
+        };
+    },
+
+    /**
      * Calculate AI probability
      */
-    calculateAIProbability(scores, stability, toneShifts) {
+    calculateAIProbability(scores, stability, toneShifts, aiHelperTone) {
         // High stability = AI-like
         // Low emotional variance = AI-like
         // Consistent hedging = AI-like
+        // AI helper tone = strongly AI-like
         
         let probability = 0;
 
         // Stability contributions
-        probability += scores.overallStability * 0.25;
-        probability += scores.hedgingConsistency * 0.2;
-        probability += scores.emotionalFlatness * 0.25;
-        probability += scores.registerStability * 0.15;
+        probability += scores.overallStability * 0.2;
+        probability += scores.hedgingConsistency * 0.15;
+        probability += scores.emotionalFlatness * 0.2;
+        probability += scores.registerStability * 0.1;
+        
+        // AI helper tone contribution (Gemini/Claude specific)
+        probability += (scores.aiHelperTone || 0) * 0.2;
 
         // Adjustments
         if (stability.overall > 0.85) {
@@ -384,6 +476,11 @@ const ToneAnalyzer = {
 
         if (toneShifts.count === 0 && stability.overall > 0.7) {
             probability += 0.05; // No natural shifts
+        }
+        
+        // Gemini/Claude helper tone bonus
+        if (aiHelperTone && aiHelperTone.score > 0.5) {
+            probability += 0.1; // Strong helper tone signature
         }
 
         // Human signals reduce probability
@@ -408,8 +505,30 @@ const ToneAnalyzer = {
     /**
      * Generate findings with detailed statistics
      */
-    generateFindings(stability, drift, toneShifts, hedging, emotional) {
+    generateFindings(stability, drift, toneShifts, hedging, emotional, aiHelperTone) {
         const findings = [];
+
+        // AI Helper Tone findings (Gemini/Claude specific)
+        if (aiHelperTone && aiHelperTone.isHelperTone) {
+            findings.push({
+                label: 'AI Assistant Tone',
+                value: `Detected ${aiHelperTone.totalSignals} AI helper/assistant tone markers`,
+                note: 'Characteristic of Gemini, Claude, and ChatGPT conversational responses',
+                indicator: 'ai',
+                severity: aiHelperTone.totalSignals >= 4 ? 'high' : 'medium',
+                stats: {
+                    enthusiasticPatterns: aiHelperTone.patternMatches,
+                    helperPhrases: aiHelperTone.helperWordCount,
+                    characteristicOpenings: aiHelperTone.openingScore,
+                    examples: aiHelperTone.patternsFound.slice(0, 3).join(', ')
+                },
+                benchmark: {
+                    humanRange: '0-1 helper markers',
+                    aiRange: '2-10+ helper markers',
+                    interpretation: 'Modern AI assistants have distinctive enthusiastic, helpful language'
+                }
+            });
+        }
 
         // Stability findings
         if (stability.overall > 0.85) {

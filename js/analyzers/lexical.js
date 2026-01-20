@@ -8,8 +8,9 @@ const LexicalAnalyzer = {
     category: 3,
     weight: 1.2,
 
-    // Common mid-frequency words AI overuses
+    // Common mid-frequency words AI overuses (expanded for Gemini, Claude, GPT-4)
     aiOverusedWords: [
+        // Classic AI markers
         'crucial', 'essential', 'fundamental', 'significant', 'substantial',
         'comprehensive', 'extensive', 'remarkable', 'notable', 'particularly',
         'specifically', 'effectively', 'efficiently', 'subsequently', 'consequently',
@@ -18,7 +19,35 @@ const LexicalAnalyzer = {
         'enhance', 'leverage', 'utilize', 'implement', 'facilitate',
         'demonstrate', 'illustrate', 'highlight', 'emphasize', 'underscore',
         'delve', 'navigate', 'foster', 'cultivate', 'streamline',
-        'robust', 'seamless', 'holistic', 'innovative', 'dynamic'
+        'robust', 'seamless', 'holistic', 'innovative', 'dynamic',
+        // Gemini/newer model markers
+        'realm', 'landscape', 'tapestry', 'multifaceted', 'intricate',
+        'pivotal', 'paramount', 'imperative', 'indispensable', 'cornerstone',
+        'encompasses', 'embodies', 'underscores', 'underpins', 'underpin',
+        'myriad', 'plethora', 'nuanced', 'overarching', 'transformative',
+        'groundbreaking', 'cutting-edge', 'burgeoning', 'ever-evolving',
+        'harness', 'bolster', 'spearhead', 'catalyze', 'galvanize',
+        'poised', 'geared', 'tailored', 'bespoke', 'curated',
+        'synergy', 'ecosystem', 'paradigm', 'trajectory', 'benchmark',
+        'actionable', 'scalable', 'sustainable', 'impactful', 'measurable'
+    ],
+
+    // Gemini-specific phrase patterns (very strong indicators)
+    geminiPhrases: [
+        "it's important to", "it is important to", "it's worth noting",
+        "let's delve", "let's explore", "let's examine", "let's consider",
+        "in essence", "in summary", "in conclusion", "to summarize",
+        "this is particularly", "this is especially", "this is crucial",
+        "play a crucial role", "plays a vital role", "play a key role",
+        "a wide range of", "a variety of", "a number of", "a plethora of",
+        "on the other hand", "at the same time", "in this context",
+        "from this perspective", "with this in mind", "given this",
+        "it's essential to", "it is essential to", "it's vital to",
+        "can significantly", "will significantly", "has significantly",
+        "offers a unique", "provides a unique", "presents a unique",
+        "the ability to", "the capacity to", "the potential to",
+        "here's a breakdown", "here are some", "here is a",
+        "when it comes to", "in terms of", "with respect to"
     ],
 
     // Academic register words
@@ -216,12 +245,23 @@ const LexicalAnalyzer = {
             }
         }
         
+        // Check for Gemini/newer model phrase patterns (strong indicator)
+        const foundPhrases = [];
+        let phraseCount = 0;
+        for (const phrase of this.geminiPhrases) {
+            if (lower.includes(phrase)) {
+                phraseCount++;
+                foundPhrases.push(phrase);
+            }
+        }
+        
         // Sort by frequency
         foundAIWords.sort((a, b) => b.count - a.count);
         
-        // Score: ratio of AI words to total tokens
+        // Score: ratio of AI words to total tokens + phrase bonus
         const aiWordRatio = tokens.length > 0 ? aiWordCount / tokens.length : 0;
-        const aiVocabScore = Utils.normalize(aiWordRatio, 0, 0.05);
+        const phraseBonus = Math.min(0.3, phraseCount * 0.05); // Up to 0.3 bonus for phrases
+        const aiVocabScore = Math.min(1, Utils.normalize(aiWordRatio, 0, 0.05) + phraseBonus);
 
         // Check for synonym rotation (AI pattern)
         const synonymGroups = this.detectSynonymRotation(text);
@@ -231,6 +271,8 @@ const LexicalAnalyzer = {
             aiWordRatio: (aiWordRatio * 100).toFixed(2) + '%',
             aiVocabScore,
             foundAIWords: foundAIWords.slice(0, 10),
+            foundPhrases: foundPhrases.slice(0, 10),
+            phraseCount,
             synonymRotation: synonymGroups
         };
     },
@@ -439,6 +481,27 @@ const LexicalAnalyzer = {
                     note: 'Based on 50+ known AI-overused terms'
                 },
                 excerpts: extractExcerpts(excerptWords)
+            });
+        }
+
+        // Gemini/newer model phrase patterns (very strong indicator)
+        if (aiVocabAnalysis.phraseCount && aiVocabAnalysis.phraseCount >= 2) {
+            const phrases = aiVocabAnalysis.foundPhrases || [];
+            findings.push({
+                label: 'AI Phrase Patterns',
+                value: `${aiVocabAnalysis.phraseCount} characteristic AI phrases detected`,
+                note: 'Phrases like "let\'s delve", "it\'s important to note" are strong AI indicators',
+                indicator: 'ai',
+                severity: aiVocabAnalysis.phraseCount >= 4 ? 'high' : 'medium',
+                stats: {
+                    measured: `${aiVocabAnalysis.phraseCount} phrases found`,
+                    examples: phrases.slice(0, 5).map(p => `"${p}"`).join(', ')
+                },
+                benchmark: {
+                    humanRange: '0–1 such phrases per 500 words',
+                    aiRange: '3–8 such phrases per 500 words',
+                    note: 'These phrases are characteristic of Gemini, Claude, and GPT models'
+                }
             });
         }
 
