@@ -149,11 +149,19 @@ const FileParser = {
         // Short format: MM:SS.mmm --> MM:SS.mmm
         const shortTimestampPattern = /^\d{2}:\d{2}\.\d{3}\s*-->\s*\d{2}:\d{2}\.\d{3}/;
         
+        // Metadata lines to skip (case insensitive)
+        const metadataPattern = /^(kind|language|region|style|note|webvtt)\s*:/i;
+        
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i].trim();
             
             // Skip WEBVTT header and metadata
             if (line === 'WEBVTT' || line.startsWith('NOTE') || line.startsWith('STYLE')) {
+                continue;
+            }
+            
+            // Skip VTT metadata lines like "Kind: captions", "Language: en"
+            if (metadataPattern.test(line)) {
                 continue;
             }
             

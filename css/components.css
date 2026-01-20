@@ -1047,97 +1047,113 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Compact Model Selector (Horizontal Single-Item)
+   Model Selector Carousel (Horizontal Single-Item)
    ───────────────────────────────────────────────────────────────────────────── */
-.model-selector-compact {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-sm);
-    padding: var(--space-md);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-lg);
-}
-
-.model-nav {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-medium);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    flex-shrink: 0;
-    color: var(--text-secondary);
-}
-
-.model-nav:hover {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
-    transform: scale(1.05);
-}
-
-.model-nav .material-icons {
-    font-size: 20px;
-}
-
-.model-display {
-    min-width: 280px;
-    max-width: 320px;
-    text-align: center;
-}
-
-.model-display-inner {
+.model-selector-carousel {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-md);
-    padding: var(--space-sm) var(--space-lg);
-    background: var(--bg-primary);
-    border: 2px solid var(--accent);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
-    transition: all var(--transition-normal);
+    margin-bottom: var(--space-md);
 }
 
-.model-icon-sm {
-    font-size: 28px;
+.model-chevron {
+    font-size: 1.8rem;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    user-select: none;
+    transition: color var(--transition-fast);
+    padding: 0 var(--space-xs);
+    line-height: 1;
+}
+
+.model-chevron:hover {
     color: var(--accent);
 }
 
-.model-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
+.model-card-display {
+    flex: 1;
+    max-width: 400px;
 }
 
-.model-name-sm {
-    font-size: 1.1rem;
+.model-card-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-primary);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-md);
+}
+
+.model-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.model-card-icon {
+    font-size: 1.5rem;
+    color: var(--accent);
+}
+
+.model-card-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.model-card-name {
+    font-size: 1rem;
     font-weight: 700;
     color: var(--text-primary);
 }
 
-.model-accuracy-sm {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--success);
-}
-
-.model-type-badge {
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.65rem;
+.model-card-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.6rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+.model-card-badge.flagship {
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: white;
+}
+
+.model-card-badge.perplexity {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+}
+
+.model-card-badge.balanced {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.model-card-badge.legacy {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-medium);
+}
+
+.model-card-accuracy {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--success);
+}
+
+.model-card-desc {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin: 0;
 }
 
 /* Model indicator in results - Enhanced */
@@ -1548,4 +1564,21 @@
     content: '✓';
     color: var(--success);
     font-weight: bold;
+}
+
+.model-cta {
+    display: block;
+    text-align: center;
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--border-light);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.about-model-card:hover .model-cta {
+    opacity: 1;
 }

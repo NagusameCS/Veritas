@@ -219,12 +219,12 @@ const App = {
      * Bind model selector events - Carousel version
      */
     bindModelSelectorEvents() {
-        // Model data for the compact selector
+        // Model data for the carousel selector
         this.models = [
-            { id: 'helios', name: 'Helios', accuracy: '99.24%', badge: 'Flagship', icon: 'flare', badgeClass: 'flagship' },
-            { id: 'zenith', name: 'Zenith', accuracy: '99.57%', badge: 'Perplexity', icon: 'brightness_high', badgeClass: 'perplexity' },
-            { id: 'sunrise', name: 'Sunrise', accuracy: '98.08%', badge: 'Balanced', icon: 'wb_sunny', badgeClass: 'balanced' },
-            { id: 'dawn', name: 'Dawn', accuracy: '84.9%', badge: 'Legacy', icon: 'wb_twilight', badgeClass: 'legacy' }
+            { id: 'helios', name: 'Helios', accuracy: '99.24%', badge: 'Flagship', icon: 'flare', badgeClass: 'flagship', desc: '45 features · Tone + hedging · Best overall' },
+            { id: 'zenith', name: 'Zenith', accuracy: '99.57%', badge: 'Perplexity', icon: 'brightness_high', badgeClass: 'perplexity', desc: 'Entropy analysis · 86.7% humanized detection' },
+            { id: 'sunrise', name: 'Sunrise', accuracy: '98.08%', badge: 'Balanced', icon: 'wb_sunny', badgeClass: 'balanced', desc: 'Statistical variance · Fast · F1: 98.09%' },
+            { id: 'dawn', name: 'Dawn', accuracy: '84.9%', badge: 'Legacy', icon: 'wb_twilight', badgeClass: 'legacy', desc: 'Rule-based heuristics · Lightweight' }
         ];
         
         // Load saved model or default to helios
@@ -232,7 +232,7 @@ const App = {
         this.currentModelIndex = this.models.findIndex(m => m.id === savedModel);
         if (this.currentModelIndex === -1) this.currentModelIndex = 0;
         
-        // Navigation buttons
+        // Navigation arrows
         const prevBtn = document.getElementById('modelPrev');
         const nextBtn = document.getElementById('modelNext');
         
@@ -255,28 +255,24 @@ const App = {
     },
     
     /**
-     * Update the model display to show current selection
+     * Update the model carousel display
      */
     updateModelDisplay(showToast = true) {
         const model = this.models[this.currentModelIndex];
         const display = document.getElementById('modelDisplay');
         
         if (display) {
-            const badgeColors = {
-                flagship: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                perplexity: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                balanced: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                legacy: 'var(--bg-tertiary)'
-            };
-            
             display.innerHTML = `
-                <div class="model-display-inner" data-model="${model.id}">
-                    <span class="material-icons model-icon-sm">${model.icon}</span>
-                    <div class="model-info">
-                        <span class="model-name-sm">${model.name}</span>
-                        <span class="model-accuracy-sm">${model.accuracy}</span>
+                <div class="model-card-inner" data-model="${model.id}">
+                    <div class="model-card-header">
+                        <span class="material-icons model-card-icon">${model.icon}</span>
+                        <div class="model-card-title">
+                            <span class="model-card-name">${model.name}</span>
+                            <span class="model-card-badge ${model.badgeClass}">${model.badge}</span>
+                        </div>
+                        <span class="model-card-accuracy">${model.accuracy}</span>
                     </div>
-                    <span class="model-type-badge" style="background: ${badgeColors[model.badgeClass]}; ${model.badgeClass === 'legacy' ? 'color: var(--text-secondary); border: 1px solid var(--border-medium);' : 'color: white;'}">${model.badge}</span>
+                    <p class="model-card-desc">${model.desc}</p>
                 </div>
             `;
         }
@@ -290,7 +286,7 @@ const App = {
     },
     
     /**
-     * Select a model by ID
+     * Select a model by ID (used by About section links)
      */
     selectModel(modelType, showToast = true) {
         const index = this.models.findIndex(m => m.id === modelType);
@@ -298,6 +294,15 @@ const App = {
             this.currentModelIndex = index;
             this.updateModelDisplay(showToast);
         }
+    },
+    
+    /**
+     * Select model and navigate to analyze view
+     */
+    selectModelAndAnalyze(modelType) {
+        this.selectModel(modelType, true);
+        // Navigate to analyze view
+        this.showView('analyze');
     },
     
     /**
@@ -889,6 +894,9 @@ const App = {
         
         // Render simplified probability bar
         this.renderProbabilityBar(result);
+        
+        // Render high severity alerts
+        this.renderHighSeverityAlerts(result);
 
         // Render confidence interval bar
         this.renderConfidenceInterval(result);
@@ -1696,12 +1704,12 @@ const App = {
         if (result.categoryResults) {
             const aiFindings = result.categoryResults
                 .flatMap(c => (c.findings || []))
-                .filter(f => f.indicator === 'ai')
+                .filter(f => f.indicator === 'ai' && f.text && f.text !== 'undefined')
                 .slice(0, 8);
             
             const humanFindings = result.categoryResults
                 .flatMap(c => (c.findings || []))
-                .filter(f => f.indicator === 'human')
+                .filter(f => f.indicator === 'human' && f.text && f.text !== 'undefined')
                 .slice(0, 5);
             
             if (aiFindings.length > 0 || humanFindings.length > 0) {
@@ -1951,6 +1959,134 @@ const App = {
                 </div>
                 <div class="probability-percentage">
                     Confidence interval: ${Math.round(ci.lower * 100)}% — ${Math.round(ci.upper * 100)}%
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * Render high severity alerts section
+     * Shows critical warnings that need attention with full context
+     */
+    renderHighSeverityAlerts(result) {
+        const container = document.getElementById('highSeverityAlerts');
+        if (!container) return;
+        
+        // Collect all high severity findings from all sources
+        const highSeverityFindings = [];
+        
+        // From main findings
+        if (result.findings && result.findings.length > 0) {
+            result.findings.forEach((finding, idx) => {
+                if (finding.severity === 'high' || finding.severity === 'critical') {
+                    highSeverityFindings.push({
+                        ...finding,
+                        source: 'analysis',
+                        sourceLabel: finding.label || 'Detection Analysis'
+                    });
+                }
+            });
+        }
+        
+        // From false positive risks
+        if (result.falsePositiveRisk && result.falsePositiveRisk.risks) {
+            result.falsePositiveRisk.risks.forEach(risk => {
+                if (risk.severity === 'high' || risk.severity === 'critical') {
+                    highSeverityFindings.push({
+                        label: risk.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                        value: risk.message,
+                        note: risk.suggestsHumanized ? 'This pattern is commonly seen in humanized AI text' : 'This may affect detection accuracy',
+                        severity: risk.severity,
+                        source: 'risk',
+                        sourceLabel: 'Risk Assessment'
+                    });
+                }
+            });
+        }
+        
+        // If no high severity alerts, hide the container
+        if (highSeverityFindings.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        container.style.display = 'block';
+        
+        // Severity explanations
+        const severityInfo = {
+            critical: { icon: 'error', label: 'Critical', color: '#dc2626' },
+            high: { icon: 'warning', label: 'High Priority', color: '#ea580c' }
+        };
+        
+        // Indicator info for context
+        const indicatorInfo = {
+            ai: { label: 'AI Pattern', class: 'ai' },
+            human: { label: 'Human Pattern', class: 'human' },
+            mixed: { label: 'Mixed Signal', class: 'mixed' },
+            neutral: { label: 'Neutral', class: 'neutral' }
+        };
+        
+        const alertsHTML = highSeverityFindings.map((finding, index) => {
+            const sevInfo = severityInfo[finding.severity] || severityInfo.high;
+            const indInfo = indicatorInfo[finding.indicator] || indicatorInfo.neutral;
+            
+            // Build stats display if available
+            let statsHTML = '';
+            if (finding.stats) {
+                const statItems = Object.entries(finding.stats)
+                    .filter(([k, v]) => v !== undefined && v !== null)
+                    .slice(0, 4) // Limit to 4 stats
+                    .map(([key, val]) => `<span class="alert-stat"><strong>${key.replace(/([A-Z])/g, ' $1').trim()}:</strong> ${val}</span>`)
+                    .join('');
+                if (statItems) {
+                    statsHTML = `<div class="alert-stats">${statItems}</div>`;
+                }
+            }
+            
+            // Build benchmark display if available
+            let benchmarkHTML = '';
+            if (finding.benchmark) {
+                benchmarkHTML = `
+                    <div class="alert-benchmark">
+                        <span class="benchmark-label">Expected Ranges:</span>
+                        ${finding.benchmark.humanRange ? `<span class="benchmark-item human">Human: ${finding.benchmark.humanRange}</span>` : ''}
+                        ${finding.benchmark.aiRange ? `<span class="benchmark-item ai">AI: ${finding.benchmark.aiRange}</span>` : ''}
+                        ${finding.benchmark.interpretation ? `<span class="benchmark-interpretation">${finding.benchmark.interpretation}</span>` : ''}
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="high-severity-alert ${finding.severity}">
+                    <div class="alert-header">
+                        <div class="alert-icon-wrapper">
+                            <span class="material-icons alert-icon">${sevInfo.icon}</span>
+                        </div>
+                        <div class="alert-title-section">
+                            <span class="alert-label">${finding.label || 'Detection Alert'}</span>
+                            <span class="alert-indicator ${indInfo.class}">${indInfo.label}</span>
+                        </div>
+                        <span class="alert-severity-badge">${sevInfo.label}</span>
+                    </div>
+                    <div class="alert-body">
+                        <div class="alert-main-message">${finding.value || finding.note || 'High severity pattern detected'}</div>
+                        ${finding.note && finding.value ? `<div class="alert-explanation">${finding.note}</div>` : ''}
+                        ${statsHTML}
+                        ${benchmarkHTML}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        container.innerHTML = `
+            <div class="high-severity-section">
+                <div class="high-severity-header">
+                    <span class="material-icons">priority_high</span>
+                    <h3>Critical Findings <span class="alert-count">${highSeverityFindings.length}</span></h3>
+                </div>
+                <p class="high-severity-subtitle">These patterns require special attention and may significantly impact the analysis</p>
+                <div class="high-severity-alerts-list">
+                    ${alertsHTML}
                 </div>
             </div>
         `;

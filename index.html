@@ -46,24 +46,23 @@
                 <div class="analyze-container">
                     <!-- Input Panel -->
                     <div class="panel input-panel">
-                        <!-- Model Selector - Compact Horizontal -->
-                        <div class="model-selector-compact">
-                            <button class="model-nav model-prev" id="modelPrev" aria-label="Previous model">
-                                <span class="material-icons">chevron_left</span>
-                            </button>
-                            <div class="model-display" id="modelDisplay">
-                                <div class="model-display-inner" data-model="helios">
-                                    <span class="material-icons model-icon-sm">flare</span>
-                                    <div class="model-info">
-                                        <span class="model-name-sm">Helios</span>
-                                        <span class="model-accuracy-sm">99.24%</span>
+                        <!-- Model Selector - Horizontal Carousel -->
+                        <div class="model-selector-carousel">
+                            <span class="model-chevron model-prev" id="modelPrev">‹</span>
+                            <div class="model-card-display" id="modelDisplay">
+                                <div class="model-card-inner" data-model="helios">
+                                    <div class="model-card-header">
+                                        <span class="material-icons model-card-icon">flare</span>
+                                        <div class="model-card-title">
+                                            <span class="model-card-name">Helios</span>
+                                            <span class="model-card-badge flagship">Flagship</span>
+                                        </div>
+                                        <span class="model-card-accuracy">99.24%</span>
                                     </div>
-                                    <span class="model-type-badge">Flagship</span>
+                                    <p class="model-card-desc">45 features · Tone + hedging · Best overall</p>
                                 </div>
                             </div>
-                            <button class="model-nav model-next" id="modelNext" aria-label="Next model">
-                                <span class="material-icons">chevron_right</span>
-                            </button>
+                            <span class="model-chevron model-next" id="modelNext">›</span>
                             <input type="radio" name="model" value="helios" id="model-helios" checked hidden>
                             <input type="radio" name="model" value="zenith" id="model-zenith" hidden>
                             <input type="radio" name="model" value="sunrise" id="model-sunrise" hidden>
@@ -132,11 +131,6 @@
 
                     <!-- Results Panel -->
                     <div class="panel results-panel">
-                        <div class="results-placeholder">
-                            <div class="placeholder-icon">◇</div>
-                            <p>Enter text and click "Analyze" to begin detection</p>
-                        </div>
-
                         <!-- Results Content -->
                         <div class="results-content">
                             <!-- Model Transparency Header -->
@@ -165,6 +159,8 @@
                                 </div>
                                 <!-- Simplified Probability Bar -->
                                 <div class="probability-bar-container" id="probabilityBar"></div>
+                                <!-- High Severity Alerts -->
+                                <div class="high-severity-alerts-container" id="highSeverityAlerts" style="display: none;"></div>
                                 <!-- Verbose Conclusion -->
                                 <div class="verbose-conclusion" id="verboseConclusion"></div>
                                 <!-- Humanization Advisory -->
@@ -355,7 +351,7 @@
                             <p class="section-intro">Veritas offers multiple specialized detection models, each optimized for different use cases. Select the model that best fits your needs when analyzing text.</p>
                             
                             <div class="about-model-carousel">
-                                <div class="about-model-card featured">
+                                <div class="about-model-card featured" onclick="VeritasApp.selectModelAndAnalyze('helios')" style="cursor:pointer">
                                     <div class="model-header helios">
                                         <span class="material-icons model-sun-icon">flare</span>
                                         <h4>Helios</h4>
@@ -369,9 +365,10 @@
                                         <li>Tone & hedging analysis</li>
                                         <li>Best overall accuracy</li>
                                     </ul>
+                                    <span class="model-cta">Click to use →</span>
                                 </div>
                                 
-                                <div class="about-model-card">
+                                <div class="about-model-card" onclick="VeritasApp.selectModelAndAnalyze('zenith')" style="cursor:pointer">
                                     <div class="model-header zenith">
                                         <span class="material-icons model-sun-icon">brightness_high</span>
                                         <h4>Zenith</h4>
@@ -385,9 +382,10 @@
                                         <li>Burstiness metrics</li>
                                         <li>Best for bypass tools</li>
                                     </ul>
+                                    <span class="model-cta">Click to use →</span>
                                 </div>
                                 
-                                <div class="about-model-card">
+                                <div class="about-model-card" onclick="VeritasApp.selectModelAndAnalyze('sunrise')" style="cursor:pointer">
                                     <div class="model-header sunrise">
                                         <span class="material-icons model-sun-icon">wb_sunny</span>
                                         <h4>Sunrise</h4>
@@ -401,9 +399,10 @@
                                         <li>Well-rounded metrics</li>
                                         <li>Good all-rounder</li>
                                     </ul>
+                                    <span class="model-cta">Click to use →</span>
                                 </div>
                                 
-                                <div class="about-model-card">
+                                <div class="about-model-card" onclick="VeritasApp.selectModelAndAnalyze('dawn')" style="cursor:pointer">
                                     <div class="model-header dawn">
                                         <span class="material-icons model-sun-icon">wb_twilight</span>
                                         <h4>Dawn</h4>
@@ -417,6 +416,7 @@
                                         <li>Fast execution</li>
                                         <li>Baseline reference</li>
                                     </ul>
+                                    <span class="model-cta">Click to use →</span>
                                 </div>
                             </div>
                         </div>
