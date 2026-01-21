@@ -9,3 +9,8 @@ training/training_log.txt
 
 # Allow Supernova model for browser deployment
 !training/models/Supernova/
+*.pkl
+tests/large_samples.json
+tests/clean_dataset.json
+tests/merged_dataset.json
+tests/diverse_samples_v2.json
