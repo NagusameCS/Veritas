@@ -1774,3 +1774,332 @@
 .about-model-card:hover .model-cta {
     opacity: 1;
 }
+
+/* ===== SUPERNOVA Modal & Loading Overlay ===== */
+.supernova-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.supernova-modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.supernova-modal {
+    background: var(--bg-primary);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 480px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(124, 58, 237, 0.3);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.supernova-modal-overlay.show .supernova-modal {
+    transform: scale(1) translateY(0);
+}
+
+.supernova-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.supernova-modal-header .supernova-icon {
+    font-size: 32px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5, #2563eb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.supernova-modal-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+.supernova-modal-body p {
+    color: var(--text-secondary);
+    margin: 0 0 16px;
+    line-height: 1.6;
+}
+
+.supernova-requirements {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+}
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.requirement-item:last-child {
+    border-bottom: none;
+}
+
+.requirement-item .material-icons {
+    font-size: 18px;
+    color: #7c3aed;
+}
+
+.supernova-note {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+.supernova-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.supernova-confirm-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #2563eb 100%);
+    border: none;
+    color: white;
+}
+
+.supernova-confirm-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* SUPERNOVA Loading Overlay */
+.supernova-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.95), rgba(79, 70, 229, 0.95));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.supernova-loading-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.supernova-loading-content {
+    text-align: center;
+    color: white;
+    max-width: 400px;
+    padding: 40px;
+}
+
+.supernova-loading-icon {
+    margin-bottom: 20px;
+}
+
+.supernova-loading-icon .material-icons {
+    font-size: 64px;
+    color: white;
+}
+
+.supernova-loading-icon .spinning {
+    animation: supernova-spin 2s linear infinite;
+}
+
+@keyframes supernova-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.supernova-loading-content h3 {
+    margin: 0 0 8px;
+    font-size: 1.75rem;
+}
+
+.supernova-loading-status {
+    margin: 0 0 24px;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.supernova-progress-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.supernova-progress-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.supernova-progress-fill {
+    height: 100%;
+    background: white;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.supernova-progress-text {
+    font-weight: 600;
+    min-width: 45px;
+}
+
+.supernova-loading-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.supernova-loading-details .material-icons {
+    font-size: 16px;
+}
+
+/* SUPERNOVA Results Section */
+.supernova-evidence-section {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(79, 70, 229, 0.05));
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.supernova-evidence-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.supernova-evidence-header .material-icons {
+    font-size: 24px;
+    color: #7c3aed;
+}
+
+.supernova-evidence-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.supernova-evidence-badge {
+    margin-left: auto;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.supernova-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.supernova-metric {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+
+.supernova-metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #7c3aed;
+}
+
+.supernova-metric-label {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.supernova-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.supernova-feature {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-primary);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.supernova-feature-name {
+    color: var(--text-secondary);
+}
+
+.supernova-feature-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.supernova-indicators {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(124, 58, 237, 0.15);
+}
+
+.supernova-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.supernova-indicator .material-icons {
+    font-size: 18px;
+}
+
+.supernova-indicator.ai .material-icons { color: #ef4444; }
+.supernova-indicator.human .material-icons { color: #22c55e; }
+.supernova-indicator.neutral .material-icons { color: #f59e0b; }
+

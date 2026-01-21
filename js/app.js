@@ -462,18 +462,11 @@ const App = {
             AnalyzerEngine.setModel(modelType);
         }
         
-        // Special handling for SUPERNOVA - show loading indicator for model initialization
+        // Special handling for SUPERNOVA - requires confirmation and shows loading overlay
         if (modelType === 'supernova' && typeof VERITAS_SUPERNOVA !== 'undefined' && !VERITAS_SUPERNOVA.ready) {
-            this.showToast('Loading SUPERNOVA model (~95MB)... First-time download, please wait.', 'info', 10000);
-            // Pre-initialize in background
-            VERITAS_SUPERNOVA.initialize((status, progress) => {
-                console.log(`SUPERNOVA: ${status} (${Math.round(progress * 100)}%)`);
-            }).then(() => {
-                this.showToast('SUPERNOVA ready!', 'success');
-            }).catch(err => {
-                console.error('SUPERNOVA init error:', err);
-                this.showToast('SUPERNOVA failed to load: ' + err.message, 'error');
-            });
+            // Show confirmation modal
+            this.showSupernovaConfirmation();
+            return; // Don't proceed until confirmed
         }
         
         // Update Flare toggle visibility (hide when Flare is selected)
@@ -497,6 +490,156 @@ const App = {
     getCurrentModel() {
         const selected = document.querySelector('input[name="model"]:checked');
         return selected ? selected.value : 'helios';
+    },
+    
+    /**
+     * Show SUPERNOVA confirmation modal
+     */
+    showSupernovaConfirmation() {
+        // Remove any existing modal
+        const existing = document.getElementById('supernovaConfirmModal');
+        if (existing) existing.remove();
+        
+        const modal = document.createElement('div');
+        modal.id = 'supernovaConfirmModal';
+        modal.className = 'supernova-modal-overlay';
+        modal.innerHTML = `
+            <div class="supernova-modal">
+                <div class="supernova-modal-header">
+                    <span class="material-icons supernova-icon">auto_awesome</span>
+                    <h3>Load SUPERNOVA Model?</h3>
+                </div>
+                <div class="supernova-modal-body">
+                    <p><strong>SUPERNOVA</strong> is our production ML model with <strong>97.28% accuracy</strong> on high-confidence samples.</p>
+                    <div class="supernova-requirements">
+                        <div class="requirement-item">
+                            <span class="material-icons">download</span>
+                            <span><strong>~95MB download</strong> on first use</span>
+                        </div>
+                        <div class="requirement-item">
+                            <span class="material-icons">memory</span>
+                            <span>Requires <strong>WebGL/WASM</strong> support</span>
+                        </div>
+                        <div class="requirement-item">
+                            <span class="material-icons">timer</span>
+                            <span>Initial load: <strong>30-60 seconds</strong></span>
+                        </div>
+                        <div class="requirement-item">
+                            <span class="material-icons">cached</span>
+                            <span>Cached after first use</span>
+                        </div>
+                    </div>
+                    <p class="supernova-note">This model uses XGBoost + Neural Embeddings for the most accurate detection.</p>
+                </div>
+                <div class="supernova-modal-actions">
+                    <button class="btn btn-ghost" id="supernovaCancelBtn">Cancel</button>
+                    <button class="btn btn-primary supernova-confirm-btn" id="supernovaConfirmBtn">
+                        <span class="material-icons">rocket_launch</span>
+                        Load SUPERNOVA
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Animate in
+        requestAnimationFrame(() => modal.classList.add('show'));
+        
+        // Cancel button - switch back to previous model
+        document.getElementById('supernovaCancelBtn').addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+            // Switch back to Zenith (default)
+            this.currentModelIndex = this.models.findIndex(m => m.id === 'zenith');
+            this.updateModelDisplay(false);
+        });
+        
+        // Confirm button - load SUPERNOVA
+        document.getElementById('supernovaConfirmBtn').addEventListener('click', () => {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+            this.loadSupernovaWithProgress();
+        });
+    },
+    
+    /**
+     * Load SUPERNOVA with progress overlay
+     */
+    loadSupernovaWithProgress() {
+        // Create loading overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'supernovaLoadingOverlay';
+        overlay.className = 'supernova-loading-overlay';
+        overlay.innerHTML = `
+            <div class="supernova-loading-content">
+                <div class="supernova-loading-icon">
+                    <span class="material-icons spinning">auto_awesome</span>
+                </div>
+                <h3>Loading SUPERNOVA</h3>
+                <p class="supernova-loading-status">Initializing...</p>
+                <div class="supernova-progress-container">
+                    <div class="supernova-progress-bar">
+                        <div class="supernova-progress-fill" style="width: 0%"></div>
+                    </div>
+                    <span class="supernova-progress-text">0%</span>
+                </div>
+                <div class="supernova-loading-details">
+                    <span class="material-icons">info</span>
+                    <span>Downloading embedding model and classifier...</span>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('show'));
+        
+        const statusEl = overlay.querySelector('.supernova-loading-status');
+        const progressFill = overlay.querySelector('.supernova-progress-fill');
+        const progressText = overlay.querySelector('.supernova-progress-text');
+        const detailsEl = overlay.querySelector('.supernova-loading-details span:last-child');
+        
+        // Initialize with progress callback
+        VERITAS_SUPERNOVA.initialize((status, progress) => {
+            statusEl.textContent = status;
+            const pct = Math.round(progress * 100);
+            progressFill.style.width = pct + '%';
+            progressText.textContent = pct + '%';
+            
+            if (progress < 0.5) {
+                detailsEl.textContent = 'Downloading sentence embedding model (~30MB)...';
+            } else if (progress < 0.9) {
+                detailsEl.textContent = 'Loading XGBoost classifier (~65MB)...';
+            } else {
+                detailsEl.textContent = 'Finalizing model initialization...';
+            }
+        }).then(() => {
+            statusEl.textContent = 'SUPERNOVA Ready!';
+            progressFill.style.width = '100%';
+            progressText.textContent = '100%';
+            detailsEl.textContent = 'Model loaded successfully!';
+            
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                setTimeout(() => overlay.remove(), 300);
+                this.showToast('SUPERNOVA is ready for analysis!', 'success');
+                this.updateFlareToggleVisibility();
+            }, 1000);
+        }).catch(err => {
+            console.error('SUPERNOVA load error:', err);
+            statusEl.textContent = 'Failed to load';
+            detailsEl.textContent = err.message;
+            progressFill.style.background = '#ef4444';
+            
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                setTimeout(() => overlay.remove(), 300);
+                this.showToast('Failed to load SUPERNOVA: ' + err.message, 'error');
+                // Switch back to Zenith
+                this.currentModelIndex = this.models.findIndex(m => m.id === 'zenith');
+                this.updateModelDisplay(false);
+            }, 2000);
+        });
     },
     
     /**
@@ -1068,6 +1211,11 @@ const App = {
 
         // Render humanization advisory
         this.renderHumanizationAdvisory(result);
+
+        // Render SUPERNOVA evidence section if applicable
+        if (result.modelInfo?.id === 'supernova' && result.supernovaResult) {
+            this.renderSupernovaEvidence(result);
+        }
 
         // Stats
         const statsContainer = document.querySelector('.text-stats');
@@ -1765,6 +1913,9 @@ const App = {
                 </div>
             </div>
 
+            <!-- SUPERNOVA ML Model Details (if applicable) -->
+            ${fullResult?.modelInfo?.id === 'supernova' ? this.renderSupernovaStats(fullResult, formatNum, formatPct) : ''}
+
             <!-- Detection Transparency: Show the math behind the prediction -->
             ${this.renderDetectionTransparency(fullResult, formatNum, formatPct)}
 
@@ -1779,6 +1930,68 @@ const App = {
         `;
 
         container.innerHTML = html;
+    },
+
+    /**
+     * Render SUPERNOVA ML-specific statistics section
+     */
+    renderSupernovaStats(result, formatNum, formatPct) {
+        const sr = result.supernovaResult;
+        const features = result.heuristicFeatures || sr?.heuristicFeatures || {};
+        
+        if (!sr) return '';
+        
+        return `
+            <div class="stats-section supernova-stats-section" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.03), rgba(79, 70, 229, 0.03)); border: 1px solid rgba(124, 58, 237, 0.15); grid-column: span 2;">
+                <h4 style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-icons section-icon" style="color: #7c3aed;">auto_awesome</span>
+                    SUPERNOVA Neural Analysis
+                    <span style="margin-left: auto; background: linear-gradient(135deg, #7c3aed, #4f46e5); color: white; font-size: 0.65rem; padding: 3px 8px; border-radius: 10px;">ML Model</span>
+                </h4>
+                <div class="stats-table" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                    <div class="stat-row">
+                        <span class="stat-label">Model Confidence</span>
+                        <span class="stat-value">${sr.confidenceLevel || 'Unknown'}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Raw Score</span>
+                        <span class="stat-value">${formatNum(sr.confidence, 3)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Inference Time</span>
+                        <span class="stat-value">${sr.inferenceTimeMs || '—'}ms</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Vocab Richness</span>
+                        <span class="stat-value">${formatPct(features.vocab_richness)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Sentence Std Dev</span>
+                        <span class="stat-value">${formatNum(features.sent_len_std, 2)}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Contraction Rate</span>
+                        <span class="stat-value">${formatPct(features.contraction_rate)}</span>
+                    </div>
+                    <div class="stat-row ${features.helpful_phrases > 0 ? 'indicator-ai' : ''}">
+                        <span class="stat-label">AI Helper Phrases</span>
+                        <span class="stat-value">${features.helpful_phrases || 0}</span>
+                    </div>
+                    <div class="stat-row ${features.instruction_phrases > 1 ? 'indicator-ai' : ''}">
+                        <span class="stat-label">Instruction Phrases</span>
+                        <span class="stat-value">${features.instruction_phrases || 0}</span>
+                    </div>
+                    <div class="stat-row ${features.ellipsis_count > 0 ? 'indicator-human' : ''}">
+                        <span class="stat-label">Ellipses Count</span>
+                        <span class="stat-value">${features.ellipsis_count || 0}</span>
+                    </div>
+                </div>
+                <p style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(124, 58, 237, 0.1);">
+                    <strong>Technical Details:</strong> XGBoost ensemble with 1000 trees (max_depth=18) processing 31 heuristic features + 384-dim sentence embeddings from all-MiniLM-L6-v2. 
+                    Trained on 240,034 samples achieving 97.28% accuracy on high-confidence predictions (94.4% of samples).
+                </p>
+            </div>
+        `;
     },
 
     /**
@@ -2581,6 +2794,149 @@ const App = {
                     <em>Note: This is an advisory indicator, not a definitive classification. Some human-written text may trigger false positives, 
                     and sophisticated humanization may evade detection.</em>
                 </p>
+            </div>
+        `;
+    },
+
+    /**
+     * Render SUPERNOVA ML evidence section
+     * Shows comprehensive proof from the neural-enhanced model
+     */
+    renderSupernovaEvidence(result) {
+        // Find or create container
+        let container = document.getElementById('supernovaEvidence');
+        if (!container) {
+            // Create container after findings
+            const findingsSection = document.querySelector('.findings-section');
+            if (findingsSection) {
+                container = document.createElement('div');
+                container.id = 'supernovaEvidence';
+                findingsSection.parentNode.insertBefore(container, findingsSection.nextSibling);
+            } else {
+                return;
+            }
+        }
+        
+        const sr = result.supernovaResult;
+        const features = result.heuristicFeatures || sr?.heuristicFeatures || {};
+        const indicators = sr?.indicators || [];
+        
+        // Format feature value
+        const fmt = (v, decimals = 2) => {
+            if (typeof v !== 'number' || isNaN(v)) return '—';
+            return v.toFixed(decimals);
+        };
+        
+        // Build indicators HTML
+        let indicatorsHtml = '';
+        if (indicators.length > 0) {
+            indicatorsHtml = `
+                <div class="supernova-indicators">
+                    <h5 style="margin: 0 0 12px; color: var(--text-secondary); font-size: 0.85rem;">
+                        <span class="material-icons" style="font-size: 16px; vertical-align: middle;">psychology</span>
+                        Key Detection Signals
+                    </h5>
+                    ${indicators.map(ind => {
+                        const icon = ind.includes('AI') || ind.includes('Instructional') || ind.includes('list') 
+                            ? 'smart_toy' 
+                            : ind.includes('human') || ind.includes('Personal') || ind.includes('casual')
+                            ? 'person'
+                            : 'info';
+                        const cls = ind.includes('AI') || ind.includes('Instructional') || ind.includes('list') 
+                            ? 'ai' 
+                            : ind.includes('human') || ind.includes('Personal') || ind.includes('casual')
+                            ? 'human'
+                            : 'neutral';
+                        return `<div class="supernova-indicator ${cls}"><span class="material-icons">${icon}</span><span>${ind}</span></div>`;
+                    }).join('')}
+                </div>
+            `;
+        }
+        
+        // Build feature grid HTML
+        const keyFeatures = [
+            { key: 'vocab_richness', label: 'Vocab Richness', fmt: v => (v * 100).toFixed(1) + '%' },
+            { key: 'avg_sent_len', label: 'Avg Sentence', fmt: v => fmt(v, 1) + ' words' },
+            { key: 'sent_len_std', label: 'Sent. Variance', fmt: v => fmt(v, 2) },
+            { key: 'contraction_rate', label: 'Contractions', fmt: v => (v * 100).toFixed(2) + '%' },
+            { key: 'helpful_phrases', label: 'AI Phrases', fmt: v => v.toFixed(0) },
+            { key: 'ellipsis_count', label: 'Ellipses', fmt: v => v.toFixed(0) },
+            { key: 'instruction_phrases', label: 'Instructions', fmt: v => v.toFixed(0) },
+            { key: 'discourse_markers', label: 'Discourse Markers', fmt: v => v.toFixed(0) },
+            { key: 'first_I', label: 'First Person (I)', fmt: v => (v * 100).toFixed(2) + '%' },
+            { key: 'question_rate', label: 'Questions/Sent', fmt: v => fmt(v, 2) }
+        ];
+        
+        const featuresHtml = keyFeatures.map(f => {
+            const val = features[f.key];
+            return `
+                <div class="supernova-feature">
+                    <span class="supernova-feature-name">${f.label}</span>
+                    <span class="supernova-feature-value">${val !== undefined ? f.fmt(val) : '—'}</span>
+                </div>
+            `;
+        }).join('');
+        
+        // Confidence explanation
+        const confLevel = sr?.confidenceLevel || result.confidenceLevel || 'Unknown';
+        const confScore = (sr?.confidence || result.confidence || 0) * 100;
+        let confExplanation = '';
+        if (confLevel === 'Very High' || confLevel === 'High') {
+            confExplanation = 'High confidence: This prediction is highly reliable.';
+        } else if (confLevel === 'Medium') {
+            confExplanation = 'Medium confidence: Prediction is likely accurate but review may be helpful.';
+        } else {
+            confExplanation = 'Low confidence: This sample is ambiguous. Consider manual review.';
+        }
+        
+        container.innerHTML = `
+            <div class="supernova-evidence-section">
+                <div class="supernova-evidence-header">
+                    <span class="material-icons">auto_awesome</span>
+                    <h4>SUPERNOVA ML Analysis</h4>
+                    <span class="supernova-evidence-badge">97.28% Accuracy</span>
+                </div>
+                
+                <div class="supernova-metrics-grid">
+                    <div class="supernova-metric">
+                        <div class="supernova-metric-value">${(result.aiProbability * 100).toFixed(1)}%</div>
+                        <div class="supernova-metric-label">AI Probability</div>
+                    </div>
+                    <div class="supernova-metric">
+                        <div class="supernova-metric-value">${(result.humanProbability * 100).toFixed(1)}%</div>
+                        <div class="supernova-metric-label">Human Probability</div>
+                    </div>
+                    <div class="supernova-metric">
+                        <div class="supernova-metric-value">${confScore.toFixed(0)}%</div>
+                        <div class="supernova-metric-label">${confLevel} Confidence</div>
+                    </div>
+                    <div class="supernova-metric">
+                        <div class="supernova-metric-value">${sr?.inferenceTimeMs || '—'}ms</div>
+                        <div class="supernova-metric-label">Inference Time</div>
+                    </div>
+                </div>
+                
+                <p style="font-size: 0.85rem; color: var(--text-tertiary); margin: 12px 0;">
+                    <span class="material-icons" style="font-size: 14px; vertical-align: middle;">info</span>
+                    ${confExplanation}
+                </p>
+                
+                ${indicatorsHtml}
+                
+                <details style="margin-top: 16px;">
+                    <summary style="cursor: pointer; font-weight: 600; color: var(--text-secondary); font-size: 0.9rem;">
+                        <span class="material-icons" style="font-size: 16px; vertical-align: middle;">science</span>
+                        View Extracted Features (31 heuristics + 384 embeddings)
+                    </summary>
+                    <div class="supernova-features-grid" style="margin-top: 12px;">
+                        ${featuresHtml}
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-tertiary); margin-top: 12px;">
+                        These 31 hand-crafted features are combined with 384-dimensional sentence embeddings 
+                        from the <code>all-MiniLM-L6-v2</code> transformer model, then classified by an 
+                        XGBoost ensemble (1000 trees, depth 18) trained on 240,034 samples from 19 diverse sources.
+                    </p>
+                </details>
             </div>
         `;
     },
