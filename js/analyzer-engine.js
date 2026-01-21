@@ -19,14 +19,45 @@ const AnalyzerEngine = {
     // Binary mode settings (disabled by default for 3-class detection)
     binaryMode: false, // When true, only Human vs AI (ignores humanized classification)
     
+    // SUPERNOVA neural model state
+    supernovaReady: false,
+    supernovaLoading: false,
+    
     /**
      * Set the active model
      */
     setModel(modelType) {
-        const validModels = ['helios', 'zenith', 'sunrise', 'dawn', 'flare'];
+        const validModels = ['helios', 'zenith', 'sunrise', 'dawn', 'flare', 'supernova'];
         if (validModels.includes(modelType)) {
             this.currentModel = modelType;
             console.log(`AnalyzerEngine: Model set to ${modelType}`);
+            
+            // Initialize SUPERNOVA if selected
+            if (modelType === 'supernova' && !this.supernovaReady && !this.supernovaLoading) {
+                this.initializeSupernova();
+            }
+        }
+    },
+    
+    /**
+     * Initialize SUPERNOVA neural model (async)
+     */
+    async initializeSupernova(progressCallback = null) {
+        if (this.supernovaReady || this.supernovaLoading) return;
+        
+        this.supernovaLoading = true;
+        try {
+            if (typeof VERITAS_SUPERNOVA !== 'undefined') {
+                await VERITAS_SUPERNOVA.initialize(progressCallback);
+                this.supernovaReady = true;
+                console.log('AnalyzerEngine: SUPERNOVA initialized');
+            } else {
+                console.warn('AnalyzerEngine: SUPERNOVA module not loaded');
+            }
+        } catch (error) {
+            console.error('AnalyzerEngine: Failed to initialize SUPERNOVA:', error);
+        } finally {
+            this.supernovaLoading = false;
         }
     },
     
@@ -59,6 +90,8 @@ const AnalyzerEngine = {
                 return typeof VERITAS_SUNRISE_CONFIG !== 'undefined' ? VERITAS_SUNRISE_CONFIG : null;
             case 'flare':
                 return typeof FlareConfig !== 'undefined' ? FlareConfig : null;
+            case 'supernova':
+                return typeof VERITAS_SUPERNOVA_CONFIG !== 'undefined' ? VERITAS_SUPERNOVA_CONFIG : null;
             case 'dawn':
                 return null; // Dawn uses rule-based defaults
             default:
@@ -227,6 +260,11 @@ const AnalyzerEngine = {
         
         if (!text || text.trim().length === 0) {
             return this.getEmptyResult();
+        }
+
+        // Special handling for SUPERNOVA model - neural-enhanced detection
+        if (this.currentModel === 'supernova') {
+            return this.analyzeWithSupernova(text, metadata, startTime);
         }
 
         // Special handling for Flare model - dedicated humanization detection
@@ -568,6 +606,243 @@ const AnalyzerEngine = {
                 specialty: 'Humanization Detection',
                 accuracy: '99.84%',
                 description: 'Specialized model for detecting AI text that has been processed through humanization tools'
+            }
+        };
+    },
+
+    /**
+     * Analyze with SUPERNOVA - production ML model with 97.28% accuracy
+     * Uses XGBoost + sentence-transformers via ONNX in browser
+     */
+    async analyzeWithSupernova(text, metadata, startTime) {
+        const sentences = Utils.splitSentences(text);
+        const tokens = Utils.tokenize(text);
+        const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+
+        // Basic stats
+        const stats = {
+            characters: text.length,
+            words: tokens.length,
+            sentences: sentences.length,
+            paragraphs: paragraphs.length,
+            avgWordsPerSentence: sentences.length > 0 ? (tokens.length / sentences.length).toFixed(1) : 0
+        };
+
+        // Initialize SUPERNOVA if needed
+        if (!this.supernovaReady && !this.supernovaLoading) {
+            await this.initializeSupernova();
+        }
+
+        // Wait for initialization if in progress
+        while (this.supernovaLoading) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        // Run SUPERNOVA analysis
+        let supernovaResult = null;
+        if (this.supernovaReady && typeof VERITAS_SUPERNOVA !== 'undefined') {
+            try {
+                supernovaResult = await VERITAS_SUPERNOVA.analyzeForVeritas(text);
+            } catch (e) {
+                console.error('SUPERNOVA analysis error:', e);
+            }
+        }
+
+        // Fallback to basic analysis if SUPERNOVA failed
+        if (!supernovaResult) {
+            console.warn('SUPERNOVA not available, falling back to Sunrise model');
+            return this.analyzeWithSunrise(text, metadata, startTime);
+        }
+
+        // Get additional context from standard analyzers
+        const advancedStats = this.computeAdvancedStatistics(text, tokens, sentences);
+        
+        const categoryResults = [];
+        for (const analyzer of this.analyzers) {
+            if (!analyzer) continue;
+            try {
+                const result = analyzer.analyze(text, metadata);
+                categoryResults.push(result);
+            } catch (error) {
+                console.error(`Error in ${analyzer?.name || 'unknown'}:`, error);
+            }
+        }
+
+        // Extract probabilities from SUPERNOVA result
+        const aiProbability = supernovaResult.aiProbability;
+        const humanProbability = supernovaResult.humanProbability;
+        const confidence = supernovaResult.confidence;
+        const confidenceLevel = supernovaResult.confidenceLevel;
+
+        // Determine verdict based on SUPERNOVA output
+        let verdictLabel, verdictLevel, verdictDescription;
+        
+        if (confidenceLevel === 'low') {
+            // Low confidence - flag for manual review
+            verdictLabel = 'UNCERTAIN - REVIEW NEEDED';
+            verdictLevel = 'mixed';
+            verdictDescription = `Model confidence is low (${(confidence * 100).toFixed(0)}%). This sample requires human review.`;
+        } else if (aiProbability >= 0.85) {
+            verdictLabel = 'AI-GENERATED';
+            verdictLevel = 'ai';
+            verdictDescription = `High confidence (${(confidence * 100).toFixed(0)}%) that this text was generated by AI`;
+        } else if (aiProbability >= 0.65) {
+            verdictLabel = 'LIKELY AI-GENERATED';
+            verdictLevel = 'likely-ai';
+            verdictDescription = `Significant AI patterns detected (${(aiProbability * 100).toFixed(0)}% probability)`;
+        } else if (aiProbability >= 0.45) {
+            verdictLabel = 'MIXED SIGNALS';
+            verdictLevel = 'mixed';
+            verdictDescription = 'Contains both human and AI characteristics';
+        } else if (aiProbability >= 0.25) {
+            verdictLabel = 'LIKELY HUMAN';
+            verdictLevel = 'likely-human';
+            verdictDescription = `Probably written by a human (${(humanProbability * 100).toFixed(0)}% probability)`;
+        } else {
+            verdictLabel = 'HUMAN-WRITTEN';
+            verdictLevel = 'human';
+            verdictDescription = `High confidence (${(confidence * 100).toFixed(0)}%) that this text was written by a human`;
+        }
+
+        const verdict = {
+            label: verdictLabel,
+            level: verdictLevel,
+            description: verdictDescription
+        };
+
+        // Generate findings from SUPERNOVA analysis
+        const findings = [];
+        
+        // Add main finding
+        if (aiProbability >= 0.5) {
+            findings.push({
+                indicator: 'ai',
+                severity: aiProbability >= 0.85 ? 'high' : 'medium',
+                message: 'AI Generation Detected',
+                detail: `SUPERNOVA ML model detected ${(aiProbability * 100).toFixed(1)}% AI probability with ${confidenceLevel} confidence`
+            });
+        } else {
+            findings.push({
+                indicator: 'human',
+                severity: 'low',
+                message: 'Human Writing Detected',
+                detail: `SUPERNOVA ML model detected ${(humanProbability * 100).toFixed(1)}% human probability with ${confidenceLevel} confidence`
+            });
+        }
+
+        // Add feature-based findings if available
+        if (supernovaResult.heuristicFeatures) {
+            const features = supernovaResult.heuristicFeatures;
+            
+            // Check for notable patterns - using SUPERNOVA feature names
+            if (features.sent_len_std < 4) {
+                findings.push({
+                    indicator: 'ai',
+                    severity: 'medium',
+                    message: 'Low Sentence Variance',
+                    detail: 'Sentence lengths are unusually uniform, which is common in AI-generated text'
+                });
+            }
+            
+            if (features.vocab_richness < 0.4) {
+                findings.push({
+                    indicator: 'ai',
+                    severity: 'medium',
+                    message: 'Limited Vocabulary',
+                    detail: 'Low lexical diversity detected, suggesting AI-generated content'
+                });
+            }
+            
+            if (features.helpful_phrases > 0) {
+                findings.push({
+                    indicator: 'ai',
+                    severity: 'medium',
+                    message: 'AI Helper Phrases',
+                    detail: 'Text contains phrases like "here is", "let me", "feel free" - common in AI responses'
+                });
+            }
+            
+            if (features.avg_sent_len > 25 && features.sent_len_std < 5) {
+                findings.push({
+                    indicator: 'ai',
+                    severity: 'low',
+                    message: 'Uniform Complex Sentences',
+                    detail: 'Consistently long sentences with low variation is an AI signature'
+                });
+            }
+            
+            if (features.instruction_phrases > 2) {
+                findings.push({
+                    indicator: 'ai',
+                    severity: 'medium',
+                    message: 'Instructional Language',
+                    detail: 'Contains step-by-step or instructional phrasing typical of AI'
+                });
+            }
+            
+            if (features.ellipsis_count > 1) {
+                findings.push({
+                    indicator: 'human',
+                    severity: 'medium',
+                    message: 'Ellipsis Usage',
+                    detail: 'Multiple ellipses suggest informal human trailing thoughts'
+                });
+            }
+            
+            if (features.contraction_rate > 0.03) {
+                findings.push({
+                    indicator: 'human',
+                    severity: 'low',
+                    message: 'Natural Contractions',
+                    detail: 'High contraction rate is typical of authentic human writing'
+                });
+            }
+        }
+
+        // Add confidence warning if needed
+        if (confidenceLevel === 'low') {
+            findings.unshift({
+                indicator: 'mixed',
+                severity: 'high',
+                message: 'Low Model Confidence',
+                detail: 'This sample falls in an ambiguous zone. The prediction may be unreliable and should be verified manually.'
+            });
+        }
+
+        const endTime = performance.now();
+
+        // Return SUPERNOVA-specific result format
+        return {
+            // Overall results
+            aiProbability,
+            humanProbability,
+            mixedProbability: 0,
+            confidence,
+            verdict,
+            
+            // SUPERNOVA-specific data
+            supernovaResult,
+            confidenceLevel,
+            heuristicFeatures: supernovaResult.heuristicFeatures,
+            
+            // Standard data
+            categoryResults,
+            sentences,
+            sentenceScores: this.scoreSentences(text, sentences, categoryResults),
+            findings,
+            stats,
+            advancedStats,
+            tokens,
+            metadata: metadata || null,
+            analysisTime: (endTime - startTime).toFixed(0) + 'ms',
+            
+            // Model info
+            modelInfo: {
+                id: 'supernova',
+                name: 'SUPERNOVA',
+                specialty: 'Production AI Detection',
+                accuracy: '97.28%',
+                description: 'Production ML model trained on 240k+ samples using XGBoost + neural embeddings. 97.28% accuracy on high-confidence samples (94.4% coverage).'
             }
         };
     },

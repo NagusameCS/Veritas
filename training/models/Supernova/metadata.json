@@ -1,0 +1,13 @@
+{
+  "name": "Supernova",
+  "version": "1.0",
+  "accuracy": 0.9529522857301561,
+  "high_conf_accuracy": 0.9728011303426352,
+  "high_conf_coverage": 0.9435094150974838,
+  "auc_roc": 0.9908191913853267,
+  "n_heuristic_features": 31,
+  "n_embedding_features": 384,
+  "embedding_model": "Xenova/all-MiniLM-L6-v2",
+  "training_samples": 204028,
+  "description": "SUPERNOVA - Neural-enhanced AI detection with 97%+ accuracy on high-confidence samples"
+}

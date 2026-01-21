@@ -6,3 +6,6 @@ training/__pycache__/
 training/models/
 training/training_log.txt
 *.log
+
+# Allow Supernova model for browser deployment
+!training/models/Supernova/

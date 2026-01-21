@@ -1174,6 +1174,18 @@
     border: 1px solid var(--border-medium);
 }
 
+.model-card-badge.production {
+    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.4);
+    animation: supernova-pulse 2s ease-in-out infinite;
+}
+
+@keyframes supernova-pulse {
+    0%, 100% { box-shadow: 0 0 8px rgba(124, 58, 237, 0.4); }
+    50% { box-shadow: 0 0 16px rgba(124, 58, 237, 0.7); }
+}
+
 .model-card-accuracy {
     font-size: 1rem;
     font-weight: 700;

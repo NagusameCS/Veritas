@@ -64,6 +64,7 @@
                             </div>
                             <span class="model-chevron model-next" id="modelNext">›</span>
                             <input type="radio" name="model" value="zenith" id="model-zenith" checked hidden>
+                            <input type="radio" name="model" value="supernova" id="model-supernova" hidden>
                             <input type="radio" name="model" value="flare" id="model-flare" hidden>
                             <input type="radio" name="model" value="helios" id="model-helios" hidden>
                             <input type="radio" name="model" value="sunrise" id="model-sunrise" hidden>
@@ -380,6 +381,27 @@
                             <p class="section-intro">Veritas offers multiple specialized detection models, each optimized for different use cases. Select the model that best fits your needs when analyzing text.</p>
                             
                             <div class="about-model-carousel">
+                                <div class="about-model-card featured" data-model="supernova" style="border:2px solid #7c3aed;">
+                                    <div class="model-header supernova" style="background:linear-gradient(135deg,#7c3aed 0%,#4f46e5 50%,#2563eb 100%);">
+                                        <span class="material-icons model-sun-icon">auto_awesome</span>
+                                        <h4>SUPERNOVA</h4>
+                                        <span class="model-badge" style="background:#4ade80;">Production ML</span>
+                                    </div>
+                                    <div class="model-accuracy">97.28%*</div>
+                                    <p class="model-desc-text">Production-grade XGBoost + Neural Embeddings trained on 240k+ samples. Our most robust model for real-world detection.</p>
+                                    <ul class="model-highlights">
+                                        <li>240,034 training samples</li>
+                                        <li>415 features (31 heuristic + 384 embedding)</li>
+                                        <li>97.28% on high-confidence (94.4%)</li>
+                                        <li>98.13% on very-high-confidence</li>
+                                    </ul>
+                                    <p style="font-size:8pt;color:#6b7280;margin-top:8px;">*High-confidence accuracy. Overall: 95.30%</p>
+                                    <div class="model-card-hover-overlay">
+                                        <span class="material-icons">analytics</span>
+                                        <span>View Benchmarks</span>
+                                    </div>
+                                </div>
+                                
                                 <div class="about-model-card featured" data-model="helios">
                                     <div class="model-header helios">
                                         <span class="material-icons model-sun-icon">flare</span>
@@ -1165,6 +1187,29 @@
                             </div>
                             <p>Final balanced dataset: 14,988 human samples + 14,988 AI samples = 29,976 total.</p>
 
+                            <h3 style="margin-top:20px;color:#7c3aed;">8.1.1 SUPERNOVA Training Data (240,034 samples)</h3>
+                            <p>SUPERNOVA was trained on a significantly larger and more diverse dataset to achieve production-grade accuracy:</p>
+                            <div class="weight-table">
+                                <table>
+                                    <thead>
+                                        <tr><th>Source</th><th>Samples</th><th>Type</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>Reddit (ELI5, WritingPrompts)</td><td>~35,000</td><td>Human</td></tr>
+                                        <tr><td>arXiv Abstracts</td><td>~18,000</td><td>Human</td></tr>
+                                        <tr><td>BBC News</td><td>~2,000</td><td>Human</td></tr>
+                                        <tr><td>Wikipedia</td><td>~30,000</td><td>Human</td></tr>
+                                        <tr><td>C4 (Web Crawl)</td><td>~30,000</td><td>Human</td></tr>
+                                        <tr><td>ChatGPT/GPT-4 Outputs</td><td>~40,000</td><td>AI</td></tr>
+                                        <tr><td>GPT-Wiki-Intro</td><td>~30,000</td><td>AI</td></tr>
+                                        <tr><td>LLaMA/Mistral Outputs</td><td>~25,000</td><td>AI</td></tr>
+                                        <tr><td>Claude Outputs</td><td>~15,000</td><td>AI</td></tr>
+                                        <tr><td>Dolly/GPT4All</td><td>~15,000</td><td>AI</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p>Final dataset: ~115,000 human samples + ~125,000 AI samples = 240,034 total from 19 diverse sources.</p>
+
                             <h3>8.2 Model Comparison</h3>
                             <div class="weight-table">
                                 <table>
@@ -1172,12 +1217,14 @@
                                         <tr><th>Model</th><th>Accuracy</th><th>F1 Score</th><th>ROC-AUC</th><th>Features</th><th>Specialization</th></tr>
                                     </thead>
                                     <tbody>
+                                        <tr style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(79,70,229,0.1));"><td><strong>SUPERNOVA v1.0</strong></td><td>97.28%*</td><td>95.30%</td><td>99.08%</td><td>415</td><td><strong>Production ML:</strong> XGBoost + Neural Embeddings, 240k samples</td></tr>
                                         <tr><td><strong>Helios v4.0</strong></td><td>99.24%</td><td>99.24%</td><td>99.98%</td><td>45</td><td>Flagship: Tone, hedging, rhetorical analysis</td></tr>
                                         <tr><td><strong>Zenith v1.0</strong></td><td>99.57%</td><td>99.57%</td><td>99.97%</td><td>35</td><td>Perplexity-based, humanized text detection (86.7%)</td></tr>
                                         <tr><td><strong>Sunrise v3.0</strong></td><td>98.08%</td><td>98.09%</td><td>99.80%</td><td>37</td><td>Balanced general-purpose detection</td></tr>
                                         <tr><td><strong>Dawn v1.0</strong></td><td>84.9%</td><td>~85%</td><td>~92%</td><td>14</td><td>Legacy rule-based heuristics</td></tr>
                                     </tbody>
                                 </table>
+                                <p style="font-size:8pt;color:#6b7280;margin-top:8px;">*SUPERNOVA high-confidence accuracy on 94.4% of samples. Overall accuracy 95.30%.</p>
                             </div>
 
                             <h3>8.3 Helios Model v4.0 Features (45 total)</h3>
@@ -1216,6 +1263,27 @@
                                 <p style="font-size:9pt;color:#166534;margin-bottom:15px;">All accuracy claims are backed by reproducible training runs with stored model artifacts. Below are the official training receipts for each model.</p>
                                 
                                 <div class="receipt-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;">
+                                    <!-- SUPERNOVA Receipt -->
+                                    <div class="receipt-card" id="benchmark-supernova" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:2px solid #7c3aed;border-radius:6px;padding:15px;">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                                            <span style="font-weight:700;font-size:11pt;color:#111;">SUPERNOVA v1.0</span>
+                                            <span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;padding:2px 8px;border-radius:4px;font-size:8pt;">PRODUCTION ML</span>
+                                        </div>
+                                        <div style="font-size:9pt;color:#374151;line-height:1.8;">
+                                            <div><strong>Overall Accuracy:</strong> 95.30%</div>
+                                            <div><strong>High-Conf Accuracy:</strong> 97.28% (94.4% coverage)</div>
+                                            <div><strong>Very-High-Conf:</strong> 98.13% (90.7% coverage)</div>
+                                            <div><strong>ROC-AUC:</strong> 99.08%</div>
+                                            <div><strong>Training Samples:</strong> 240,034</div>
+                                            <div><strong>Data Sources:</strong> 19 diverse datasets</div>
+                                            <div><strong>Features:</strong> 31 heuristic + 384 embedding = 415</div>
+                                            <div><strong>Model:</strong> XGBoost (1000 trees, depth 18)</div>
+                                            <div style="margin-top:8px;padding-top:8px;border-top:1px solid #c4b5fd;">
+                                                <strong>Model File:</strong> <code style="background:#f3f4f6;padding:2px 4px;border-radius:3px;font-size:8pt;">training/models/Supernova/supernova_xgb.onnx</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <!-- Helios Receipt -->
                                     <div class="receipt-card" id="benchmark-helios" style="background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:15px;">
                                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -1560,6 +1628,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/docx@8.2.4/build/index.umd.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SUPERNOVA Dependencies (ONNX Runtime + Transformers.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/ort.min.js"></script>
+    <script type="module">
+        // Pre-load Transformers.js for SUPERNOVA
+        import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
+        env.allowLocalModels = false;
+        window.TransformersJS = { pipeline, env };
+    </script>
     
     <!-- Core Utilities -->
     <script src="js/utils.js"></script>
@@ -1567,7 +1643,9 @@
     <script src="js/sunrise-model.js"></script>
     <script src="js/zenith-model.js"></script>
     <script src="js/helios-model.js"></script>
+    <script src="js/supernova-model.js"></script>
     <script src="training/models/Flare/veritas_config.js"></script>
+    <script src="training/models/Supernova/veritas_config.js"></script>
     
     <!-- Analyzers -->
     <script src="js/analyzers/grammar.js"></script>

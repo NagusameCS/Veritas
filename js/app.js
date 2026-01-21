@@ -344,6 +344,7 @@ const App = {
         // Model data for the carousel selector
         // Ordered by recommended usage based on benchmarks
         this.models = [
+            { id: 'supernova', name: 'SUPERNOVA', accuracy: '97.28%', badge: 'Production ML', icon: 'auto_awesome', badgeClass: 'production', desc: '240k samples · XGBoost + Embeddings · 94.4% coverage' },
             { id: 'zenith', name: 'Zenith', accuracy: '99.57%', badge: 'Recommended', icon: 'brightness_high', badgeClass: 'perplexity', desc: 'Best overall · 99.17% binary · Low FPR' },
             { id: 'flare', name: 'Flare', accuracy: '99.84%', badge: 'Anti-Humanizer', icon: 'local_fire_department', badgeClass: 'anti-humanizer', desc: '99.3% humanized detection · 66 features' },
             { id: 'helios', name: 'Helios', accuracy: '99.24%', badge: 'Flagship', icon: 'flare', badgeClass: 'flagship', desc: '45 features · Tone + hedging analysis' },
@@ -445,10 +446,12 @@ const App = {
         
         // Model labels for all supported models
         const modelLabels = {
+            'supernova': 'SUPERNOVA',
             'helios': 'Helios',
             'zenith': 'Zenith',
             'sunrise': 'Sunrise',
-            'dawn': 'Dawn'
+            'dawn': 'Dawn',
+            'flare': 'Flare'
         };
         
         const modelLabel = modelLabels[modelType] || modelType;
@@ -457,6 +460,20 @@ const App = {
         // Update the analyzer engine's model
         if (typeof AnalyzerEngine !== 'undefined') {
             AnalyzerEngine.setModel(modelType);
+        }
+        
+        // Special handling for SUPERNOVA - show loading indicator for model initialization
+        if (modelType === 'supernova' && typeof VERITAS_SUPERNOVA !== 'undefined' && !VERITAS_SUPERNOVA.ready) {
+            this.showToast('Loading SUPERNOVA model (~95MB)... First-time download, please wait.', 'info', 10000);
+            // Pre-initialize in background
+            VERITAS_SUPERNOVA.initialize((status, progress) => {
+                console.log(`SUPERNOVA: ${status} (${Math.round(progress * 100)}%)`);
+            }).then(() => {
+                this.showToast('SUPERNOVA ready!', 'success');
+            }).catch(err => {
+                console.error('SUPERNOVA init error:', err);
+                this.showToast('SUPERNOVA failed to load: ' + err.message, 'error');
+            });
         }
         
         // Update Flare toggle visibility (hide when Flare is selected)
@@ -826,7 +843,14 @@ const App = {
             await new Promise(resolve => setTimeout(resolve, 100));
             
             // Run analysis with metadata if available
-            const result = AnalyzerEngine.analyze(text, this.currentMetadata);
+            // Note: analyze() may return a Promise for async models like SUPERNOVA
+            let result = AnalyzerEngine.analyze(text, this.currentMetadata);
+            
+            // If result is a Promise (async model like SUPERNOVA), await it
+            if (result && typeof result.then === 'function') {
+                result = await result;
+            }
+            
             this.currentResult = result;
             
             // Display results
@@ -3226,7 +3250,7 @@ Confidence: ${Math.round(this.currentResult.confidence * 100)}%`;
     /**
      * Show toast notification
      */
-    showToast(message, type = 'info') {
+    showToast(message, type = 'info', duration = 3000) {
         // Remove existing toast
         const existing = document.querySelector('.toast');
         if (existing) {
@@ -3247,7 +3271,7 @@ Confidence: ${Math.round(this.currentResult.confidence * 100)}%`;
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        }, duration);
     },
 
     /**
