@@ -1,0 +1,110 @@
+{
+  "timestamp": "2026-01-22T03:12:50.325960",
+  "models": {
+    "SUPERNOVA": {
+      "version": "v1.0",
+      "features": 415,
+      "description": "XGBoost + all-MiniLM-L6-v2 embeddings for AI detection"
+    },
+    "FlareV2": {
+      "version": "v2.0",
+      "features": 441,
+      "description": "XGBoost + embeddings for humanization detection"
+    }
+  },
+  "datasets": {
+    "GPT-wiki-intro": "Human Wikipedia intros vs GPT-generated",
+    "RAID": "Large-scale AI detection benchmark with adversarial attacks"
+  },
+  "benchmarks": {
+    "supernova_human_vs_ai": {
+      "description": "SUPERNOVA classifying human vs AI text (GPT-wiki-intro)",
+      "n_human": 500,
+      "n_ai": 500,
+      "accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5,
+      "confusion_matrix": [
+        [
+          500,
+          0
+        ],
+        [
+          500,
+          0
+        ]
+      ]
+    },
+    "supernova_humanized_detection": {
+      "description": "SUPERNOVA detecting humanized AI (adversarial attacks)",
+      "n_human": 500,
+      "n_humanized": 500,
+      "accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5,
+      "confusion_matrix": [
+        [
+          500,
+          0
+        ],
+        [
+          500,
+          0
+        ]
+      ]
+    },
+    "flare_v2_humanized_detection": {
+      "description": "Flare V2 detecting humanized AI (specialized model)",
+      "n_human": 500,
+      "n_humanized": 500,
+      "accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5,
+      "confusion_matrix": [
+        [
+          500,
+          0
+        ],
+        [
+          500,
+          0
+        ]
+      ]
+    },
+    "pipeline": {
+      "description": "Full SUPERNOVA + Flare V2 pipeline for 3-class detection",
+      "n_human": 500,
+      "n_ai": 500,
+      "n_humanized": 500,
+      "three_class_accuracy": 0.3333333333333333,
+      "binary_accuracy": 0.3333333333333333,
+      "human_correct_rate": 1.0,
+      "ai_detection_rate": 0.0,
+      "humanized_specific_rate": 0.0,
+      "humanized_as_any_ai_rate": 0.0,
+      "confusion_matrix": [
+        [
+          500,
+          0,
+          0
+        ],
+        [
+          500,
+          0,
+          0
+        ],
+        [
+          500,
+          0,
+          0
+        ]
+      ]
+    }
+  }
+}

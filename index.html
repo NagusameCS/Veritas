@@ -29,6 +29,7 @@
                 <a href="#" class="nav-link" data-view="humanizer">Humanizer</a>
                 <a href="#" class="nav-link" data-view="history">History</a>
                 <a href="#" class="nav-link" data-view="methodology">Methodology</a>
+                <a href="#" class="nav-link" data-view="training-data">Training Data</a>
                 <a href="#" class="nav-link" data-view="about">About</a>
             </nav>
             <div class="header-actions">
@@ -362,6 +363,153 @@
                             <p>No analysis history yet</p>
                             <p class="text-muted">Your analyzed texts will appear here</p>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Training Data View -->
+            <section class="view" id="training-dataView" hidden>
+                <div class="methodology-container">
+                    <h1>Training Data & Benchmarks</h1>
+                    <p class="methodology-intro">VERITAS is committed to transparency. Below you'll find all datasets used to train our models, along with performance benchmarks.</p>
+                    
+                    <!-- Benchmark Results -->
+                    <div class="methodology-section">
+                        <h2><span class="material-icons">assessment</span> Model Performance</h2>
+                        
+                        <div class="benchmark-summary">
+                            <div class="benchmark-card">
+                                <h3>SUPERNOVA v1.0</h3>
+                                <div class="benchmark-stat">
+                                    <span class="stat-value">97.28%</span>
+                                    <span class="stat-label">High-Confidence Accuracy</span>
+                                </div>
+                                <div class="benchmark-stat">
+                                    <span class="stat-value">99.08%</span>
+                                    <span class="stat-label">ROC AUC</span>
+                                </div>
+                                <p>Primary AI detection model with 415 features (31 heuristic + 384 embedding)</p>
+                            </div>
+                            <div class="benchmark-card">
+                                <h3>Flare V2</h3>
+                                <div class="benchmark-stat">
+                                    <span class="stat-value">98.00%</span>
+                                    <span class="stat-label">Accuracy</span>
+                                </div>
+                                <div class="benchmark-stat">
+                                    <span class="stat-value">99.71%</span>
+                                    <span class="stat-label">ROC AUC</span>
+                                </div>
+                                <p>Humanization detector with 441 features, specialized for paraphrased AI text</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Training Datasets -->
+                    <div class="methodology-section">
+                        <h2><span class="material-icons">storage</span> Training Datasets</h2>
+                        <p>All training data is publicly available. Click the links to access each dataset.</p>
+                        
+                        <table class="methodology-table">
+                            <thead>
+                                <tr>
+                                    <th>Dataset</th>
+                                    <th>Samples</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a href="https://huggingface.co/datasets/liamdugan/raid" target="_blank" class="dataset-link">
+                                        <span class="material-icons">open_in_new</span> RAID
+                                    </a></td>
+                                    <td><strong>5,600,000+</strong></td>
+                                    <td>AI Detection + Attacks</td>
+                                    <td>Multi-model AI text with adversarial attacks (paraphrase, synonym, homoglyph, misspelling)</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="https://huggingface.co/datasets/aadityaubhat/GPT-wiki-intro" target="_blank" class="dataset-link">
+                                        <span class="material-icons">open_in_new</span> GPT-wiki-intro
+                                    </a></td>
+                                    <td><strong>150,000</strong></td>
+                                    <td>Human vs GPT</td>
+                                    <td>Wikipedia introductions paired with GPT-generated equivalents</td>
+                                </tr>
+                                <tr>
+                                    <td><a href="https://huggingface.co/datasets/Skylion007/openwebtext" target="_blank" class="dataset-link">
+                                        <span class="material-icons">open_in_new</span> OpenWebText
+                                    </a></td>
+                                    <td><strong>500,000+</strong></td>
+                                    <td>Human Web Text</td>
+                                    <td>High-quality human-written web content from Reddit links</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- RAID Dataset Details -->
+                    <div class="methodology-section">
+                        <h2><span class="material-icons">psychology</span> RAID Dataset Details</h2>
+                        <p>The RAID dataset is our primary source for training humanization detection. It includes:</p>
+                        
+                        <h4>AI Models Covered:</h4>
+                        <div class="model-tags">
+                            <span class="model-tag">GPT-4</span>
+                            <span class="model-tag">GPT-3.5</span>
+                            <span class="model-tag">ChatGPT</span>
+                            <span class="model-tag">Claude</span>
+                            <span class="model-tag">Claude 2</span>
+                            <span class="model-tag">LLaMA</span>
+                            <span class="model-tag">LLaMA 2</span>
+                            <span class="model-tag">Mistral</span>
+                            <span class="model-tag">Mixtral</span>
+                            <span class="model-tag">Cohere</span>
+                            <span class="model-tag">Palm 2</span>
+                        </div>
+                        
+                        <h4>Attack Types (Humanization Techniques):</h4>
+                        <ul class="attack-list">
+                            <li><strong>Paraphrase:</strong> AI text rewritten by paraphrasing tools</li>
+                            <li><strong>Synonym Substitution:</strong> Word-level synonym replacement</li>
+                            <li><strong>Homoglyph:</strong> Character substitution with similar-looking characters</li>
+                            <li><strong>Misspelling:</strong> Intentional spelling errors to evade detection</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Training Methodology -->
+                    <div class="methodology-section">
+                        <h2><span class="material-icons">science</span> Training Methodology</h2>
+                        
+                        <h4>Feature Engineering:</h4>
+                        <ul>
+                            <li><strong>Linguistic Features:</strong> Sentence structure, vocabulary richness, punctuation patterns</li>
+                            <li><strong>AI Signatures:</strong> Discourse markers, attribution patterns, hedging phrases</li>
+                            <li><strong>Semantic Embeddings:</strong> all-MiniLM-L6-v2 (384 dimensions)</li>
+                        </ul>
+                        
+                        <h4>Model Architecture:</h4>
+                        <ul>
+                            <li><strong>Algorithm:</strong> XGBoost Gradient Boosting</li>
+                            <li><strong>SUPERNOVA:</strong> 1,000 trees, depth 8, learning rate 0.05</li>
+                            <li><strong>Flare V2:</strong> 914 trees, depth 7, learning rate 0.03</li>
+                        </ul>
+                        
+                        <h4>Validation:</h4>
+                        <ul>
+                            <li>80/20 train/test split</li>
+                            <li>Early stopping with 50 rounds patience</li>
+                            <li>Stratified sampling to ensure class balance</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Full Benchmark Report Link -->
+                    <div class="methodology-section">
+                        <h2><span class="material-icons">description</span> Full Benchmark Report</h2>
+                        <p>For detailed benchmark results including confusion matrices and feature importance analysis, see our full report on GitHub:</p>
+                        <a href="https://github.com/NagusameCS/Veritas/blob/main/BENCHMARK_REPORT.md" target="_blank" class="benchmark-link">
+                            <span class="material-icons">launch</span> View Full Benchmark Report on GitHub
+                        </a>
                     </div>
                 </div>
             </section>

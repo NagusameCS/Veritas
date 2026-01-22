@@ -507,35 +507,39 @@ const App = {
             <div class="supernova-modal">
                 <div class="supernova-modal-header">
                     <span class="material-icons supernova-icon">auto_awesome</span>
-                    <h3>Load SUPERNOVA Model?</h3>
+                    <h3>Authorize Local ML Processing</h3>
                 </div>
                 <div class="supernova-modal-body">
-                    <p><strong>SUPERNOVA</strong> is our production ML model with <strong>97.28% accuracy</strong> on high-confidence samples.</p>
+                    <p class="supernova-free-notice">
+                        <span class="material-icons">volunteer_activism</span>
+                        <strong>To keep VERITAS free</strong>, we run AI detection models directly on your computer instead of expensive cloud servers.
+                    </p>
+                    <p><strong>SUPERNOVA + Flare V2</strong> delivers <strong>97.28% accuracy</strong> for AI detection and <strong>98.00% accuracy</strong> for humanization detection.</p>
                     <div class="supernova-requirements">
                         <div class="requirement-item">
                             <span class="material-icons">download</span>
-                            <span><strong>~95MB download</strong> on first use</span>
+                            <span><strong>~120MB download</strong> (SUPERNOVA + Flare V2 + Embeddings)</span>
                         </div>
                         <div class="requirement-item">
-                            <span class="material-icons">memory</span>
-                            <span>Requires <strong>WebGL/WASM</strong> support</span>
+                            <span class="material-icons">computer</span>
+                            <span>Runs <strong>100% locally</strong> — your text never leaves your device</span>
                         </div>
                         <div class="requirement-item">
                             <span class="material-icons">timer</span>
-                            <span>Initial load: <strong>30-60 seconds</strong></span>
+                            <span>First load: <strong>30-60 seconds</strong> (cached afterward)</span>
                         </div>
                         <div class="requirement-item">
-                            <span class="material-icons">cached</span>
-                            <span>Cached after first use</span>
+                            <span class="material-icons">security</span>
+                            <span><strong>Privacy-first:</strong> No data sent to servers</span>
                         </div>
                     </div>
-                    <p class="supernova-note">This model uses XGBoost + Neural Embeddings for the most accurate detection.</p>
+                    <p class="supernova-note">Uses XGBoost + Neural Embeddings (all-MiniLM-L6-v2) for production-grade detection.</p>
                 </div>
                 <div class="supernova-modal-actions">
-                    <button class="btn btn-ghost" id="supernovaCancelBtn">Cancel</button>
+                    <button class="btn btn-ghost" id="supernovaCancelBtn">Use Lighter Models</button>
                     <button class="btn btn-primary supernova-confirm-btn" id="supernovaConfirmBtn">
                         <span class="material-icons">rocket_launch</span>
-                        Load SUPERNOVA
+                        Authorize & Load
                     </button>
                 </div>
             </div>
