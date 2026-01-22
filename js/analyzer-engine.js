@@ -31,11 +31,8 @@ const AnalyzerEngine = {
         if (validModels.includes(modelType)) {
             this.currentModel = modelType;
             console.log(`AnalyzerEngine: Model set to ${modelType}`);
-            
-            // Initialize SUPERNOVA if selected
-            if (modelType === 'supernova' && !this.supernovaReady && !this.supernovaLoading) {
-                this.initializeSupernova();
-            }
+            // Note: SUPERNOVA initialization is handled by app.js after user confirmation
+            // Do NOT auto-initialize here to avoid unwanted downloads
         }
     },
     
