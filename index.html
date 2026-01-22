@@ -634,7 +634,7 @@
                         <div class="methodology-section paper-section">
                             <h2>Abstract</h2>
                             <div class="abstract-box">
-                                <p>We present VERITAS, a statistical framework for detecting AI-generated text. The system offers multiple detection models: the flagship <strong>Helios Model</strong> (v4.0) achieving <strong>99.24% accuracy</strong> and <strong>99.98% ROC-AUC</strong>, the <strong>Sunrise Model</strong> (v3.0) at <strong>98.08% accuracy</strong>, and the <strong>Zenith Model</strong> specialized for humanized text detection. Our approach is based on the principle that human writing exhibits characteristic variance patterns that differ fundamentally from machine-generated text. Rather than identifying specific "AI features," we measure <em>deviation from expected human variance</em> across multiple linguistic dimensions using <strong>ML-derived feature weights</strong> optimized through supervised training on 29,976 diverse human and AI text samples. We introduce a <strong>Gaussian Deviation Scoring</strong> methodology that models human writing as falling within a normal distribution—penalizing both extremes of "too perfect" (suspiciously uniform) and "too chaotic" (incoherent). We also address the challenge of <strong>humanized AI text</strong> through second-order variance analysis that detects the statistical artifacts left by post-processing tools. The Helios model uses 45 features across tone, hedging, rhetorical patterns, and structural analysis, combined via Bayesian probability aggregation with ML-calibrated weights.</p>
+                                <p>We present VERITAS, a statistical framework for detecting AI-generated text. The system offers multiple detection models: the flagship <strong>Helios Model</strong> (v4.0) achieving <strong>99.24% accuracy</strong> and <strong>99.98% ROC-AUC</strong>, the <strong>Sunrise Model</strong> (v3.0) at <strong>98.08% accuracy</strong>, and the <strong>Zenith Model</strong> specialized for humanized text detection. For production environments, we introduce <strong>SUPERNOVA</strong> (97.28% accuracy on 240k samples) with an integrated <strong>Flare V2</strong> secondary layer (98.00% accuracy) that specifically detects AI text that has been paraphrased to evade detection. Our approach is based on the principle that human writing exhibits characteristic variance patterns that differ fundamentally from machine-generated text. Rather than identifying specific "AI features," we measure <em>deviation from expected human variance</em> across multiple linguistic dimensions using <strong>ML-derived feature weights</strong> optimized through supervised training on diverse human and AI text samples. We introduce a <strong>Gaussian Deviation Scoring</strong> methodology that models human writing as falling within a normal distribution—penalizing both extremes of "too perfect" (suspiciously uniform) and "too chaotic" (incoherent). We also address the challenge of <strong>humanized AI text</strong> through second-order variance analysis and ML-based humanization detection (Flare V2) that detects the statistical artifacts left by post-processing tools.</p>
                             </div>
                         </div>
 
@@ -1210,6 +1210,30 @@
                             </div>
                             <p>Final dataset: ~115,000 human samples + ~125,000 AI samples = 240,034 total from 19 diverse sources.</p>
 
+                            <h3 style="margin-top:20px;color:#ec4899;">8.1.2 Flare V2 Training Data (200,000 samples)</h3>
+                            <p>Flare V2 is a specialized <strong>human vs humanized</strong> detector, designed as a secondary layer for SUPERNOVA. It runs automatically when SUPERNOVA classifies text as "human" to verify the text wasn't AI-generated and then paraphrased to evade detection.</p>
+                            <div class="weight-table">
+                                <table>
+                                    <thead>
+                                        <tr><th>Source</th><th>Samples</th><th>Type</th><th>Description</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>RAID Dataset (Paraphrase Attacks)</td><td>100,000</td><td>Humanized</td><td>AI text processed through paraphrasing tools to evade detection</td></tr>
+                                        <tr><td>RAID Dataset (Human Baseline)</td><td>~60,000</td><td>Human</td><td>Genuine human text across multiple domains</td></tr>
+                                        <tr><td>GPT-Wiki-Intro (Human)</td><td>~40,000</td><td>Human</td><td>Original Wikipedia introductions written by humans</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p><strong>Key Features (57 heuristic + 384 embedding = 441 total):</strong></p>
+                            <ul>
+                                <li><strong>AI Residue Detection:</strong> Phrases that survive paraphrasing ("it is important to note", "furthermore", "leverage", etc.)</li>
+                                <li><strong>Paraphrase Markers:</strong> Artifacts left by paraphrasing tools ("in other words", "put differently")</li>
+                                <li><strong>Thesaurus Word Swaps:</strong> Uncommon formal synonyms ("utilize" for "use", "commence" for "start")</li>
+                                <li><strong>Style Inconsistency:</strong> Measures formality shifts between sentences (humanized text often has mixed styles)</li>
+                                <li><strong>Human Informal Markers:</strong> Contractions, slang, abbreviations that indicate genuine human writing</li>
+                                <li><strong>Neural Embeddings:</strong> all-MiniLM-L6-v2 (384D) captures semantic patterns of humanization</li>
+                            </ul>
+
                             <h3>8.2 Model Comparison</h3>
                             <div class="weight-table">
                                 <table>
@@ -1218,6 +1242,7 @@
                                     </thead>
                                     <tbody>
                                         <tr style="background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(79,70,229,0.1));"><td><strong>SUPERNOVA v1.0</strong></td><td>97.28%*</td><td>95.30%</td><td>99.08%</td><td>415</td><td><strong>Production ML:</strong> XGBoost + Neural Embeddings, 240k samples</td></tr>
+                                        <tr style="background:linear-gradient(135deg,rgba(236,72,153,0.1),rgba(219,39,119,0.1));"><td><strong>Flare V2</strong></td><td>98.00%</td><td>98.02%</td><td>99.71%</td><td>441</td><td><strong>Humanization Detection:</strong> Secondary layer for SUPERNOVA</td></tr>
                                         <tr><td><strong>Helios v4.0</strong></td><td>99.24%</td><td>99.24%</td><td>99.98%</td><td>45</td><td>Flagship: Tone, hedging, rhetorical analysis</td></tr>
                                         <tr><td><strong>Zenith v1.0</strong></td><td>99.57%</td><td>99.57%</td><td>99.97%</td><td>35</td><td>Perplexity-based, humanized text detection (86.7%)</td></tr>
                                         <tr><td><strong>Sunrise v3.0</strong></td><td>98.08%</td><td>98.09%</td><td>99.80%</td><td>37</td><td>Balanced general-purpose detection</td></tr>
@@ -1644,6 +1669,7 @@
     <script src="js/zenith-model.js"></script>
     <script src="js/helios-model.js"></script>
     <script src="js/supernova-model.js"></script>
+    <script src="js/flare-v2-model.js"></script>
     <script src="training/models/Flare/veritas_config.js"></script>
     <script src="training/models/Supernova/veritas_config.js"></script>
     

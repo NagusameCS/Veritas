@@ -809,13 +809,63 @@ const AnalyzerEngine = {
             });
         }
 
+        // === FLARE V2 INTEGRATION ===
+        // Run Flare V2 humanization check if SUPERNOVA thinks it's human
+        let flareV2Result = null;
+        if (humanProbability >= 0.5 && typeof VERITAS_FLARE_V2 !== 'undefined') {
+            try {
+                console.log('SUPERNOVA classified as human - running Flare V2 humanization check...');
+                flareV2Result = await VERITAS_FLARE_V2.analyze(text);
+                
+                if (flareV2Result && flareV2Result.isHumanized) {
+                    // Update verdict if humanization detected
+                    verdict.label = 'HUMANIZED AI';
+                    verdict.level = 'humanized';
+                    verdict.description = `Flare V2 detected humanization with ${(flareV2Result.humanizedProbability * 100).toFixed(0)}% confidence - AI text modified to appear human`;
+                    
+                    // Add humanization finding
+                    findings.unshift({
+                        indicator: 'ai',
+                        severity: 'high',
+                        message: 'Humanized AI Text Detected',
+                        detail: `Flare V2 (98% accuracy) detected this text as AI-generated but paraphrased/humanized to evade detection`
+                    });
+                    
+                    // Add specific flags from Flare V2
+                    if (flareV2Result.flags) {
+                        flareV2Result.flags.forEach(flag => {
+                            if (flag.severity !== 'positive') {
+                                findings.push({
+                                    indicator: 'ai',
+                                    severity: flag.severity,
+                                    message: flag.message,
+                                    detail: flag.detail,
+                                    source: 'flare-v2'
+                                });
+                            }
+                        });
+                    }
+                } else if (flareV2Result) {
+                    // Confirmed genuine human
+                    findings.push({
+                        indicator: 'human',
+                        severity: 'low',
+                        message: 'Verified Genuine Human',
+                        detail: `Flare V2 confirmed this text as genuinely human-written (${(flareV2Result.humanProbability * 100).toFixed(0)}% confidence)`
+                    });
+                }
+            } catch (e) {
+                console.warn('Flare V2 analysis failed:', e);
+            }
+        }
+
         const endTime = performance.now();
 
         // Return SUPERNOVA-specific result format
         return {
             // Overall results
-            aiProbability,
-            humanProbability,
+            aiProbability: flareV2Result?.isHumanized ? 0.85 : aiProbability,
+            humanProbability: flareV2Result?.isHumanized ? 0.15 : humanProbability,
             mixedProbability: 0,
             confidence,
             verdict,
@@ -824,6 +874,10 @@ const AnalyzerEngine = {
             supernovaResult,
             confidenceLevel,
             heuristicFeatures: supernovaResult.heuristicFeatures,
+            
+            // Flare V2 humanization data
+            flareV2Result,
+            isHumanized: flareV2Result?.isHumanized || false,
             
             // Standard data
             categoryResults,
@@ -842,7 +896,12 @@ const AnalyzerEngine = {
                 name: 'SUPERNOVA',
                 specialty: 'Production AI Detection',
                 accuracy: '97.28%',
-                description: 'Production ML model trained on 240k+ samples using XGBoost + neural embeddings. 97.28% accuracy on high-confidence samples (94.4% coverage).'
+                description: 'Production ML model trained on 240k+ samples using XGBoost + neural embeddings. 97.28% accuracy on high-confidence samples (94.4% coverage).',
+                flareV2: flareV2Result ? {
+                    name: 'Flare V2',
+                    accuracy: '98.00%',
+                    description: 'Secondary layer for humanization detection. Detects AI text that has been paraphrased to evade detection.'
+                } : null
             }
         };
     },
