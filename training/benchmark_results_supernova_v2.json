@@ -1,0 +1,7 @@
+{
+  "model": "SUPERNOVA v2",
+  "accuracy": 0.92695,
+  "high_conf_accuracy": 0.9800465732158349,
+  "auc": 0.9837616277777779,
+  "test_samples": 60000
+}
