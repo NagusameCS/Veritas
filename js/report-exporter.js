@@ -1382,6 +1382,8 @@ const ReportExporter = {
             categoryAnalyses: this.generateCategoryAnalyses(result),
             keyFindings: this.generateKeyFindings(result),
             detailedBreakdown: this.generateDetailedBreakdown(result),
+            extendedHeuristics: this.generateExtendedHeuristicsSection(result, originalText),
+            modelBenchmarks: this.generateModelBenchmarksSection(result),
             methodology: this.generateMethodologySection(),
             disclaimer: this.generateDisclaimer(),
             analyzedText: originalText
@@ -2219,6 +2221,63 @@ ${escaped}
         md += `\`\`\`\n${originalText}\n\`\`\`\n`;
 
         return md;
+    },
+
+    /**
+     * Generate extended heuristics section for human reviewers
+     * These are additional metrics beyond the ML model for manual inspection
+     */
+    generateExtendedHeuristicsSection(result, originalText) {
+        // If ExtendedHeuristicsAnalyzer is available, use it
+        if (typeof ExtendedHeuristicsAnalyzer !== 'undefined') {
+            try {
+                return ExtendedHeuristicsAnalyzer.analyze(originalText);
+            } catch (e) {
+                console.warn('Extended heuristics analysis failed:', e);
+            }
+        }
+        
+        // Return placeholder if analyzer not available
+        return {
+            available: false,
+            message: 'Extended heuristics module not loaded. Include extended-heuristics.js for additional metrics.',
+            categories: [
+                'Linguistic Micro-Features',
+                'Stylometric Signatures',
+                'Cognitive Load Indicators',
+                'Emotional/Affective Signals',
+                'Structural Patterns',
+                'Error & Imperfection Analysis',
+                'Domain-Specific Markers',
+                'Temporal & Cultural Signals',
+                'Discourse & Pragmatic Features',
+                'Statistical Distributions'
+            ]
+        };
+    },
+
+    /**
+     * Generate model benchmarks section with public AI model data
+     */
+    generateModelBenchmarksSection(result) {
+        // If AIModelBenchmarks is available, use it
+        if (typeof AIModelBenchmarks !== 'undefined') {
+            const allModels = AIModelBenchmarks.getAllModels ? AIModelBenchmarks.getAllModels() : [];
+            return {
+                available: true,
+                version: AIModelBenchmarks.version,
+                lastUpdated: AIModelBenchmarks.lastUpdated,
+                totalModels: allModels.length,
+                detectionGuide: AIModelBenchmarks.detectionGuide,
+                benchmarkInfo: AIModelBenchmarks.benchmarkInfo,
+                providers: ['OpenAI', 'Anthropic', 'Google', 'Meta', 'Mistral', 'Cohere', 'DeepSeek', 'Alibaba', 'xAI']
+            };
+        }
+        
+        return {
+            available: false,
+            message: 'AI Model Benchmarks not loaded. Include model-benchmarks.js for comparative data.'
+        };
     }
 };
 

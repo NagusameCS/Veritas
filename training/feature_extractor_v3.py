@@ -48,18 +48,38 @@ class FeatureExtractorV3:
             r'\bthe\s+(my|your|his|her)\b',  # "the my friend"
         ]
         
-        # Student/academic writing markers
+        # Student/academic writing markers (Model UN, debate, presentations)
         self.student_markers = [
-            r'\bdear\s+(delegates?|chair|committee)\b',
-            r'\bI\s+will\s+be\s+(discussing|representing|presenting)\b',
-            r'\bIn\s+conclusion\b',
-            r'\bto\s+summarize\b',
-            r'\bthank\s+you\s+for\s+(your\s+)?(time|attention|listening)\b',
-            r'\bmy\s+(country|delegation|position)\b',
-            r'\bthe\s+delegation\s+of\b',
+            # Greetings and salutations
+            r'\b(dear|distinguished|honorable|hello)\s+(delegates?|chair|committee|members?)\b',
             r'\bhonor(able|ed)\s+(delegates?|chair)\b',
+            # Self-introduction
+            r'\bmy\s+name\s+is\b',
+            r'\bI\s+am\s+representing\b',
+            r'\btoday\s+I\s+will\s+(be\s+)?(discussing|presenting|addressing)\b',
+            r'\bI\s+will\s+be\s+(discussing|representing|presenting|addressing)\b',
+            # Delegation/country references
+            r'\bmy\s+(country|delegation|position|nation)\b',
+            r'\bthe\s+delegation\s+of\b',
+            r'\bour\s+(country|delegation|nation|position)\s+(believes?|proposes?|supports?)\b',
+            # Structural markers
+            r'\bIn\s+conclusion\b',
+            r'\bto\s+(summarize|conclude|sum\s+up)\b',
+            r'\bthank\s+you\s+for\s+(your\s+)?(time|attention|listening)\b',
             r'\bmodel\s+un\b',
-            r'\bbelieve\s+that\b',  # Strong opinion statement
+            # Proposal language
+            r'\bproposes?\s+(several|the\s+following|that)\b',
+            r'\bwe\s+(firmly\s+)?believe\b',
+            r'\bcommittee\s+sessions?\b',
+            r'\bFirst[,.].*Second[,.].*Third\b',
+            # Opinion markers
+            r'\bI\s+believe\s+that\b',
+            r'\bbelieve\s+that\b',
+            # MUN-specific
+            r'\bposition\s+paper\b',
+            r'\bresolution\s+draft\b',
+            r'\bworking\s+paper\b',
+            r'\burges?\s+(all\s+)?(member\s+)?states?\b',
         ]
         
         # Authentic human uncertainty markers
@@ -228,6 +248,10 @@ class FeatureExtractorV3:
             'citation_count',
             'url_count',
             'date_mention_count',
+            
+            # === STRONG HUMAN INDICATORS ===
+            'formal_speech_strength',  # Strong indicator for MUN/debate
+            'human_authenticity_score',  # Combined authenticity signal
             
             # === EMBEDDING-INDEPENDENT SIGNALS ===
             'typo_density',
@@ -539,6 +563,12 @@ class FeatureExtractorV3:
             'url_count': len(re.findall(r'https?://\S+', text)),
             'date_mention_count': len(re.findall(r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}|\d{1,2}/\d{1,2}/\d{2,4}|\b\d{4}\b', text)),
             
+            # Strong human indicators
+            'formal_speech_strength': self._formal_speech_strength(text, student_count),
+            'human_authenticity_score': self._human_authenticity_score(
+                student_count, uncertainty_count, esl_count, run_on_count, casual_count
+            ),
+            
             # Typos and errors
             'typo_density': self.detect_typos(words),
             'spelling_inconsistency': self._spelling_inconsistency(text),
@@ -727,6 +757,68 @@ class FeatureExtractorV3:
         
         sentences = self.split_sentences(text)
         return errors / max(len(sentences), 1)
+    
+    def _formal_speech_strength(self, text: str, student_count: int) -> float:
+        """
+        Calculate formal speech strength indicator.
+        High values strongly indicate human-written formal speeches (MUN, debate, etc.)
+        """
+        text_lower = text.lower()
+        strength = 0.0
+        
+        # Direct student markers - each one adds to strength
+        strength += student_count * 0.15  # 10 markers = 1.5 base
+        
+        # Specific MUN/formal speech patterns (weighted heavily)
+        mun_patterns = [
+            (r'\b(united\s+nations?|un|unhcr)\b', 0.3),
+            (r'\b(delegates?|committee|council)\b', 0.2),
+            (r'\b(representing|delegation\s+of)\b', 0.25),
+            (r'\bhello\s+delegates\b', 0.4),
+            (r'\bdistinguished\s+delegates\b', 0.4),
+            (r'\bmy\s+name\s+is\b', 0.3),
+            (r'\btoday\s+I\s+will\b', 0.3),
+            (r'\bour\s+(country|nation)\b', 0.2),
+            (r'\bfirst[,.].*second[,.].*third\b', 0.3),  # Structured proposals
+            (r'\bproposes?\s+(several|the\s+following)\b', 0.25),
+        ]
+        
+        for pattern, weight in mun_patterns:
+            if re.search(pattern, text, re.I):
+                strength += weight
+        
+        # Cap at 3.0 (very strong indicator)
+        return min(strength, 3.0)
+    
+    def _human_authenticity_score(self, student_count: int, uncertainty_count: int, 
+                                   esl_count: int, run_on_count: int, casual_count: int) -> float:
+        """
+        Calculate overall human authenticity score.
+        Combines multiple signals that indicate human writing.
+        """
+        score = 0.0
+        
+        # Student markers are strong indicators
+        if student_count >= 5:
+            score += 1.0
+        elif student_count >= 2:
+            score += 0.5
+        elif student_count >= 1:
+            score += 0.25
+        
+        # Uncertainty markers
+        score += uncertainty_count * 0.1
+        
+        # ESL patterns
+        score += esl_count * 0.15
+        
+        # Run-on sentences (human error)
+        score += run_on_count * 0.1
+        
+        # Casual markers
+        score += casual_count * 0.1
+        
+        return min(score, 2.0)  # Cap at 2.0
     
     def extract_feature_vector(self, text: str) -> np.ndarray:
         """Extract features as numpy array."""
